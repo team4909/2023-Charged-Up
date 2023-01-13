@@ -50,6 +50,11 @@ public class SwerveModuleFactory<DriveConfiguration, SteerConfiguration> {
         public double getDriveVelocity() {
             return driveController.getStateVelocity();
         }
+        
+        @Override
+        public double getDriveDistance() {
+            return driveController.getStateDistance();
+        }
 
         @Override
         public double getSteerAngle() {
