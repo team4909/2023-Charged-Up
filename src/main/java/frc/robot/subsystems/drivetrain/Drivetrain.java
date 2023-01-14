@@ -161,7 +161,7 @@ public class Drivetrain extends SubsystemBase {
                     currentDrivetrainCommand = joystickDrive(1.0);
                     break;
                 case PRECISE:
-                    currentDrivetrainCommand = joystickDrive(0.2);
+                    currentDrivetrainCommand = joystickDrive(PRECISE_SPEED_SCALE);
                     break;
                 case LOCKED:
                     break;
