@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -39,6 +40,7 @@ public class Drivetrain extends SubsystemBase {
     private SwerveModuleState[] m_states = new SwerveModuleState[4];
     private SwerveDriveOdometry m_odometry;
     private Pose2d m_pose;
+    private Field2d m_field;
 
     private final Pigeon2 m_pigeon = new Pigeon2(PIGEON_ID, "Drivetrain-CANivore");
     private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
@@ -74,6 +76,7 @@ public class Drivetrain extends SubsystemBase {
         m_chassisSpeeds = new ChassisSpeeds(0, 0, 0);
         m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroYaw(), generateSwerveModulePositions());
         m_states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
+        m_field = new Field2d();
     }
 
     public void periodic() {
@@ -83,8 +86,8 @@ public class Drivetrain extends SubsystemBase {
         m_frontRightModule.set(m_states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, m_states[1].angle.getRadians());
         m_backLeftModule.set(m_states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, m_states[2].angle.getRadians());
         m_backRightModule.set(m_states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, m_states[3].angle.getRadians());
+        m_field.setRobotPose(m_pose);
         m_pose = m_odometry.update(getGyroYaw(), generateSwerveModulePositions());
-
     }
 
     private void initializeMotors() {
@@ -180,7 +183,7 @@ public class Drivetrain extends SubsystemBase {
                             m_joystickTranslationX.getAsDouble() * speedMultiplier,
                             m_joystickTranslationY.getAsDouble() * speedMultiplier,
                             m_joystickRotationOmega.getAsDouble(),
-                            getGyroYaw())); // @TODO add gyroscope getter
+                            getGyroYaw()));
                 },
                 this).andThen(stop());
     }
