@@ -1,10 +1,10 @@
 package frc.robot;
 
-import edu.wpi.first.math.util.Units;
-import frc.lib.swervedrivespecialties.swervelib.ModuleConfiguration;
-import frc.lib.swervedrivespecialties.swervelib.SdsModuleConfigurations;
-import frc.lib.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper.GearRatio;
-
 public final class Constants {
+    public static final class VisionConstants {
 
+        public static final double CAMERA_PITCH_DEGREES = 1;
+        public static final double CAMERA_HEIGHT_METERS = 1;
+
+    }
 }
