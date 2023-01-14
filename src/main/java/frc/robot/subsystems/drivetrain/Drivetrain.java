@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.drivetrain;
 
 import static frc.robot.Constants.DrivetrainConstants.*;
 
@@ -19,9 +19,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.swervedrivespecialties.swervelib.Mk4ModuleConfiguration;
-import frc.lib.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
-import frc.lib.swervedrivespecialties.swervelib.SwerveModule;
+import frc.lib.swervelib.Mk4ModuleConfiguration;
+import frc.lib.swervelib.Mk4iSwerveModuleHelper;
+import frc.lib.swervelib.SwerveModule;
 
 public class Drivetrain extends SubsystemBase {
 

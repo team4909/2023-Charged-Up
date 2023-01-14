@@ -1,4 +1,4 @@
-package frc.lib.swervedrivespecialties.swervelib.ctre;
+package frc.lib.swervelib.ctre;
 
 import com.ctre.phoenix.ErrorCode;
 import edu.wpi.first.wpilibj.DriverStation;

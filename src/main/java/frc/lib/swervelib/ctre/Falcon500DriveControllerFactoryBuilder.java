@@ -1,4 +1,4 @@
-package frc.lib.swervedrivespecialties.swervelib.ctre;
+package frc.lib.swervelib.ctre;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
@@ -6,9 +6,10 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-import frc.lib.swervedrivespecialties.swervelib.DriveController;
-import frc.lib.swervedrivespecialties.swervelib.DriveControllerFactory;
-import frc.lib.swervedrivespecialties.swervelib.ModuleConfiguration;
+
+import frc.lib.swervelib.DriveController;
+import frc.lib.swervelib.DriveControllerFactory;
+import frc.lib.swervelib.ModuleConfiguration;
 
 public final class Falcon500DriveControllerFactoryBuilder {
     private static final double TICKS_PER_ROTATION = 2048.0;

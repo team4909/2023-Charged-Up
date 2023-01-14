@@ -1,4 +1,4 @@
-package frc.lib.swervedrivespecialties.swervelib.ctre;
+package frc.lib.swervelib.ctre;
 
 import java.util.Objects;
 

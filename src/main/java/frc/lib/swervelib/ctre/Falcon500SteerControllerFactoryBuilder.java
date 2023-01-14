@@ -1,11 +1,13 @@
-package frc.lib.swervedrivespecialties.swervelib.ctre;
+package frc.lib.swervelib.ctre;
+
+import static frc.lib.swervelib.ctre.CtreUtils.checkCtreError;
 
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-import frc.lib.swervedrivespecialties.swervelib.*;
+
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
-import static frc.lib.swervedrivespecialties.swervelib.ctre.CtreUtils.checkCtreError;
+import frc.lib.swervelib.*;
 
 public final class Falcon500SteerControllerFactoryBuilder {
     private static final int CAN_TIMEOUT_MS = 250;

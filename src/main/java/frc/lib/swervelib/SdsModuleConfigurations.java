@@ -1,4 +1,4 @@
-package frc.lib.swervedrivespecialties.swervelib;
+package frc.lib.swervelib;
 
 public final class SdsModuleConfigurations {
     public static final ModuleConfiguration MK3_STANDARD = new ModuleConfiguration(
