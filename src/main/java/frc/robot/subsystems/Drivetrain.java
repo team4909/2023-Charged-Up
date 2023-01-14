@@ -1,18 +1,26 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.DrivetrainConstants.*;
+
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.swervedrivespecialties.swervelib.Mk4ModuleConfiguration;
+import frc.lib.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
+import frc.lib.swervedrivespecialties.swervelib.SwerveModule;
 
 public class Drivetrain extends SubsystemBase {
 
@@ -20,12 +28,30 @@ public class Drivetrain extends SubsystemBase {
     private DrivetrainStates m_state;
     private DrivetrainStates m_lastState;
 
-    private Pigeon2 m_pigeon;
-
     private ChassisSpeeds m_chassisSpeeds;
     private DoubleSupplier m_joystickTranslationX;
     private DoubleSupplier m_joystickTranslationY;
     private DoubleSupplier m_joystickRotationOmega;
+    private SwerveModule m_frontLeftModule;
+    private SwerveModule m_frontRightModule;
+    private SwerveModule m_backLeftModule;
+    private SwerveModule m_backRightModule;
+    private SwerveModuleState[] m_states = new SwerveModuleState[4];
+    private SwerveDriveOdometry m_odometry;
+    private Pose2d m_pose;
+
+    private final Pigeon2 m_pigeon = new Pigeon2(PIGEON_ID, "Drivetrain-CANivore");
+    private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
+            new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0), // FL
+            new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0), // FR
+            new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0), // BL
+            new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0) // BR
+    );
+
+    private final double MAX_VOLTAGE = 12d; 
+    private final double MAX_VELOCITY_METERS_PER_SECOND = FALCON_500_FREE_SPEED / 60.0 *
+            MODULE_CONFIGURATION.getDriveReduction() *
+            MODULE_CONFIGURATION.getWheelDiameter() * Math.PI;
 
     private enum DrivetrainStates {
         JOYSTICK_DRIVE("Joystick Drive"),
@@ -44,17 +70,75 @@ public class Drivetrain extends SubsystemBase {
     }
 
     private Drivetrain() {
-
+        initializeMotors();
+        m_chassisSpeeds = new ChassisSpeeds(0, 0, 0);
+        m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroYaw(), generateSwerveModulePositions());
+        m_states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
     }
 
     public void periodic() {
         stateMachine();
+        updateSwerveModuleStates();
+        m_frontLeftModule.set(m_states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, m_states[0].angle.getRadians());
+        m_frontRightModule.set(m_states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, m_states[1].angle.getRadians());
+        m_backLeftModule.set(m_states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, m_states[2].angle.getRadians());
+        m_backRightModule.set(m_states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, m_states[3].angle.getRadians());
+        m_pose = m_odometry.update(getGyroYaw(), generateSwerveModulePositions());
+
+    }
+
+    private void initializeMotors() {
+        Mk4ModuleConfiguration config = new Mk4ModuleConfiguration();
+        config.setCanivoreName("Drivetrain-CANivore");
+        m_frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
+                config,
+                GEAR_RATIO,
+                FRONT_LEFT_DRIVE_MOTOR,
+                FRONT_LEFT_STEER_MOTOR,
+                FRONT_LEFT_STEER_ENCODER,
+                FRONT_LEFT_MODULE_STEER_OFFSET);
+        m_frontRightModule = Mk4iSwerveModuleHelper.createFalcon500(
+                config,
+                GEAR_RATIO,
+                FRONT_RIGHT_DRIVE_MOTOR,
+                FRONT_RIGHT_STEER_MOTOR,
+                FRONT_RIGHT_STEER_ENCODER,
+                FRONT_RIGHT_MODULE_STEER_OFFSET);
+        m_backLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
+                config,
+                GEAR_RATIO,
+                BACK_LEFT_DRIVE_MOTOR,
+                BACK_LEFT_STEER_MOTOR,
+                BACK_LEFT_STEER_ENCODER,
+                BACK_LEFT_MODULE_STEER_OFFSET);
+        m_backRightModule = Mk4iSwerveModuleHelper.createFalcon500(
+                config,
+                GEAR_RATIO,
+                BACK_RIGHT_DRIVE_MOTOR,
+                BACK_RIGHT_STEER_MOTOR,
+                BACK_RIGHT_STEER_ENCODER,
+                BACK_RIGHT_MODULE_STEER_OFFSET);
+        m_pigeon.clearStickyFaults();
     }
 
     private Rotation2d getGyroYaw() {
         return Rotation2d.fromDegrees(m_pigeon.getYaw());
     }
 
+    private SwerveModulePosition[] generateSwerveModulePositions() {
+        return new SwerveModulePosition[] {
+            m_frontLeftModule.getPosition(), m_frontRightModule.getPosition(),
+            m_backLeftModule.getPosition(), m_backRightModule.getPosition()
+        };
+    }
+
+    private void updateSwerveModuleStates() {
+        m_states[0].speedMetersPerSecond = Math.abs(m_frontLeftModule.getDriveVelocity());
+        m_states[1].speedMetersPerSecond = Math.abs(m_frontRightModule.getDriveVelocity());
+        m_states[2].speedMetersPerSecond = Math.abs(m_backLeftModule.getDriveVelocity());
+        m_states[3].speedMetersPerSecond = Math.abs(m_backRightModule.getDriveVelocity());
+        SwerveDriveKinematics.desaturateWheelSpeeds(m_states, MAX_VELOCITY_METERS_PER_SECOND);
+    }
 
     public void setJoystickSuppliers(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega) {
         m_joystickTranslationX = x;
