@@ -1,4 +1,4 @@
-package frc.lib.swervedrivespecialties.swervelib;
+package frc.lib.swervelib;
 
 public interface SteerController {
     double getReferenceAngle();

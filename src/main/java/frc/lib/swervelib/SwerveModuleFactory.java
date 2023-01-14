@@ -1,4 +1,4 @@
-package frc.lib.swervedrivespecialties.swervelib;
+package frc.lib.swervelib;
 
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 
@@ -49,6 +49,11 @@ public class SwerveModuleFactory<DriveConfiguration, SteerConfiguration> {
         @Override
         public double getDriveVelocity() {
             return driveController.getStateVelocity();
+        }
+        
+        @Override
+        public double getDriveDistance() {
+            return driveController.getStateDistance();
         }
 
         @Override
