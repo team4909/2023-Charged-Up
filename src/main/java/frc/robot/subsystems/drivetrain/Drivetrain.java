@@ -14,6 +14,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -22,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.swervelib.Mk4ModuleConfiguration;
 import frc.lib.swervelib.Mk4iSwerveModuleHelper;
 import frc.lib.swervelib.SwerveModule;
+import frc.robot.Constants;
 
 public class Drivetrain extends SubsystemBase {
 
@@ -74,7 +77,7 @@ public class Drivetrain extends SubsystemBase {
     private Drivetrain() {
         initializeMotors();
         m_chassisSpeeds = new ChassisSpeeds(0, 0, 0);
-        m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroYaw(), generateSwerveModulePositions());
+        m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroYaw(), getSwerveModulePositions());
         m_states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
         m_field = new Field2d();
     }
@@ -87,8 +90,16 @@ public class Drivetrain extends SubsystemBase {
         m_backLeftModule.set(m_states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, m_states[2].angle.getRadians());
         m_backRightModule.set(m_states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, m_states[3].angle.getRadians());
         m_field.setRobotPose(m_pose);
-        m_pose = m_odometry.update(getGyroYaw(), generateSwerveModulePositions());
+        if (Constants.SIM)
+            m_pose = m_odometry.update(getGyroYaw(), getSwerveModulePositions());
+        else
+            m_pose = m_odometry.update(getGyroYaw(), getSwerveModulePositions());
     }
+
+    public void simulationPeriodic() {
+        
+    }
+
 
     private void initializeMotors() {
         Mk4ModuleConfiguration config = new Mk4ModuleConfiguration();
@@ -128,14 +139,17 @@ public class Drivetrain extends SubsystemBase {
         return Rotation2d.fromDegrees(m_pigeon.getYaw());
     }
 
-    private SwerveModulePosition[] generateSwerveModulePositions() {
+    // *Current* Positions
+    private SwerveModulePosition[] getSwerveModulePositions() {
         return new SwerveModulePosition[] {
             m_frontLeftModule.getPosition(), m_frontRightModule.getPosition(),
             m_backLeftModule.getPosition(), m_backRightModule.getPosition()
         };
     }
 
+    // *Desired* States
     private void updateSwerveModuleStates() {
+        m_states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
         m_states[0].speedMetersPerSecond = Math.abs(m_frontLeftModule.getDriveVelocity());
         m_states[1].speedMetersPerSecond = Math.abs(m_frontRightModule.getDriveVelocity());
         m_states[2].speedMetersPerSecond = Math.abs(m_backLeftModule.getDriveVelocity());
