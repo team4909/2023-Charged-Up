@@ -1,11 +1,15 @@
 package frc.robot;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 import frc.lib.swervelib.ModuleConfiguration;
 import frc.lib.swervelib.SdsModuleConfigurations;
 import frc.lib.swervelib.Mk4iSwerveModuleHelper.GearRatio;
 
 public final class Constants {
+
+    public static boolean SIM = RobotBase.isSimulation();
+
     public static final class DrivetrainConstants {
         // The left-to-right distance between the drivetrain wheels, should be measured from center to center.
         public static final double DRIVETRAIN_TRACKWIDTH_METERS = Units.inchesToMeters(20.768);
