@@ -9,9 +9,16 @@ public class ModuleSim {
     private FlywheelSim turnMotor;
 
     public ModuleSim() {
-        // Source for ratios: https://www.swervedrivespecialties.com/products/mk4i-swerve-module
-        driveMotor = new FlywheelSim(DCMotor.getFalcon500(1), 6.75, 0);
-        turnMotor = new FlywheelSim(DCMotor.getFalcon500(1), 150d / 7d, 0);
+        // Source for ratios: https://www.swervedrivespecialties.com/products/mk4i-swerve-module, using inertia values from 6328
+        driveMotor = new FlywheelSim(DCMotor.getFalcon500(1), 6.75, 0.025);
+        turnMotor = new FlywheelSim(DCMotor.getFalcon500(1), 150d / 7d, 0.004);
+    }
+
+    public void updateInputs(ModuleSimInputs inputs) {
+        driveMotor.update(0.02);
+        turnMotor.update(0.02);
+
+
     }
     
     public static class ModuleSimInputs {

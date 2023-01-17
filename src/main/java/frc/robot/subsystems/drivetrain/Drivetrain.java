@@ -9,13 +9,12 @@ import com.ctre.phoenix.sensors.Pigeon2;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.simulation.SimDeviceSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -80,12 +79,13 @@ public class Drivetrain extends SubsystemBase {
         initializeMotors();
         m_chassisSpeeds = new ChassisSpeeds(0, 0, 0);
         m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroYaw(), getSwerveModulePositions());
+        m_pose = m_odometry.getPoseMeters();
         m_states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
         m_field = new Field2d();
         m_lastState = null; //@TODO these should be the same and should be an IDLE state
         m_state = DrivetrainStates.JOYSTICK_DRIVE; //Initial State
     }
-
+    
     public void periodic() {
         stateMachine();
         updateSwerveModuleStates();
@@ -94,18 +94,27 @@ public class Drivetrain extends SubsystemBase {
         m_backLeftModule.set(m_states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, m_states[2].angle.getRadians());
         m_backRightModule.set(m_states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, m_states[3].angle.getRadians());
         m_field.setRobotPose(m_pose);
-        if (Constants.SIM)
-            m_pose = m_odometry.update(getGyroYaw(), getSwerveModulePositions());
+        if (Constants.SIM) {
+            ChassisSpeeds dChassisSpeeds = m_kinematics.toChassisSpeeds(m_states);
+            //In sim the encoders don't output a distance obviously, so we use delta chasisspeeds
+            m_pose = m_pose.exp(new Twist2d(
+                dChassisSpeeds.vxMetersPerSecond,
+                dChassisSpeeds.vyMetersPerSecond,
+                dChassisSpeeds.omegaRadiansPerSecond
+            ));
+        }
         else
             m_pose = m_odometry.update(getGyroYaw(), getSwerveModulePositions());
     }
 
     public void simulationPeriodic() {
         SmartDashboard.putData(CommandScheduler.getInstance());
-        SmartDashboard.putNumber("suppler x", m_joystickTranslationX.getAsDouble());
         SmartDashboard.putString("State", m_state.toString());
-        SmartDashboard.putString("module 1", m_states[0].toString());
         SmartDashboard.putString("chassis speeds", m_chassisSpeeds.toString());
+        SmartDashboard.putString("Odo", m_odometry.getPoseMeters().toString());
+        SmartDashboard.putString("pose", m_pose.toString());
+        SmartDashboard.putNumber("posex", m_pose.getX());
+        SmartDashboard.putString("pos 1", getSwerveModulePositions()[0].toString());
     }
 
 
@@ -188,17 +197,14 @@ public class Drivetrain extends SubsystemBase {
             }
         }
 
-
         m_lastState = m_state;
         
         if (currentDrivetrainCommand != null) {
             currentDrivetrainCommand.schedule();
         }
-            
-
     }
 
-    // State Commands
+    //#region State Commands
     private final Command JoystickDrive(double speedMultiplier) {
         return new RunCommand(
                 () -> {
@@ -211,12 +217,12 @@ public class Drivetrain extends SubsystemBase {
                 this).ignoringDisable(true);//.andThen(stop());
     }
 
-    // Helper Commands
     private final Command stop() {
         return new InstantCommand(
                 () -> drive(new ChassisSpeeds(0d, 0d, 0d)),
                 this);
     }
+    //#endregion
 
     public final static Drivetrain getInstance() {
         if (m_instance == null) {
