@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drivetrain.sim;
+package frc.robot.subsystems.drivetrain.module;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
@@ -17,7 +17,6 @@ public class ModuleSim {
     public void updateInputs(ModuleSimInputs inputs) {
         driveMotor.update(0.02);
         turnMotor.update(0.02);
-
 
     }
     

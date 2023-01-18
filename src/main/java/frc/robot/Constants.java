@@ -9,6 +9,7 @@ import frc.lib.swervelib.Mk4iSwerveModuleHelper.GearRatio;
 public final class Constants {
 
     public static final boolean SIM = RobotBase.isSimulation();
+    public static final double PERIODIC_LOOP_DURATION = 0.02;
 
     public static final class DrivetrainConstants {
         // The left-to-right distance between the drivetrain wheels, should be measured from center to center.
