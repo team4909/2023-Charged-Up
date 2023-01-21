@@ -1,5 +1,6 @@
 package frc.robot.subsystems.drivetrain.module;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
@@ -50,13 +51,13 @@ public class SimulatedModule extends ModuleBase {
 
     @Override
     void setDriveVolts(double volts) {
-        m_driveAppliedVolts = volts;
+        m_driveAppliedVolts = MathUtil.clamp(volts, -12d, 12d);
         driveMotor.setInputVoltage(m_driveAppliedVolts);
     }
 
     @Override
     void setTurnVolts(double volts) {
-        m_turnAppliedVolts = volts;
+        m_turnAppliedVolts = MathUtil.clamp(volts, -12d, 12d);
         turnMotor.setInputVoltage(m_turnAppliedVolts);
     }
 }
