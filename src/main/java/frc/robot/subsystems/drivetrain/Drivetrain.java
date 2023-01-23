@@ -22,29 +22,28 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.swervelib.Mk4ModuleConfiguration;
-import frc.lib.swervelib.Mk4iSwerveModuleHelper;
-import frc.lib.swervelib.SwerveModule;
 import frc.robot.Constants;
+import frc.robot.subsystems.drivetrain.module.Module;
 
 public class Drivetrain extends SubsystemBase {
 
+    // #region Fields
     private static Drivetrain m_instance = null;
-    private DrivetrainStates m_state;
-    private DrivetrainStates m_lastState;
 
-    private ChassisSpeeds m_chassisSpeeds;
+    private final Module[] m_modules = new Module[4]; // 0-FL 1-FR 2-BL 3-BR
+    private final Field2d m_field = new Field2d();
+
+    // @TODO these should be the same and should be an IDLE state
+    private DrivetrainStates m_state = DrivetrainStates.JOYSTICK_DRIVE;
+    private DrivetrainStates m_lastState = null;
+
+    private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
+    private Rotation2d m_simChassisAngle = new Rotation2d();
     private DoubleSupplier m_joystickTranslationX;
     private DoubleSupplier m_joystickTranslationY;
     private DoubleSupplier m_joystickRotationOmega;
-    private SwerveModule m_frontLeftModule;
-    private SwerveModule m_frontRightModule;
-    private SwerveModule m_backLeftModule;
-    private SwerveModule m_backRightModule;
-    private SwerveModuleState[] m_states = new SwerveModuleState[4];
     private SwerveDriveOdometry m_odometry;
     private Pose2d m_pose;
-    private Field2d m_field;
 
     private final Pigeon2 m_pigeon = new Pigeon2(PIGEON_ID, "Drivetrain-CANivore");
     private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
@@ -53,11 +52,7 @@ public class Drivetrain extends SubsystemBase {
             new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0), // BL
             new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0) // BR
     );
-
-    private final double MAX_VOLTAGE = 12d; 
-    private final double MAX_VELOCITY_METERS_PER_SECOND = FALCON_500_FREE_SPEED / 60.0 *
-            MODULE_CONFIGURATION.getDriveReduction() *
-            MODULE_CONFIGURATION.getWheelDiameter() * Math.PI;
+    // #endregion
 
     private enum DrivetrainStates {
         JOYSTICK_DRIVE("Joystick Drive"),
@@ -77,98 +72,64 @@ public class Drivetrain extends SubsystemBase {
 
     private Drivetrain() {
         initializeMotors();
-        m_chassisSpeeds = new ChassisSpeeds(0, 0, 0);
+        for (int i = 0; i < m_modules.length; i++)
+            m_modules[i] = new Module(i);
         m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroYaw(), getSwerveModulePositions());
         m_pose = m_odometry.getPoseMeters();
-        m_states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
-        m_field = new Field2d();
-        m_lastState = null; //@TODO these should be the same and should be an IDLE state
-        m_state = DrivetrainStates.JOYSTICK_DRIVE; //Initial State
     }
-    
+
     @Override
     public void periodic() {
         stateMachine();
-        updateSwerveModuleStates();
-        m_frontLeftModule.set(m_states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, m_states[0].angle.getRadians());
-        m_frontRightModule.set(m_states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, m_states[1].angle.getRadians());
-        m_backLeftModule.set(m_states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, m_states[2].angle.getRadians());
-        m_backRightModule.set(m_states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, m_states[3].angle.getRadians());
+        for (Module module : m_modules)
+            module.update();
         m_field.setRobotPose(m_pose);
-        if (Constants.SIM) {
-            ChassisSpeeds dChassisSpeeds = m_kinematics.toChassisSpeeds(m_states);
-            //In sim the encoders don't output a distance obviously, so we use delta chasisspeeds
-            m_pose = m_pose.exp(new Twist2d(
-                dChassisSpeeds.vxMetersPerSecond,
-                dChassisSpeeds.vyMetersPerSecond,
-                dChassisSpeeds.omegaRadiansPerSecond
-            ));
-        }
-        else
-            m_pose = m_odometry.update(getGyroYaw(), getSwerveModulePositions());
+
+        double dt = Constants.PERIODIC_LOOP_DURATION;
+        
+        Twist2d dModuleState = new Pose2d()
+                .log(new Pose2d(
+                        m_chassisSpeeds.vxMetersPerSecond * dt,
+                        m_chassisSpeeds.vyMetersPerSecond * dt,
+                        new Rotation2d(
+                                m_chassisSpeeds.omegaRadiansPerSecond * dt)));
+        m_simChassisAngle = m_simChassisAngle.plus(new Rotation2d(dModuleState.dtheta));
+        ChassisSpeeds adjustedSpeeds = new ChassisSpeeds(
+                dModuleState.dx / dt,
+                dModuleState.dy / dt,
+                dModuleState.dtheta / dt);
+        SwerveModuleState[] setpointModuleStates = m_kinematics.toSwerveModuleStates(adjustedSpeeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(setpointModuleStates, 5);
+
+        for (int i = 0; i < 4; i++)
+            m_modules[i].set(setpointModuleStates[i]);
+        
+        m_pose = m_odometry.update(getGyroYaw(), getSwerveModulePositions());
     }
 
     public void simulationPeriodic() {
         SmartDashboard.putData(CommandScheduler.getInstance());
-        SmartDashboard.putString("State", m_state.toString());
+        SmartDashboard.putString("DrivetrainState", m_state.toString());
         SmartDashboard.putString("chassis speeds", m_chassisSpeeds.toString());
         SmartDashboard.putString("Odo", m_odometry.getPoseMeters().toString());
-        SmartDashboard.putString("pose", m_pose.toString());
-        SmartDashboard.putNumber("posex", m_pose.getX());
-        SmartDashboard.putString("pos 1", getSwerveModulePositions()[0].toString());
+        SmartDashboard.putString("sim angle", m_simChassisAngle.toString());
+        SmartDashboard.putData(m_field);
     }
 
-
     private void initializeMotors() {
-        Mk4ModuleConfiguration config = new Mk4ModuleConfiguration();
-        config.setCanivoreName("Drivetrain-CANivore");
-        m_frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
-                config,
-                GEAR_RATIO,
-                FRONT_LEFT_DRIVE_MOTOR,
-                FRONT_LEFT_STEER_MOTOR,
-                FRONT_LEFT_STEER_ENCODER,
-                FRONT_LEFT_MODULE_STEER_OFFSET);
-        m_frontRightModule = Mk4iSwerveModuleHelper.createFalcon500(
-                config,
-                GEAR_RATIO,
-                FRONT_RIGHT_DRIVE_MOTOR,
-                FRONT_RIGHT_STEER_MOTOR,
-                FRONT_RIGHT_STEER_ENCODER,
-                FRONT_RIGHT_MODULE_STEER_OFFSET);
-        m_backLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
-                config,
-                GEAR_RATIO,
-                BACK_LEFT_DRIVE_MOTOR,
-                BACK_LEFT_STEER_MOTOR,
-                BACK_LEFT_STEER_ENCODER,
-                BACK_LEFT_MODULE_STEER_OFFSET);
-        m_backRightModule = Mk4iSwerveModuleHelper.createFalcon500(
-                config,
-                GEAR_RATIO,
-                BACK_RIGHT_DRIVE_MOTOR,
-                BACK_RIGHT_STEER_MOTOR,
-                BACK_RIGHT_STEER_ENCODER,
-                BACK_RIGHT_MODULE_STEER_OFFSET);
+
         m_pigeon.clearStickyFaults();
     }
 
     private Rotation2d getGyroYaw() {
-        return Rotation2d.fromDegrees(m_pigeon.getYaw());
+        return Constants.SIM ? m_simChassisAngle : Rotation2d.fromDegrees(m_pigeon.getYaw());
     }
 
-    // *Current* Positions
     private SwerveModulePosition[] getSwerveModulePositions() {
-        return new SwerveModulePosition[] {
-            m_frontLeftModule.getPosition(), m_frontRightModule.getPosition(),
-            m_backLeftModule.getPosition(), m_backRightModule.getPosition()
-        };
-    }
-
-    // *Desired* States
-    private void updateSwerveModuleStates() {
-        m_states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(m_states, MAX_VELOCITY_METERS_PER_SECOND);
+        SwerveModulePosition[] positions = new SwerveModulePosition[4];
+        for (int i = 0; i < m_modules.length; i++)
+            positions[i] = m_modules[i].getModulePosition();
+        return positions;
     }
 
     public void setJoystickSuppliers(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega) {
@@ -186,7 +147,7 @@ public class Drivetrain extends SubsystemBase {
         if (!m_state.equals(m_lastState)) {
             switch (m_state) {
                 case JOYSTICK_DRIVE:
-                    currentDrivetrainCommand = JoystickDrive(1.0);
+                    currentDrivetrainCommand = JoystickDrive(1d);
                     break;
                 case PRECISE:
                     currentDrivetrainCommand = JoystickDrive(PRECISE_SPEED_SCALE);
@@ -199,13 +160,13 @@ public class Drivetrain extends SubsystemBase {
         }
 
         m_lastState = m_state;
-        
+
         if (currentDrivetrainCommand != null) {
             currentDrivetrainCommand.schedule();
         }
     }
 
-    //#region State Commands
+    // #region State Commands
     private final Command JoystickDrive(double speedMultiplier) {
         return new RunCommand(
                 () -> {
@@ -215,7 +176,7 @@ public class Drivetrain extends SubsystemBase {
                             m_joystickRotationOmega.getAsDouble(),
                             getGyroYaw()));
                 },
-                this).ignoringDisable(true);//.andThen(stop());
+                this).ignoringDisable(true);// .andThen(stop());
     }
 
     private final Command stop() {
@@ -223,7 +184,7 @@ public class Drivetrain extends SubsystemBase {
                 () -> drive(new ChassisSpeeds(0d, 0d, 0d)),
                 this);
     }
-    //#endregion
+    // #endregion
 
     public final static Drivetrain getInstance() {
         if (m_instance == null) {
