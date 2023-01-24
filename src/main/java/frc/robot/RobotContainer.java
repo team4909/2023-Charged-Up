@@ -22,12 +22,30 @@ public class RobotContainer {
 
   private void configureBindings() {
     m_drivetrain.setJoystickSuppliers(
-        () -> m_driverController.getLeftY(),
-        () -> m_driverController.getLeftX(),
-        () -> m_driverController.getRightX());
+        () -> -modifyAxis(m_driverController.getLeftY()),
+        () -> -modifyAxis(m_driverController.getLeftX()),
+        () -> -modifyAxis(m_driverController.getRightX()));
   }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
+  }
+
+  private double deadband(double value, double deadband) {
+    if (Math.abs(value) > deadband) {
+      if (value > 0d)
+        return (value - deadband) / (1d - deadband);
+      else
+        return (value + deadband) / (1d - deadband);
+    } else {
+      return 0d;
+    }
+  }
+
+  private double modifyAxis(double value) {
+    value = deadband(value, 0.05);
+    // Square the axis
+    value = Math.copySign(value * value, value);
+    return value;
   }
 }
