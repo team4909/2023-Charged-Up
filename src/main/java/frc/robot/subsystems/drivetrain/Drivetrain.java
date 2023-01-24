@@ -1,13 +1,19 @@
 package frc.robot.subsystems.drivetrain;
 
-import static frc.robot.Constants.DrivetrainConstants.*;
+import static frc.robot.Constants.DrivetrainConstants.DRIVETRAIN_TRACKWIDTH_METERS;
+import static frc.robot.Constants.DrivetrainConstants.DRIVETRAIN_WHEELBASE_METERS;
+import static frc.robot.Constants.DrivetrainConstants.PIGEON_ID;
+import static frc.robot.Constants.DrivetrainConstants.PRECISE_SPEED_SCALE;
+import static frc.robot.Constants.DrivetrainConstants.MAX_DRIVETRAIN_SPEED;
 
+import java.util.Arrays;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -33,25 +39,27 @@ public class Drivetrain extends SubsystemBase {
     private final Module[] m_modules = new Module[4]; // 0-FL 1-FR 2-BL 3-BR
     private final Field2d m_field = new Field2d();
 
-    // @TODO these should be the same and should be an IDLE state
+    // TODO these should be the same and should be an IDLE state
     private DrivetrainStates m_state = DrivetrainStates.JOYSTICK_DRIVE;
     private DrivetrainStates m_lastState = null;
 
     private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
     private Rotation2d m_simChassisAngle = new Rotation2d();
-    private DoubleSupplier m_joystickTranslationX;
-    private DoubleSupplier m_joystickTranslationY;
-    private DoubleSupplier m_joystickRotationOmega;
+    private DoubleSupplier m_joystickTranslationX, m_joystickTranslationY, m_joystickRotationOmega;
     private SwerveDriveOdometry m_odometry;
     private Pose2d m_pose;
 
     private final Pigeon2 m_pigeon = new Pigeon2(PIGEON_ID, "Drivetrain-CANivore");
-    private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
+    private final Translation2d[] m_moduleTranslations = new Translation2d[] {
             new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0), // FL
             new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0), // FR
             new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0), // BL
             new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0) // BR
-    );
+    };
+    private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(m_moduleTranslations);
+    private final double MAX_ANGULAR_SPEED = MAX_DRIVETRAIN_SPEED / Arrays.stream(m_moduleTranslations)
+            .map(t -> t.getNorm())
+            .max(Double::compare).get();
     // #endregion
 
     private enum DrivetrainStates {
@@ -86,7 +94,7 @@ public class Drivetrain extends SubsystemBase {
         m_field.setRobotPose(m_pose);
 
         double dt = Constants.PERIODIC_LOOP_DURATION;
-        
+
         Twist2d dModuleState = new Pose2d()
                 .log(new Pose2d(
                         m_chassisSpeeds.vxMetersPerSecond * dt,
@@ -99,11 +107,11 @@ public class Drivetrain extends SubsystemBase {
                 dModuleState.dy / dt,
                 dModuleState.dtheta / dt);
         SwerveModuleState[] setpointModuleStates = m_kinematics.toSwerveModuleStates(adjustedSpeeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(setpointModuleStates, 5);
+        SwerveDriveKinematics.desaturateWheelSpeeds(setpointModuleStates, MAX_DRIVETRAIN_SPEED);
 
         for (int i = 0; i < 4; i++)
             m_modules[i].set(setpointModuleStates[i]);
-        
+
         m_pose = m_odometry.update(getGyroYaw(), getSwerveModulePositions());
     }
 
@@ -147,10 +155,10 @@ public class Drivetrain extends SubsystemBase {
         if (!m_state.equals(m_lastState)) {
             switch (m_state) {
                 case JOYSTICK_DRIVE:
-                    currentDrivetrainCommand = JoystickDrive(1d);
+                    currentDrivetrainCommand = JoystickDrive(1d, 1d);
                     break;
                 case PRECISE:
-                    currentDrivetrainCommand = JoystickDrive(PRECISE_SPEED_SCALE);
+                    currentDrivetrainCommand = JoystickDrive(PRECISE_SPEED_SCALE, PRECISE_SPEED_SCALE);
                     break;
                 case LOCKED:
                     break;
@@ -167,24 +175,57 @@ public class Drivetrain extends SubsystemBase {
     }
 
     // #region State Commands
-    private final Command JoystickDrive(double speedMultiplier) {
+    private final Command JoystickDrive(double linearSpeedScale, double angularSpeedScale) {
         return new RunCommand(
                 () -> {
+                    final double x = -m_joystickTranslationX.getAsDouble();
+                    final double y = -m_joystickTranslationY.getAsDouble();
+                    final Rotation2d theta = new Rotation2d(x, y);
+                    double magnitude = Math.hypot(x, y);
+                    double omega = -m_joystickRotationOmega.getAsDouble();
+
+                    magnitude = deadband(magnitude, 0.05);
+                    omega = deadband(omega, 0.05);
+                    magnitude = squareAxis(magnitude);
+                    omega = squareAxis(omega);
+
+                    magnitude *= linearSpeedScale;
+                    omega *= angularSpeedScale;
+
+                    Translation2d linearVelocity = new Pose2d(new Translation2d(), theta)
+                            .transformBy(new Transform2d(new Translation2d(magnitude, 0d), new Rotation2d()))
+                            .getTranslation();
+
                     drive(ChassisSpeeds.fromFieldRelativeSpeeds(
-                            m_joystickTranslationX.getAsDouble() * speedMultiplier,
-                            m_joystickTranslationY.getAsDouble() * speedMultiplier,
-                            m_joystickRotationOmega.getAsDouble(),
+                            linearVelocity.getX() * MAX_DRIVETRAIN_SPEED,
+                            linearVelocity.getY() * MAX_DRIVETRAIN_SPEED,
+                            omega * MAX_ANGULAR_SPEED,
                             getGyroYaw()));
                 },
-                this).ignoringDisable(true);// .andThen(stop());
+                this).andThen(stop()).ignoringDisable(true);
     }
 
     private final Command stop() {
         return new InstantCommand(
-                () -> drive(new ChassisSpeeds(0d, 0d, 0d)),
+                () -> drive(new ChassisSpeeds()),
                 this);
     }
     // #endregion
+
+    private double deadband(double value, double deadband) {
+        if (Math.abs(value) > deadband) {
+            if (value > 0d)
+                return (value - deadband) / (1d - deadband);
+            else
+                return (value + deadband) / (1d - deadband);
+        } else {
+            return 0d;
+        }
+    }
+
+    private double squareAxis(double value) {
+        return Math.copySign(value * value, value);
+    }
 
     public final static Drivetrain getInstance() {
         if (m_instance == null) {

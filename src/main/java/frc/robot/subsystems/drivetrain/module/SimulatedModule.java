@@ -15,10 +15,8 @@ public class SimulatedModule extends ModuleBase {
     private double m_turnAppliedVolts = 0d;
 
     public SimulatedModule() {
-        // Source for ratios:
-        // https://www.swervedrivespecialties.com/products/mk4i-swerve-module, using
-        // inertia values from 6328
-        driveMotor = new FlywheelSim(DCMotor.getFalcon500(1), 6.75, 0.025);
+        // Ratios: https://www.swervedrivespecialties.com/products/mk4i-swerve-module
+        driveMotor = new FlywheelSim(DCMotor.getFalcon500(1), 6.75, 0.08);
         turnMotor = new FlywheelSim(DCMotor.getFalcon500(1), 150d / 7d, 0.004);
     }
 
@@ -30,7 +28,7 @@ public class SimulatedModule extends ModuleBase {
         turnMotor.update(dt);
 
         m_turnAbsolutePositionRad += turnMotor.getAngularVelocityRadPerSec() * dt;
-        // Keep wheel in range (0, 2pi) //TODO should this be a while loop?
+        // Keep wheel in range (0, 2pi)
         if (m_turnAbsolutePositionRad < 0)
             m_turnAbsolutePositionRad += 2.0 * Math.PI;
         if (m_turnAbsolutePositionRad > 2.0 * Math.PI)
