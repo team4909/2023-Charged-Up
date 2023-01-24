@@ -1,62 +1,70 @@
 package frc.robot.subsystems.drivetrain.module;
 
+import static frc.robot.Constants.DrivetrainConstants.FALCON_500_FREE_SPEED;
+import static frc.robot.Constants.DrivetrainConstants.MODULE_CONFIGURATION;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 public class Module {
 
-    private ModuleBase m_module;
-    private double m_wheelRadius = Constants.DrivetrainConstants.MODULE_CONFIGURATION.getWheelDiameter() / 2d; 
-    private double m_driveReduction = Constants.DrivetrainConstants.MODULE_CONFIGURATION.getDriveReduction();
+    private final ModuleBase m_module;
+    private final int m_index;
+    private final double m_wheelRadius = MODULE_CONFIGURATION.getWheelDiameter() / 2d;
+    private final double MAX_VOLTAGE = 12d;
+    private final double MAX_VELOCITY_METERS_PER_SECOND = FALCON_500_FREE_SPEED / 60.0 *
+            MODULE_CONFIGURATION.getDriveReduction() *
+            MODULE_CONFIGURATION.getWheelDiameter() * Math.PI;
 
-    private final PIDController m_turnMotorPID = new PIDController(0.2, 0.0, 0.1); // This is just used as a container
+    private final PIDController m_turnMotorPID = new PIDController(23.0, 0.0, 0.1); // Tuned for SIM!
 
-    public Module() {
+    public Module(int index) {
         m_module = Constants.SIM ? new SimulatedModule() : new PhysicalModule();
+        m_index = index;
+
     }
 
-    void update() {
+    public void update() {
         m_module.updateModuleInputs();
+
+        SmartDashboard.putString("State " + m_index, getModuleState().toString());
+        SmartDashboard.putString("Pos " + m_index, getModulePosition().toString());
     }
 
-    void set(SwerveModuleState state) {
-        SwerveModuleState optimizedState = SwerveModuleState.optimize(state, getAngle());
+    public void set(SwerveModuleState state) {
+        SwerveModuleState desiredState = SwerveModuleState.optimize(state, getModuleAngle());
 
-        final double MAX_VOLTAGE = 12d; 
-        final double MAX_VELOCITY_METERS_PER_SECOND = Constants.DrivetrainConstants.FALCON_500_FREE_SPEED / 60.0 *
-                m_driveReduction *
-                m_wheelRadius * 2d * Math.PI;
+        m_module.setTurnVolts(m_turnMotorPID.calculate(getModuleAngle().getRadians(), desiredState.angle.getRadians()));
+        desiredState.speedMetersPerSecond *= Math.cos(m_turnMotorPID.getPositionError()); // using cosine error:
+                                                                                          // v_m = v_a * cos theta
 
-        var driveVolts = state.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE;
-        
-        
-        m_module.setDriveVolts(driveVolts);
-        m_module.setTurnVolts(0);
-        
+        m_module.setDriveVolts(desiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE);
+
     }
 
-    public Rotation2d getAngle() {
+    private Rotation2d getModuleAngle() {
         return new Rotation2d(MathUtil.angleModulus(m_module.turnAbsolutePositionRad));
     }
 
-    public double getPositionMeters() {
+    private double getPositionMeters() {
         return m_module.drivePositionRad * m_wheelRadius;
     }
 
-    public double getVelocityMetersPerSec() {
+    private double getVelocityMetersPerSec() {
         return m_module.driveVelocityRadPerSec * m_wheelRadius;
     }
 
     public SwerveModulePosition getModulePosition() {
-        return new SwerveModulePosition(getPositionMeters(), getAngle());
+        return new SwerveModulePosition(getPositionMeters(), getModuleAngle());
     }
 
     public SwerveModuleState getModuleState() {
-        return new SwerveModuleState(getVelocityMetersPerSec(), getAngle());
+        return new SwerveModuleState(getVelocityMetersPerSec(), getModuleAngle());
     }
 
     public void stop() {

@@ -18,6 +18,7 @@ public final class Constants {
         public static final double DRIVETRAIN_WHEELBASE_METERS = Units.inchesToMeters(32);
 
         public static final double FALCON_500_FREE_SPEED = 6380d;
+        public static final double MAX_DRIVETRAIN_SPEED = Units.feetToMeters(16.3); //From SDS
         public static final GearRatio GEAR_RATIO = GearRatio.L2;
         public static final ModuleConfiguration MODULE_CONFIGURATION = SdsModuleConfigurations.MK4I_L2;
         public static final double PRECISE_SPEED_SCALE = 0.2;
