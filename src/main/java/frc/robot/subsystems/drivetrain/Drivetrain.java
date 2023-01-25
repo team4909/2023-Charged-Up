@@ -174,6 +174,10 @@ public class Drivetrain extends SubsystemBase {
         }
     }
 
+    public void setState(DrivetrainStates state) {
+        m_state = state;
+    }
+
     // #region State Commands
     private final Command JoystickDrive(double linearSpeedScale, double angularSpeedScale) {
         return new RunCommand(
