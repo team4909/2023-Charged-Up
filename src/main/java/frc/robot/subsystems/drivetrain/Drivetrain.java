@@ -7,7 +7,9 @@ import static frc.robot.Constants.DrivetrainConstants.PRECISE_SPEED_SCALE;
 import static frc.robot.Constants.DrivetrainConstants.MAX_DRIVETRAIN_SPEED;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 
@@ -21,6 +23,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -62,7 +65,10 @@ public class Drivetrain extends SubsystemBase {
             .max(Double::compare).get();
     // #endregion
 
-    private enum DrivetrainStates {
+    public Consumer<SwerveModuleState[]> m_swerveModuleConsumer = (states) -> drive(m_kinematics.toChassisSpeeds(states));
+    public Supplier<Pose2d> m_poseSupplier = () -> m_pose;
+
+    public enum DrivetrainStates {
         JOYSTICK_DRIVE("Joystick Drive"),
         PRECISE("Precise"),
         LOCKED("Locked");
@@ -79,7 +85,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     private Drivetrain() {
-        initializeMotors();
+        m_pigeon.clearStickyFaults();
         for (int i = 0; i < m_modules.length; i++)
             m_modules[i] = new Module(i);
         m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroYaw(), getSwerveModulePositions());
@@ -123,10 +129,13 @@ public class Drivetrain extends SubsystemBase {
         SmartDashboard.putString("sim angle", m_simChassisAngle.toString());
         SmartDashboard.putData(m_field);
     }
+    
+    public void setFieldTrajectory(Trajectory t) {
+        m_field.getObject("traj").setTrajectory(t);
+    }
 
-    private void initializeMotors() {
-
-        m_pigeon.clearStickyFaults();
+    public SwerveDriveKinematics getKinematics() {
+        return m_kinematics;
     }
 
     private Rotation2d getGyroYaw() {

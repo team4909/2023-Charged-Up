@@ -22,6 +22,7 @@ public final class Constants {
         public static final GearRatio GEAR_RATIO = GearRatio.L2;
         public static final ModuleConfiguration MODULE_CONFIGURATION = SdsModuleConfigurations.MK4I_L2;
         public static final double PRECISE_SPEED_SCALE = 0.2;
+        public static final double DEFAULT_TIMEOUT = 15d; // For auto trajectories
 
         public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(307d);
         public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(242.5d);
