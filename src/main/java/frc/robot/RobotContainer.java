@@ -4,20 +4,25 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.auto.AutoRoutines;
 
 public class RobotContainer {
 
   private final CommandXboxController m_driverController = new CommandXboxController(0);
   private final CommandXboxController m_operatorController = new CommandXboxController(1);
+  private final SendableChooser<Command> m_chooser = new SendableChooser<>();
+  private final AutoRoutines m_routines = new AutoRoutines();
 
-  Drivetrain m_drivetrain = Drivetrain.getInstance();
+  private final Drivetrain m_drivetrain = Drivetrain.getInstance();
 
   public RobotContainer() {
     configureBindings();
+    configureSendableChooser();
   }
 
   private void configureBindings() {
@@ -28,6 +33,11 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return m_chooser.getSelected();
+  }
+
+  private void configureSendableChooser() {
+    m_chooser.setDefaultOption("Test Auto", m_routines.testCommand());
+    SmartDashboard.putData(m_chooser);
   }
 }

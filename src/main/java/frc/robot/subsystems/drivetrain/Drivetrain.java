@@ -70,6 +70,7 @@ public class Drivetrain extends SubsystemBase {
 
     public enum DrivetrainStates {
         JOYSTICK_DRIVE("Joystick Drive"),
+        AUTONOMOUS("Autonomous"),
         PRECISE("Precise"),
         LOCKED("Locked");
 
@@ -165,6 +166,8 @@ public class Drivetrain extends SubsystemBase {
             switch (m_state) {
                 case JOYSTICK_DRIVE:
                     currentDrivetrainCommand = JoystickDrive(1d, 1d);
+                    break;
+                case AUTONOMOUS:
                     break;
                 case PRECISE:
                     currentDrivetrainCommand = JoystickDrive(PRECISE_SPEED_SCALE, PRECISE_SPEED_SCALE);

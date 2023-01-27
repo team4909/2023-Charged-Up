@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drivetrain;
+package frc.robot.subsystems.drivetrain.auto;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -6,17 +6,19 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Drivetrain.DrivetrainStates;
 
 public class TrajectoryFollow extends CommandBase {
 
     private String m_pathName;
-    private PathPlannerTrajectory m_trajectory = null;
+    private PathPlannerTrajectory m_trajectory;
     private double m_timeout = DrivetrainConstants.DEFAULT_TIMEOUT;
-    private Timer timer = new Timer();
+    private final Timer timer = new Timer();
     private final Drivetrain m_drivetrain = Drivetrain.getInstance();
 
     public TrajectoryFollow() {
@@ -35,10 +37,11 @@ public class TrajectoryFollow extends CommandBase {
     @Override
     public void initialize() {
         timer.start();
-        try {
-            m_trajectory = PathPlanner.loadPath(m_pathName, DrivetrainConstants.MAX_DRIVETRAIN_SPEED, 3);
-        } catch (Exception e) {
-            e.printStackTrace();
+        m_drivetrain.setState(DrivetrainStates.AUTONOMOUS);
+        m_trajectory = PathPlanner.loadPath(m_pathName, DrivetrainConstants.MAX_DRIVETRAIN_SPEED, 3);
+        if (m_trajectory == null) {
+            DriverStation.reportError("Path not loaded correctly!", Thread.currentThread().getStackTrace());
+            return;
         }
 
         m_drivetrain.setFieldTrajectory(m_trajectory);
@@ -53,7 +56,11 @@ public class TrajectoryFollow extends CommandBase {
                 m_drivetrain.m_swerveModuleConsumer,
                 true,
                 m_drivetrain)
-                .andThen(() -> m_drivetrain.setState(DrivetrainStates.JOYSTICK_DRIVE))
-                .withTimeout(m_timeout); // TODO change this to idle
+                .withTimeout(m_timeout).schedule(); 
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        m_drivetrain.setState(DrivetrainStates.JOYSTICK_DRIVE); // TODO change this to idle
     }
 }
