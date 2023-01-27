@@ -32,16 +32,16 @@ public final class Constants {
         //CAN IDS
         public static final int PIGEON_ID = 20;
         public static final int FRONT_LEFT_DRIVE_MOTOR = 7;
-        public static final int FRONT_LEFT_STEER_MOTOR = 8;
+        public static final int FRONT_LEFT_TURN_MOTOR = 8;
         public static final int FRONT_LEFT_STEER_ENCODER = 14;
         public static final int FRONT_RIGHT_DRIVE_MOTOR = 2;
-        public static final int FRONT_RIGHT_STEER_MOTOR = 1;
+        public static final int FRONT_RIGHT_TURN_MOTOR = 1;
         public static final int FRONT_RIGHT_STEER_ENCODER = 11;
         public static final int BACK_LEFT_DRIVE_MOTOR = 6;
-        public static final int BACK_LEFT_STEER_MOTOR = 5;
+        public static final int BACK_LEFT_TURN_MOTOR = 5;
         public static final int BACK_LEFT_STEER_ENCODER = 13;
         public static final int BACK_RIGHT_DRIVE_MOTOR = 4;
-        public static final int BACK_RIGHT_STEER_MOTOR = 3;
+        public static final int BACK_RIGHT_TURN_MOTOR = 3;
         public static final int BACK_RIGHT_STEER_ENCODER = 12;
         
     }

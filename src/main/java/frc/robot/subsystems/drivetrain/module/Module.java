@@ -11,7 +11,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
-public class Module {
+public final class Module {
 
     private final ModuleBase m_module;
     private final int m_index;
@@ -24,7 +24,7 @@ public class Module {
     private final PIDController m_turnMotorPID = new PIDController(23.0, 0.0, 0.1); // Tuned for SIM!
 
     public Module(int index) {
-        m_module = Constants.SIM ? new SimulatedModule() : new PhysicalModule();
+        m_module = Constants.SIM ? new SimulatedModule() : new PhysicalModule(index);
         m_index = index;
 
     }

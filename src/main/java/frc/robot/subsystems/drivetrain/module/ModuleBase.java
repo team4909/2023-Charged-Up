@@ -2,16 +2,16 @@ package frc.robot.subsystems.drivetrain.module;
 
 public abstract class ModuleBase {
 
-    public double drivePositionRad = 0.0;
-    public double driveVelocityRadPerSec = 0.0;
-    public double driveAppliedVolts = 0.0;
-    public double[] driveCurrentAmps = new double[] {};
+    public double drivePositionRad = 0d;
+    public double driveVelocityRadPerSec = 0d;
+    public double driveAppliedVolts = 0d;
+    public double driveCurrentAmps = 0d;
 
-    public double turnAbsolutePositionRad = 0.0;
-    public double turnPositionRad = 0.0;
-    public double turnVelocityRadPerSec = 0.0;
-    public double turnAppliedVolts = 0.0;
-    public double[] turnCurrentAmps = new double[] {};
+    public double turnAbsolutePositionRad = 0d;
+    public double turnPositionRad = 0d;
+    public double turnVelocityRadPerSec = 0d;
+    public double turnAppliedVolts = 0d;
+    public double turnCurrentAmps = 0d;
 
     abstract void updateModuleInputs();
 

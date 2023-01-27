@@ -5,10 +5,10 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants;
 
-public class SimulatedModule extends ModuleBase {
+public final class SimulatedModule extends ModuleBase {
 
-    private FlywheelSim driveMotor;
-    private FlywheelSim turnMotor;
+    private final FlywheelSim driveMotor;
+    private final FlywheelSim turnMotor;
 
     private double m_turnRelativePositionRad = 0d;
     private double m_turnAbsolutePositionRad = 0d;
@@ -38,13 +38,13 @@ public class SimulatedModule extends ModuleBase {
         super.driveAppliedVolts = m_driveAppliedVolts;
         super.drivePositionRad += driveMotor.getAngularVelocityRadPerSec() * dt;
         super.driveVelocityRadPerSec = driveMotor.getAngularVelocityRadPerSec();
-        super.driveCurrentAmps = new double[] { Math.abs(driveMotor.getCurrentDrawAmps()) };
+        super.driveCurrentAmps = Math.abs(driveMotor.getCurrentDrawAmps());
 
         super.turnAbsolutePositionRad = m_turnAbsolutePositionRad;
         super.turnPositionRad = m_turnRelativePositionRad;
         super.turnAppliedVolts = m_turnAppliedVolts;
         super.turnVelocityRadPerSec = turnMotor.getAngularVelocityRadPerSec();
-        super.turnCurrentAmps = new double[] { Math.abs(turnMotor.getCurrentDrawAmps()) };
+        super.turnCurrentAmps = Math.abs(turnMotor.getCurrentDrawAmps());
     }
 
     @Override
