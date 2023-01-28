@@ -2,9 +2,6 @@ package frc.robot.subsystems.drivetrain;
 
 import static frc.robot.Constants.DrivetrainConstants.DRIVETRAIN_TRACKWIDTH_METERS;
 import static frc.robot.Constants.DrivetrainConstants.DRIVETRAIN_WHEELBASE_METERS;
-import static frc.robot.Constants.DrivetrainConstants.PIGEON_ID;
-import static frc.robot.Constants.DrivetrainConstants.PRECISE_SPEED_SCALE;
-import static frc.robot.Constants.DrivetrainConstants.MAX_DRIVETRAIN_SPEED;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -27,11 +24,11 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.drivetrain.module.Module;
 
 public class Drivetrain extends SubsystemBase {
@@ -52,7 +49,7 @@ public class Drivetrain extends SubsystemBase {
     private SwerveDriveOdometry m_odometry;
     private Pose2d m_pose;
 
-    private final Pigeon2 m_pigeon = new Pigeon2(PIGEON_ID);
+    private final Pigeon2 m_pigeon = new Pigeon2(DrivetrainConstants.PIGEON_ID);
     private final Translation2d[] m_moduleTranslations = new Translation2d[] {
             new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0), // FL
             new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0), // FR
@@ -60,12 +57,14 @@ public class Drivetrain extends SubsystemBase {
             new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0) // BR
     };
     private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(m_moduleTranslations);
-    private final double MAX_ANGULAR_SPEED = MAX_DRIVETRAIN_SPEED / Arrays.stream(m_moduleTranslations)
-            .map(t -> t.getNorm())
-            .max(Double::compare).get();
+    private final double MAX_ANGULAR_SPEED = DrivetrainConstants.MAX_DRIVETRAIN_SPEED
+            / Arrays.stream(m_moduleTranslations)
+                    .map(t -> t.getNorm())
+                    .max(Double::compare).get();
     // #endregion
 
-    public Consumer<SwerveModuleState[]> m_swerveModuleConsumer = (states) -> drive(m_kinematics.toChassisSpeeds(states));
+    public Consumer<SwerveModuleState[]> m_swerveModuleConsumer = (states) -> drive(
+            m_kinematics.toChassisSpeeds(states));
     public Supplier<Pose2d> m_poseSupplier = () -> m_pose;
 
     public enum DrivetrainStates {
@@ -113,7 +112,7 @@ public class Drivetrain extends SubsystemBase {
                 dModuleState.dy / dt,
                 dModuleState.dtheta / dt);
         SwerveModuleState[] setpointModuleStates = m_kinematics.toSwerveModuleStates(adjustedSpeeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(setpointModuleStates, MAX_DRIVETRAIN_SPEED);
+        SwerveDriveKinematics.desaturateWheelSpeeds(setpointModuleStates, DrivetrainConstants.MAX_DRIVETRAIN_SPEED);
 
         for (int i = 0; i < 4; i++) {
             m_modules[i].update();
@@ -130,7 +129,7 @@ public class Drivetrain extends SubsystemBase {
         SmartDashboard.putString("Odo", m_odometry.getPoseMeters().toString());
         SmartDashboard.putString("sim angle", m_simChassisAngle.toString());
     }
-    
+
     public void setFieldTrajectory(Trajectory t) {
         m_field.getObject("traj").setTrajectory(t);
     }
@@ -170,7 +169,8 @@ public class Drivetrain extends SubsystemBase {
                 case AUTONOMOUS:
                     break;
                 case PRECISE:
-                    currentDrivetrainCommand = JoystickDrive(PRECISE_SPEED_SCALE, PRECISE_SPEED_SCALE);
+                    currentDrivetrainCommand = JoystickDrive(DrivetrainConstants.PRECISE_SPEED_SCALE,
+                            DrivetrainConstants.PRECISE_SPEED_SCALE);
                     break;
                 case LOCKED:
                     break;
@@ -213,8 +213,8 @@ public class Drivetrain extends SubsystemBase {
                             .getTranslation();
 
                     drive(ChassisSpeeds.fromFieldRelativeSpeeds(
-                            linearVelocity.getX() * MAX_DRIVETRAIN_SPEED,
-                            linearVelocity.getY() * MAX_DRIVETRAIN_SPEED,
+                            linearVelocity.getX() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
+                            linearVelocity.getY() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
                             omega * MAX_ANGULAR_SPEED,
                             getGyroYaw()));
                 },
@@ -227,7 +227,7 @@ public class Drivetrain extends SubsystemBase {
                 this);
     }
     // #endregion
-    
+
     public Command zeroGyro() {
         return new InstantCommand(() -> m_pigeon.setYaw(0d));
     }
