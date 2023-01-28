@@ -26,10 +26,10 @@ public final class Constants {
         public static final double PRECISE_SPEED_SCALE = 0.2;
         public static final double DEFAULT_TIMEOUT = 15d; // For auto trajectories
 
-        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -0.99;//Units.rotationsToRadians(-307d / TICKS_PER_ROTATION);
-        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -0.787;//Units.rotationsToRadians(-242.5d / TICKS_PER_ROTATION);
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -0.81;//Units.rotationsToRadians(-307d / TICKS_PER_ROTATION);
-        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -0.81;//Units.rotationsToRadians(-306.7d / TICKS_PER_ROTATION);
+        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = 0.4;//-0.99//Units.rotationsToRadians(-307d / TICKS_PER_ROTATION);
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = 2.26;//-0.787//Units.rotationsToRadians(-242.5d / TICKS_PER_ROTATION);
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = 1.11;//-0.81//Units.rotationsToRadians(-307d / TICKS_PER_ROTATION);
+        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 2.35;//-0.81//Units.rotationsToRadians(-306.7d / TICKS_PER_ROTATION);
 
         //CAN IDS
         public static final int PIGEON_ID = 20;
