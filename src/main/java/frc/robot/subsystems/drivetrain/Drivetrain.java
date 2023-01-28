@@ -91,13 +91,12 @@ public class Drivetrain extends SubsystemBase {
             m_modules[i] = new Module(i);
         m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroYaw(), getSwerveModulePositions());
         m_pose = m_odometry.getPoseMeters();
+        SmartDashboard.putData(m_field);
     }
 
     @Override
     public void periodic() {
         stateMachine();
-        for (Module module : m_modules)
-            module.update();
         m_field.setRobotPose(m_pose);
 
         double dt = Constants.PERIODIC_LOOP_DURATION;
@@ -116,20 +115,20 @@ public class Drivetrain extends SubsystemBase {
         SwerveModuleState[] setpointModuleStates = m_kinematics.toSwerveModuleStates(adjustedSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(setpointModuleStates, MAX_DRIVETRAIN_SPEED);
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 4; i++) {
+            m_modules[i].update();
             m_modules[i].set(setpointModuleStates[i]);
+        }
 
         m_pose = m_odometry.update(getGyroYaw(), getSwerveModulePositions());
         telem();
     }
 
     public void telem() {
-        SmartDashboard.putData(CommandScheduler.getInstance());
         SmartDashboard.putString("DrivetrainState", m_state.toString());
         SmartDashboard.putString("chassis speeds", m_chassisSpeeds.toString());
         SmartDashboard.putString("Odo", m_odometry.getPoseMeters().toString());
         SmartDashboard.putString("sim angle", m_simChassisAngle.toString());
-        SmartDashboard.putData(m_field);
     }
     
     public void setFieldTrajectory(Trajectory t) {
