@@ -21,26 +21,28 @@ public final class Module {
             MODULE_CONFIGURATION.getDriveReduction() *
             MODULE_CONFIGURATION.getWheelDiameter() * Math.PI;
 
-    private final PIDController m_turnMotorPID = new PIDController(23.0, 0.0, 0.1); // Tuned for SIM!
+    private final PIDController m_turnMotorSimGains = new PIDController(23.0, 0.0, 0.1); // Tuned for SIM!
+    private final PIDController m_turnMotorGains = new PIDController(0.2, 0.0, 0.0);
+    private final PIDController m_turnPID;
 
     public Module(int index) {
         m_module = Constants.SIM ? new SimulatedModule() : new PhysicalModule(index);
         m_index = index;
-
+        m_turnPID = Constants.SIM ? m_turnMotorSimGains : m_turnMotorGains;
     }
 
     public void update() {
         m_module.updateModuleInputs();
-
+        
+        SmartDashboard.putNumber("Encoder " + m_index, m_module.turnAbsolutePositionRad);
         SmartDashboard.putString("State " + m_index, getModuleState().toString());
         SmartDashboard.putString("Pos " + m_index, getModulePosition().toString());
     }
 
     public void set(SwerveModuleState state) {
         SwerveModuleState desiredState = SwerveModuleState.optimize(state, getModuleAngle());
-
-        m_module.setTurnVolts(m_turnMotorPID.calculate(getModuleAngle().getRadians(), desiredState.angle.getRadians()));
-        desiredState.speedMetersPerSecond *= Math.cos(m_turnMotorPID.getPositionError()); // using cosine error:
+        m_module.setTurnVolts(m_turnPID.calculate(getModuleAngle().getRadians(), desiredState.angle.getRadians()));
+        desiredState.speedMetersPerSecond *= Math.cos(m_turnPID.getPositionError()); // using cosine error:
                                                                                           // v_m = v_a * cos theta
 
         m_module.setDriveVolts(desiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE);

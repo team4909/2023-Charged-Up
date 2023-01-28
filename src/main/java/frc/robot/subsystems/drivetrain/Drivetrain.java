@@ -52,7 +52,7 @@ public class Drivetrain extends SubsystemBase {
     private SwerveDriveOdometry m_odometry;
     private Pose2d m_pose;
 
-    private final Pigeon2 m_pigeon = new Pigeon2(PIGEON_ID, "Drivetrain-CANivore");
+    private final Pigeon2 m_pigeon = new Pigeon2(PIGEON_ID);
     private final Translation2d[] m_moduleTranslations = new Translation2d[] {
             new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0), // FL
             new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0), // FR
@@ -120,9 +120,10 @@ public class Drivetrain extends SubsystemBase {
             m_modules[i].set(setpointModuleStates[i]);
 
         m_pose = m_odometry.update(getGyroYaw(), getSwerveModulePositions());
+        telem();
     }
 
-    public void simulationPeriodic() {
+    public void telem() {
         SmartDashboard.putData(CommandScheduler.getInstance());
         SmartDashboard.putString("DrivetrainState", m_state.toString());
         SmartDashboard.putString("chassis speeds", m_chassisSpeeds.toString());
@@ -191,7 +192,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     // #region State Commands
-    private final Command JoystickDrive(double linearSpeedScale, double angularSpeedScale) {
+    private Command JoystickDrive(double linearSpeedScale, double angularSpeedScale) {
         return new RunCommand(
                 () -> {
                     final double x = -m_joystickTranslationX.getAsDouble();
@@ -221,12 +222,16 @@ public class Drivetrain extends SubsystemBase {
                 this).andThen(stop()).ignoringDisable(true);
     }
 
-    private final Command stop() {
+    private Command stop() {
         return new InstantCommand(
                 () -> drive(new ChassisSpeeds()),
                 this);
     }
     // #endregion
+    
+    public Command zeroGyro() {
+        return new InstantCommand(() -> m_pigeon.setYaw(0d));
+    }
 
     private double deadband(double value, double deadband) {
         if (Math.abs(value) > deadband) {
