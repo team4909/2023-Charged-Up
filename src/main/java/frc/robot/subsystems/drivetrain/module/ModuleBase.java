@@ -7,7 +7,7 @@ public abstract class ModuleBase {
     public double driveAppliedVolts = 0d;
     public double driveCurrentAmps = 0d;
 
-    public double turnAbsolutePositionRad = 0d;
+    public double turnAbsolutePosition = 0d;
     public double turnPositionRad = 0d;
     public double turnVelocityRadPerSec = 0d;
     public double turnAppliedVolts = 0d;
@@ -17,5 +17,5 @@ public abstract class ModuleBase {
 
     abstract void setDriveVolts(double volts);
 
-    abstract void setTurnVolts(double volts);
+    abstract void setTurn(double input);
 }

@@ -12,26 +12,28 @@ public final class Constants {
     public static final double PERIODIC_LOOP_DURATION = 0.02;
 
     public static final class DrivetrainConstants {
-        // The left-to-right distance between the drivetrain wheels, should be measured from center to center.
+        // The left-to-right distance between the drivetrain wheels, should be measured
+        // from center to center.
         public static final double DRIVETRAIN_TRACKWIDTH_METERS = Units.inchesToMeters(32);
-        // The front-to-back distance between the drivetrain wheels, should be measured from center to center.
+        // The front-to-back distance between the drivetrain wheels, should be measured
+        // from center to center.
         public static final double DRIVETRAIN_WHEELBASE_METERS = Units.inchesToMeters(32);
 
         public static final String CANBUS = "CANivore1";
         public static final double FALCON_500_FREE_SPEED = 6380d;
         public static final double TICKS_PER_ROTATION = 2048d;
-        public static final double MAX_DRIVETRAIN_SPEED = Units.feetToMeters(16.3); //From SDS
+        public static final double MAX_DRIVETRAIN_SPEED = Units.feetToMeters(16.3); // From SDS
         public static final GearRatio GEAR_RATIO = GearRatio.L2;
         public static final ModuleConfiguration MODULE_CONFIGURATION = SdsModuleConfigurations.MK4I_L2;
         public static final double PRECISE_SPEED_SCALE = 0.2;
         public static final double DEFAULT_TIMEOUT = 15d; // For auto trajectories
 
-        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = 0.4;//-0.99//Units.rotationsToRadians(-307d / TICKS_PER_ROTATION);
-        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = 2.26;//-0.787//Units.rotationsToRadians(-242.5d / TICKS_PER_ROTATION);
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = 1.11;//-0.81//Units.rotationsToRadians(-307d / TICKS_PER_ROTATION);
-        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 2.35;//-0.81//Units.rotationsToRadians(-306.7d / TICKS_PER_ROTATION);
+        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = 0d;
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = 0d;
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = 0d;
+        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 0d;
 
-        //CAN IDS
+        // CAN IDS
         public static final int PIGEON_ID = 20;
         public static final int FRONT_LEFT_DRIVE_MOTOR = 7;
         public static final int FRONT_LEFT_TURN_MOTOR = 8;
@@ -45,6 +47,6 @@ public final class Constants {
         public static final int BACK_RIGHT_DRIVE_MOTOR = 4;
         public static final int BACK_RIGHT_TURN_MOTOR = 3;
         public static final int BACK_RIGHT_STEER_ENCODER = 12;
-        
+
     }
 }

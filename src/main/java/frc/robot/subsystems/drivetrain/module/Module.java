@@ -33,24 +33,26 @@ public final class Module {
 
     public void update() {
         m_module.updateModuleInputs();
-        
-        SmartDashboard.putNumber("Encoder " + m_index, m_module.turnAbsolutePositionRad);
+
+        SmartDashboard.putNumber("Encoder " + m_index, m_module.turnAbsolutePosition);
         SmartDashboard.putString("State " + m_index, getModuleState().toString());
         SmartDashboard.putString("Pos " + m_index, getModulePosition().toString());
     }
 
     public void set(SwerveModuleState state) {
         SwerveModuleState desiredState = SwerveModuleState.optimize(state, getModuleAngle());
-        m_module.setTurnVolts(m_turnPID.calculate(getModuleAngle().getRadians(), desiredState.angle.getRadians()));
-        desiredState.speedMetersPerSecond *= Math.cos(m_turnPID.getPositionError()); // using cosine error:
-                                                                                          // v_m = v_a * cos theta
-
         m_module.setDriveVolts(desiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE);
+        if (Constants.SIM) {
+            m_module.setTurn(m_turnPID.calculate(getModuleAngle().getRadians(), desiredState.angle.getRadians()));
+        } else {
+            m_module.setTurn(convertDegreesToTicks(desiredState.angle.getDegrees()));
+        }
 
     }
 
     private Rotation2d getModuleAngle() {
-        return new Rotation2d(MathUtil.angleModulus(m_module.turnAbsolutePositionRad));
+        return Constants.SIM ? new Rotation2d(MathUtil.angleModulus(m_module.turnAbsolutePosition))
+                : Rotation2d.fromDegrees(m_module.turnAbsolutePosition);
     }
 
     private double getPositionMeters() {
@@ -69,8 +71,21 @@ public final class Module {
         return new SwerveModuleState(getVelocityMetersPerSec(), getModuleAngle());
     }
 
+    // TODO get rid of
     public void stop() {
-        m_module.setTurnVolts(0d);
+        m_module.setTurn(0d);
         m_module.setDriveVolts(0d);
+    }
+
+    // Util
+    public static double convertTicksToDegrees(double ticks) {
+        double degrees = ticks * (1.0 / 2048.0) * (1.0 / (150 / 7)) * (360.0 / 1.0);
+        return degrees;
+    }
+
+    public static double convertDegreesToTicks(double degrees) {
+
+        double ticks = degrees * 1 / ((1.0 / 2048.0) * (1.0 / (150 / 7)) * (360.0 / 1.0));
+        return ticks;
     }
 }

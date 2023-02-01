@@ -40,7 +40,7 @@ public final class SimulatedModule extends ModuleBase {
         super.driveVelocityRadPerSec = driveMotor.getAngularVelocityRadPerSec();
         super.driveCurrentAmps = Math.abs(driveMotor.getCurrentDrawAmps());
 
-        super.turnAbsolutePositionRad = m_turnAbsolutePositionRad;
+        super.turnAbsolutePosition = m_turnAbsolutePositionRad;
         super.turnPositionRad = m_turnRelativePositionRad;
         super.turnAppliedVolts = m_turnAppliedVolts;
         super.turnVelocityRadPerSec = turnMotor.getAngularVelocityRadPerSec();
@@ -54,7 +54,7 @@ public final class SimulatedModule extends ModuleBase {
     }
 
     @Override
-    void setTurnVolts(double volts) {
+    void setTurn(double volts) {
         m_turnAppliedVolts = MathUtil.clamp(volts, -12d, 12d);
         turnMotor.setInputVoltage(m_turnAppliedVolts);
     }
