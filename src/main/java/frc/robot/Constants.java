@@ -28,10 +28,10 @@ public final class Constants {
         public static final double PRECISE_SPEED_SCALE = 0.2;
         public static final double DEFAULT_TIMEOUT = 15d; // For auto trajectories
 
-        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = 0d;
-        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = 0d;
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = 0d;
-        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 0d;
+        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = 426.9;
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = 78.4;
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = 317.7;
+        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 250.0;
 
         // CAN IDS
         public static final int PIGEON_ID = 20;
