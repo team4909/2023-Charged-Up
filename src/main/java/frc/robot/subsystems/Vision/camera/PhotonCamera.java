@@ -1,5 +1,5 @@
 package frc.robot.subsystems.vision.camera;
 
-public class PhotonCamera extends CameraBase {
+public final class PhotonCamera extends CameraBase {
 
 }

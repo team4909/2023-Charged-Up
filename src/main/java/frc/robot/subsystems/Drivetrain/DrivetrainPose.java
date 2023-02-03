@@ -1,4 +1,4 @@
-package frc.robot.subsystems.Drivetrain;
+package frc.robot.subsystems.drivetrain;
 
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
@@ -6,8 +6,12 @@ import org.photonvision.EstimatedRobotPose;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.camera.CameraBase;
+import frc.robot.subsystems.vision.camera.PhotonCamera;
 
 public class DrivetrainPose extends SubsystemBase {
+
+    CameraBase camera = new PhotonCamera();
 
     /* Singleton */
     private static DrivetrainPose m_instance = null;
