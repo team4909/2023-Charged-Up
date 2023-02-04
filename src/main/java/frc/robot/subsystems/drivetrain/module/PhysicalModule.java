@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.DrivetrainConstants;
@@ -79,6 +80,7 @@ public final class PhysicalModule extends ModuleBase {
 
         // This is not actually absolute
         super.turnAbsolutePosition = getWheelHeading();
+        // super.turnAbsolutePosition = m_turnMotor.getSelectedSensorPosition();
     }
 
     @Override
@@ -112,6 +114,7 @@ public final class PhysicalModule extends ModuleBase {
         m_turnMotor.config_kD(0, 0.1);
 
         m_encoder.configFactoryDefault();
+        m_encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
         m_encoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
     }
 
