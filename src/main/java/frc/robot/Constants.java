@@ -22,13 +22,26 @@ public final class Constants {
         public static final int CAMERA_RESOLUTION_WIDTH = 320;
         public static final int CAMERA_RESOLUTION_HEIGHT = 240;
 
+        public static final double ROBOT_SIDE = Units.inchesToMeters(26);
+        public static final double ROBOT_HEIGHT = Units.inchesToMeters(36);
+
         public static final double CAMERA_PITCH_RADIANS = 0d;
-        public static final double CAMERA_HEIGHT_METERS = 1.5;
+        public static final double CAMERA_HEIGHT_METERS_Z = 1.5;
+        public static final double CAMERA_SIDE_Y = 0d;
+
+        /*
+         * Bottom back right corner is the origin in OUR coords (x,y,z) -> (Y,Z,X)
+         * Forward: +x, Left: +y, Up: +z
+         */
+        public static final double CAMERA_X = Units.inchesToMeters(24);
+        public static final double CAMERA_Y = Units.inchesToMeters(13);
+        public static final double CAMERA_Z = Units.inchesToMeters(25);
 
         public static final Transform3d ROBOT_TO_CAM_DIST = new Transform3d(
                 new Translation3d(Units.inchesToMeters(13.0), Units.inchesToMeters(4.75), Units.inchesToMeters(4.0)),
                 new Rotation3d(0.0, 0.0, 0.0)
 
         );
+
     }
 }
