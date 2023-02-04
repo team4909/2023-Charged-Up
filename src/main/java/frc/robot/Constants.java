@@ -4,8 +4,12 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 
 public final class Constants {
+
+    public static final boolean SIM = RobotBase.isSimulation();
+    public static final double PERIODIC_LOOP_DURATION = 0.02;
 
     public static final class VisionConstants {
 

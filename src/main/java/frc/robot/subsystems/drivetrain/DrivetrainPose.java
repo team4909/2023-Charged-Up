@@ -7,11 +7,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.camera.CameraBase;
-import frc.robot.subsystems.vision.camera.PhotonCamera;
+import frc.robot.subsystems.vision.camera.LimelightCamera;
 
 public class DrivetrainPose extends SubsystemBase {
 
-    CameraBase camera = new PhotonCamera();
+    CameraBase camera = new LimelightCamera();
 
     /* Singleton */
     private static DrivetrainPose m_instance = null;

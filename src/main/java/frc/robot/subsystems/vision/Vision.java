@@ -1,53 +1,31 @@
 package frc.robot.subsystems.vision;
 
-import java.io.IOException;
-import java.util.Optional;
-
-import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.subsystems.vision.camera.CameraBase;
+import frc.robot.subsystems.vision.camera.LimelightCamera;
+import frc.robot.subsystems.vision.camera.SimulatedCamera;
 
 public class Vision extends SubsystemBase {
 
-    private final PhotonCamera m_photonCamera;
-    private final PhotonPoseEstimator m_photonPoseEstimator;
-    private AprilTagFieldLayout m_aprilTagFieldLayout;
+    private final CameraBase m_camera;
+    private PhotonPoseEstimator m_photonPoseEstimator;
 
     public Vision() {
+        m_camera = Constants.SIM ? new SimulatedCamera() : new LimelightCamera();
 
-        m_aprilTagFieldLayout = null;
-        try {
-            m_aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // poseEstimation = new PhotonPoseEstimator(
-        // aprilTagFieldLayout, // Field layout
-        // PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
-        // camera,
-        // ROBOT_TO_CAM_DIST);
-
-        m_photonCamera = new PhotonCamera(VisionConstants.CAMERA_NAME);
         m_photonPoseEstimator = new PhotonPoseEstimator(
-                m_aprilTagFieldLayout,
+                m_camera.getAprilTagFieldLayout(),
                 PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
-                m_photonCamera,
+                m_camera,
                 null);
 
     }
 
-    // public Optional<EstimatedRobotPose> getEstimatedRobotPose() {
-    // poseEstimation.setReferencePose(new Pose3d(5, 5, 0, new Rotation3d(0, 0,
-    // 0)));
-    // return poseEstimation.update();
-    // }
 }

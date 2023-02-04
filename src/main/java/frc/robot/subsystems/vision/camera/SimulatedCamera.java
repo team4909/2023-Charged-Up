@@ -2,7 +2,7 @@ package frc.robot.subsystems.vision.camera;
 
 import org.photonvision.SimVisionSystem;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -26,14 +26,13 @@ public final class SimulatedCamera extends CameraBase {
                 VisionConstants.CAMERA_RESOLUTION_HEIGHT,
                 VisionConstants.CAMERA_RESOLUTION_HEIGHT,
                 m_minTargetArea);
+
+        m_simCamera.addVisionTargets(super.m_aprilTagFieldLayout);
     }
 
-    private void update() {
-        // var result = m_simCamera.
-    }
-
-    void addTargets(AprilTagFieldLayout tagLayout) {
-        m_simCamera.addVisionTargets(tagLayout);
+    @Override
+    void update() {
+        m_simCamera.processFrame(new Pose2d());
     }
 
 }
