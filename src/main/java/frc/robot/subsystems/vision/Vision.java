@@ -68,10 +68,10 @@ public class Vision extends SubsystemBase {
     public static Transform3d getCameraTransform() {
         Translation3d centerLocation = new Translation3d(
                 VisionConstants.ROBOT_SIDE / 2, VisionConstants.ROBOT_SIDE / 2, VisionConstants.ROBOT_HEIGHT / 2);
-        Translation3d cameraLocationWithRespectToFrontalPlane = new Translation3d(
+        Translation3d camLocationWithRespectToBackRightCorner = new Translation3d(
                 VisionConstants.CAMERA_X, VisionConstants.CAMERA_Y, VisionConstants.CAMERA_Z);
         return new Transform3d(
-                cameraLocationWithRespectToFrontalPlane.minus(centerLocation),
+                camLocationWithRespectToBackRightCorner.minus(centerLocation),
                 new Rotation3d(0d, VisionConstants.CAMERA_PITCH_RADIANS, 0d));
 
     }
