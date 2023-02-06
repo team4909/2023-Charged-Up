@@ -21,14 +21,11 @@ public final class Module {
             MODULE_CONFIGURATION.getDriveReduction() *
             MODULE_CONFIGURATION.getWheelDiameter() * Math.PI;
 
-    private final PIDController m_turnMotorSimGains = new PIDController(23.0, 0.0, 0.1); // Tuned for SIM!
-    private final PIDController m_turnMotorGains = new PIDController(0.2, 0.0, 0.0);
-    private final PIDController m_turnPID;
+    private final PIDController m_simTurnPID = new PIDController(23.0, 0.0, 0.1); // Tuned for SIM!
 
     public Module(int index) {
         m_module = Constants.SIM ? new SimulatedModule() : new PhysicalModule(index);
         m_index = index;
-        m_turnPID = Constants.SIM ? m_turnMotorSimGains : m_turnMotorGains;
     }
 
     public void update() {
@@ -42,11 +39,10 @@ public final class Module {
     public void set(SwerveModuleState state) {
         SwerveModuleState desiredState = state;// SwerveModuleState.optimize(state, getModuleAngle());
         m_module.setDriveVolts(desiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE);
-        if (Constants.SIM) {
-            m_module.setTurn(m_turnPID.calculate(getModuleAngle().getRadians(), desiredState.angle.getRadians()));
-        } else {
+        if (Constants.SIM)
+            m_module.setTurn(m_simTurnPID.calculate(getModuleAngle().getRadians(), desiredState.angle.getRadians()));
+        else
             m_module.setTurn(convertDegreesToTicks(desiredState.angle.getDegrees()));
-        }
 
     }
 
