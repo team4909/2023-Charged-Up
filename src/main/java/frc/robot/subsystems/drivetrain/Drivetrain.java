@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 
@@ -39,9 +41,8 @@ public class Drivetrain extends SubsystemBase {
     private final Module[] m_modules = new Module[4]; // 0-FL 1-FR 2-BL 3-BR
     private final Field2d m_field = new Field2d();
 
-    // TODO these should be the same and should be an IDLE state
     private DrivetrainStates m_state = DrivetrainStates.JOYSTICK_DRIVE;
-    private DrivetrainStates m_lastState = null;
+    private DrivetrainStates m_lastState;
 
     private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
     private Rotation2d m_simChassisAngle = new Rotation2d();
@@ -68,8 +69,9 @@ public class Drivetrain extends SubsystemBase {
     public Supplier<Pose2d> m_poseSupplier = () -> m_pose;
 
     public enum DrivetrainStates {
+        IDLE("Idle"),
         JOYSTICK_DRIVE("Joystick Drive"),
-        AUTONOMOUS("Autonomous"),
+        AUTONOMOUS("Autonomous"), // TODO rename to traj following
         PRECISE("Precise"),
         LOCKED("Locked");
 
@@ -128,6 +130,7 @@ public class Drivetrain extends SubsystemBase {
         SmartDashboard.putString("chassis speeds", m_chassisSpeeds.toString());
         SmartDashboard.putString("Odo", m_odometry.getPoseMeters().toString());
         SmartDashboard.putString("sim angle", m_simChassisAngle.toString());
+        SmartDashboard.putBoolean("Joystick", isJoystickInputPresent());
     }
 
     public void setFieldTrajectory(Trajectory t) {
@@ -155,6 +158,14 @@ public class Drivetrain extends SubsystemBase {
         m_joystickRotationOmega = omega;
     }
 
+    private boolean isJoystickInputPresent() {
+        return !Stream
+                .of(m_joystickTranslationX.getAsDouble(), m_joystickTranslationY.getAsDouble(),
+                        m_joystickRotationOmega.getAsDouble())
+                .filter((input) -> deadband(input, DrivetrainConstants.DEADBAND) != 0)
+                .collect(Collectors.toList()).isEmpty();
+    }
+
     private void drive(ChassisSpeeds chassisSpeeds) {
         m_chassisSpeeds = chassisSpeeds;
     }
@@ -163,6 +174,9 @@ public class Drivetrain extends SubsystemBase {
         Command currentDrivetrainCommand = null;
         if (!m_state.equals(m_lastState)) {
             switch (m_state) {
+                case IDLE:
+                    currentDrivetrainCommand = stop();
+                    break;
                 case JOYSTICK_DRIVE:
                     currentDrivetrainCommand = JoystickDrive(1d, 1d);
                     break;
@@ -175,7 +189,7 @@ public class Drivetrain extends SubsystemBase {
                 case LOCKED:
                     break;
                 default:
-                    m_state = DrivetrainStates.JOYSTICK_DRIVE;
+                    m_state = DrivetrainStates.IDLE;
             }
         }
 
@@ -200,8 +214,8 @@ public class Drivetrain extends SubsystemBase {
                     double magnitude = Math.hypot(x, y);
                     double omega = -m_joystickRotationOmega.getAsDouble();
 
-                    magnitude = deadband(magnitude, 0.05);
-                    omega = deadband(omega, 0.05);
+                    magnitude = deadband(magnitude, DrivetrainConstants.DEADBAND);
+                    omega = deadband(omega, DrivetrainConstants.DEADBAND);
                     magnitude = squareAxis(magnitude);
                     omega = squareAxis(omega);
 
@@ -218,7 +232,7 @@ public class Drivetrain extends SubsystemBase {
                             omega * MAX_ANGULAR_SPEED,
                             getGyroYaw()));
                 },
-                this).andThen(stop()).ignoringDisable(true);
+                this).ignoringDisable(true);
     }
 
     private Command stop() {

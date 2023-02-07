@@ -25,6 +25,7 @@ public final class Constants {
         public static final ModuleConfiguration MODULE_CONFIGURATION = SdsModuleConfigurations.MK4I_L2;
         public static final double PRECISE_SPEED_SCALE = 0.2;
         public static final double DEFAULT_TIMEOUT = 15d; // For auto trajectories
+        public static final double DEADBAND = 0.05;
 
         public static final double FRONT_LEFT_MODULE_STEER_OFFSET = 0.4;//-0.99//Units.rotationsToRadians(-307d / TICKS_PER_ROTATION);
         public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = 2.26;//-0.787//Units.rotationsToRadians(-242.5d / TICKS_PER_ROTATION);
