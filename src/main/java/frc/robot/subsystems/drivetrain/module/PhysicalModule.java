@@ -15,12 +15,12 @@ import frc.robot.Constants.DrivetrainConstants;
 
 public final class PhysicalModule extends ModuleBase {
 
-    private final double TICKS_PER_ROTATION = 2048d;
     private final TalonFX m_driveMotor;
     private final TalonFX m_turnMotor;
     private final CANCoder m_encoder;
     private final double m_encoderOffset;
 
+    private final double TICKS_PER_ROTATION = 2048d;
     private final double nominalVoltage = 12d;
 
     public PhysicalModule(int index) {
@@ -73,14 +73,7 @@ public final class PhysicalModule extends ModuleBase {
                 * MODULE_CONFIGURATION.getSteerReduction();
         super.turnCurrentAmps = m_turnMotor.getSupplyCurrent();
         super.turnAppliedVolts = m_turnMotor.getMotorOutputVoltage();
-
-        double angle = Math.toRadians(m_encoder.getAbsolutePosition()) % (2d * Math.PI);
-        if (angle < 0d)
-            angle += 2d * Math.PI;
-
-        // This is not actually absolute
         super.turnAbsolutePosition = getWheelHeading();
-        // super.turnAbsolutePosition = m_turnMotor.getSelectedSensorPosition();
     }
 
     @Override
@@ -95,7 +88,7 @@ public final class PhysicalModule extends ModuleBase {
 
     private void configHardware() {
         m_driveMotor.configFactoryDefault();
-        m_turnMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 1));
+        m_driveMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 1));
         m_driveMotor.configVoltageCompSaturation(12);
         m_driveMotor.enableVoltageCompensation(true);
         m_driveMotor.setInverted(MODULE_CONFIGURATION.isDriveInverted());
@@ -109,6 +102,7 @@ public final class PhysicalModule extends ModuleBase {
         m_turnMotor.setInverted(MODULE_CONFIGURATION.isSteerInverted());
         m_turnMotor.setNeutralMode(NeutralMode.Brake);
         m_turnMotor.setSelectedSensorPosition(-1 * Module.convertDegreesToTicks(getWheelHeading()));
+        m_turnMotor.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Unsigned_0_to_360);
 
         m_turnMotor.config_kP(0, 0.2);
         m_turnMotor.config_kD(0, 0.1);

@@ -37,7 +37,7 @@ public final class Module {
     }
 
     public void set(SwerveModuleState state) {
-        SwerveModuleState desiredState = state;// SwerveModuleState.optimize(state, getModuleAngle());
+        SwerveModuleState desiredState = SwerveModuleState.optimize(state, getModuleAngle());
         m_module.setDriveVolts(desiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE);
         if (Constants.SIM)
             m_module.setTurn(m_simTurnPID.calculate(getModuleAngle().getRadians(), desiredState.angle.getRadians()));
@@ -65,12 +65,6 @@ public final class Module {
 
     public SwerveModuleState getModuleState() {
         return new SwerveModuleState(getVelocityMetersPerSec(), getModuleAngle());
-    }
-
-    // TODO get rid of
-    public void stop() {
-        m_module.setTurn(0d);
-        m_module.setDriveVolts(0d);
     }
 
     // Util

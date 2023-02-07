@@ -30,8 +30,8 @@ public final class Constants {
 
         public static final double FRONT_LEFT_MODULE_STEER_OFFSET = 426.9;
         public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = 78.4;
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = 317.7;
-        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 250.0;
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = 250.0;
+        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 317.7;
 
         // CAN IDS
         public static final int PIGEON_ID = 20;
