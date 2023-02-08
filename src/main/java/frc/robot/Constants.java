@@ -4,7 +4,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.lib.swervelib.ModuleConfiguration;
 import frc.lib.swervelib.SdsModuleConfigurations;
-import frc.lib.swervelib.Mk4iSwerveModuleHelper.GearRatio;
 
 public final class Constants {
 
@@ -23,7 +22,6 @@ public final class Constants {
         public static final double FALCON_500_FREE_SPEED = 6380d;
         public static final double TICKS_PER_ROTATION = 2048d;
         public static final double MAX_DRIVETRAIN_SPEED = Units.feetToMeters(16.3); // From SDS
-        public static final GearRatio GEAR_RATIO = GearRatio.L2;
         public static final ModuleConfiguration MODULE_CONFIGURATION = SdsModuleConfigurations.MK4I_L2;
         public static final double PRECISE_SPEED_SCALE = 0.2;
         public static final double DEFAULT_TIMEOUT = 15d; // For auto trajectories

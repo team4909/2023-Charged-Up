@@ -91,7 +91,7 @@ public final class PhysicalModule extends ModuleBase {
         m_driveMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 1));
         m_driveMotor.configVoltageCompSaturation(12);
         m_driveMotor.enableVoltageCompensation(true);
-        m_driveMotor.setInverted(MODULE_CONFIGURATION.isDriveInverted());
+        m_driveMotor.setInverted(false);
         m_driveMotor.setNeutralMode(NeutralMode.Brake);
         m_driveMotor.setSelectedSensorPosition(0);
 
@@ -99,7 +99,7 @@ public final class PhysicalModule extends ModuleBase {
         m_turnMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 1));
         m_turnMotor.configVoltageCompSaturation(12);
         m_turnMotor.enableVoltageCompensation(true);
-        m_turnMotor.setInverted(MODULE_CONFIGURATION.isSteerInverted());
+        m_turnMotor.setInverted(true);
         m_turnMotor.setNeutralMode(NeutralMode.Brake);
         m_turnMotor.setSelectedSensorPosition(-1 * Module.convertDegreesToTicks(getWheelHeading()));
         m_turnMotor.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Unsigned_0_to_360);
