@@ -175,7 +175,7 @@ public class Drivetrain extends SubsystemBase {
         if (!m_state.equals(m_lastState)) {
             switch (m_state) {
                 case IDLE:
-                    currentDrivetrainCommand = stop();
+                    currentDrivetrainCommand = Stop();
                     break;
                 case JOYSTICK_DRIVE:
                     currentDrivetrainCommand = JoystickDrive(1d, 1d);
@@ -191,7 +191,9 @@ public class Drivetrain extends SubsystemBase {
                 default:
                     m_state = DrivetrainStates.IDLE;
             }
-        }
+        } else if (m_lastState.equals(DrivetrainStates.IDLE))
+            if (isJoystickInputPresent())
+                m_state = DrivetrainStates.JOYSTICK_DRIVE;
 
         m_lastState = m_state;
 
@@ -235,10 +237,10 @@ public class Drivetrain extends SubsystemBase {
                 this).ignoringDisable(true);
     }
 
-    private Command stop() {
+    private Command Stop() {
         return new InstantCommand(
                 () -> drive(new ChassisSpeeds()),
-                this);
+                this).until(() -> isJoystickInputPresent());
     }
     // #endregion
 

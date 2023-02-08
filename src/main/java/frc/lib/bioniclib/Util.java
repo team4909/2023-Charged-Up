@@ -1,5 +1,11 @@
 package frc.lib.bioniclib;
 
+/**
+ * Assortment of utility functions
+ * 
+ * @author Mihir Patankar
+ * @author Billerica Bionics FRC 4909
+ */
 public final class Util {
 
     /**
