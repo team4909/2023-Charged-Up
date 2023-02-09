@@ -1,25 +1,24 @@
 package frc.robot.subsystems.drivetrain.module;
 
-import static frc.robot.Constants.DrivetrainConstants.FALCON_500_FREE_SPEED;
-import static frc.robot.Constants.DrivetrainConstants.MODULE_CONFIGURATION;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.lib.team364.CTREModuleState;
 import frc.robot.Constants;
+import frc.robot.Constants.DrivetrainConstants;
 
 public final class Module {
 
     private final ModuleBase m_module;
     private final int m_index;
-    private final double m_wheelRadius = MODULE_CONFIGURATION.getWheelDiameter() / 2d;
+    private final double m_wheelRadius = DrivetrainConstants.WHEEL_DIAMETER / 2d;
     private final double MAX_VOLTAGE = 12d;
-    private final double MAX_VELOCITY_METERS_PER_SECOND = FALCON_500_FREE_SPEED / 60.0 *
-            MODULE_CONFIGURATION.getDriveReduction() *
-            MODULE_CONFIGURATION.getWheelDiameter() * Math.PI;
+    private final double MAX_VELOCITY_METERS_PER_SECOND = DrivetrainConstants.FALCON_500_FREE_SPEED / 60.0 *
+            DrivetrainConstants.DRIVE_REDUCTION *
+            DrivetrainConstants.WHEEL_DIAMETER * Math.PI;
 
     private final PIDController m_simTurnPID = new PIDController(23.0, 0.0, 0.1); // Tuned for SIM!
 
@@ -37,13 +36,15 @@ public final class Module {
     }
 
     public void set(SwerveModuleState state) {
-        SwerveModuleState desiredState = SwerveModuleState.optimize(state, getModuleAngle());
-        m_module.setDriveVolts(desiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE);
-        if (Constants.SIM)
+        SwerveModuleState desiredState;
+        if (Constants.SIM) {
+            desiredState = SwerveModuleState.optimize(state, getModuleAngle());
             m_module.setTurn(m_simTurnPID.calculate(getModuleAngle().getRadians(), desiredState.angle.getRadians()));
-        else
+        } else {
+            desiredState = CTREModuleState.optimize(state, getModuleAngle());
             m_module.setTurn(convertDegreesToTicks(desiredState.angle.getDegrees()));
-
+        }
+        m_module.setDriveVolts(desiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE);
     }
 
     private Rotation2d getModuleAngle() {

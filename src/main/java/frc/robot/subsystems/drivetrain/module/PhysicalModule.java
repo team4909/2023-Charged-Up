@@ -1,7 +1,5 @@
 package frc.robot.subsystems.drivetrain.module;
 
-import static frc.robot.Constants.DrivetrainConstants.MODULE_CONFIGURATION;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
@@ -59,18 +57,18 @@ public final class PhysicalModule extends ModuleBase {
     @Override
     void updateModuleInputs() {
         super.drivePositionRad = Units.rotationsToRadians(m_driveMotor.getSelectedSensorPosition() / TICKS_PER_ROTATION)
-                * MODULE_CONFIGURATION.getDriveReduction();
+                * DrivetrainConstants.DRIVE_REDUCTION;
         super.driveVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(
                 m_driveMotor.getSelectedSensorVelocity() * (600 / TICKS_PER_ROTATION))
-                * MODULE_CONFIGURATION.getDriveReduction();
+                * DrivetrainConstants.DRIVE_REDUCTION;
         super.driveCurrentAmps = m_driveMotor.getSupplyCurrent();
         super.driveAppliedVolts = m_driveMotor.getMotorOutputVoltage();
 
         super.turnPositionRad = Units.rotationsToRadians(m_turnMotor.getSelectedSensorPosition() / TICKS_PER_ROTATION)
-                * MODULE_CONFIGURATION.getSteerReduction();
+                * DrivetrainConstants.STEER_REDUCTION;
         super.turnVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(
                 m_turnMotor.getSelectedSensorVelocity() * (600 / TICKS_PER_ROTATION))
-                * MODULE_CONFIGURATION.getSteerReduction();
+                * DrivetrainConstants.STEER_REDUCTION;
         super.turnCurrentAmps = m_turnMotor.getSupplyCurrent();
         super.turnAppliedVolts = m_turnMotor.getMotorOutputVoltage();
         super.turnAbsolutePosition = getWheelHeading();

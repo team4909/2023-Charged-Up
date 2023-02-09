@@ -41,7 +41,7 @@ public class Drivetrain extends SubsystemBase {
     private final Module[] m_modules = new Module[4]; // 0-FL 1-FR 2-BL 3-BR
     private final Field2d m_field = new Field2d();
 
-    private DrivetrainStates m_state = DrivetrainStates.JOYSTICK_DRIVE;
+    private DrivetrainStates m_state = DrivetrainStates.IDLE;
     private DrivetrainStates m_lastState;
 
     private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
@@ -127,9 +127,6 @@ public class Drivetrain extends SubsystemBase {
 
     public void telem() {
         SmartDashboard.putString("DrivetrainState", m_state.toString());
-        SmartDashboard.putString("chassis speeds", m_chassisSpeeds.toString());
-        SmartDashboard.putString("Odo", m_odometry.getPoseMeters().toString());
-        SmartDashboard.putString("sim angle", m_simChassisAngle.toString());
         SmartDashboard.putBoolean("Joystick", isJoystickInputPresent());
     }
 
@@ -175,25 +172,23 @@ public class Drivetrain extends SubsystemBase {
         if (!m_state.equals(m_lastState)) {
             switch (m_state) {
                 case IDLE:
-                    currentDrivetrainCommand = Stop();
+                    currentDrivetrainCommand = StopIdle();
                     break;
                 case JOYSTICK_DRIVE:
-                    currentDrivetrainCommand = JoystickDrive(1d, 1d);
+                    currentDrivetrainCommand = JoystickDrive(1d, 1d, DrivetrainConstants.DEADBAND);
                     break;
                 case AUTONOMOUS:
                     break;
                 case PRECISE:
                     currentDrivetrainCommand = JoystickDrive(DrivetrainConstants.PRECISE_SPEED_SCALE,
-                            DrivetrainConstants.PRECISE_SPEED_SCALE);
+                            DrivetrainConstants.PRECISE_SPEED_SCALE, DrivetrainConstants.DEADBAND / 2d);
                     break;
                 case LOCKED:
                     break;
                 default:
                     m_state = DrivetrainStates.IDLE;
             }
-        } else if (m_lastState.equals(DrivetrainStates.IDLE))
-            if (isJoystickInputPresent())
-                m_state = DrivetrainStates.JOYSTICK_DRIVE;
+        }
 
         m_lastState = m_state;
 
@@ -207,7 +202,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     // #region State Commands
-    private Command JoystickDrive(double linearSpeedScale, double angularSpeedScale) {
+    private Command JoystickDrive(double linearSpeedScale, double angularSpeedScale, double deadband) {
         return new RunCommand(
                 () -> {
                     final double x = -m_joystickTranslationX.getAsDouble();
@@ -216,8 +211,8 @@ public class Drivetrain extends SubsystemBase {
                     double magnitude = Math.hypot(x, y);
                     double omega = -m_joystickRotationOmega.getAsDouble();
 
-                    magnitude = deadband(magnitude, DrivetrainConstants.DEADBAND);
-                    omega = deadband(omega, DrivetrainConstants.DEADBAND);
+                    magnitude = deadband(magnitude, deadband);
+                    omega = deadband(omega, deadband);
                     magnitude = squareAxis(magnitude);
                     omega = squareAxis(omega);
 
@@ -234,13 +229,20 @@ public class Drivetrain extends SubsystemBase {
                             omega * MAX_ANGULAR_SPEED,
                             getGyroYaw()));
                 },
-                this).ignoringDisable(true);
+                this)
+                .until(() -> !isJoystickInputPresent())
+                .finallyDo((interrupted) -> {
+                    if (!interrupted)
+                        setState(DrivetrainStates.IDLE);
+                })
+                .ignoringDisable(true);
     }
 
-    private Command Stop() {
+    private Command StopIdle() {
         return new InstantCommand(
-                () -> drive(new ChassisSpeeds()),
-                this).until(() -> isJoystickInputPresent());
+                () -> drive(new ChassisSpeeds()), this).repeatedly().until(this::isJoystickInputPresent)
+                .finallyDo((interrupted) -> setState(DrivetrainStates.JOYSTICK_DRIVE))
+                .ignoringDisable(true);
     }
     // #endregion
 

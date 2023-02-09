@@ -56,11 +56,7 @@ public class TrajectoryFollow extends CommandBase {
                 m_drivetrain.m_swerveModuleConsumer,
                 true,
                 m_drivetrain)
-                .withTimeout(m_timeout).schedule(); 
+                .withTimeout(m_timeout).schedule();
     }
 
-    @Override
-    public void end(boolean interrupted) {
-        m_drivetrain.setState(DrivetrainStates.JOYSTICK_DRIVE); // TODO change this to idle
-    }
 }

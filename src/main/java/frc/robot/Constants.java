@@ -2,8 +2,6 @@ package frc.robot;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.lib.swervelib.ModuleConfiguration;
-import frc.lib.swervelib.SdsModuleConfigurations;
 
 public final class Constants {
 
@@ -21,8 +19,10 @@ public final class Constants {
         public static final String CANBUS = "CANivore1";
         public static final double FALCON_500_FREE_SPEED = 6380d;
         public static final double TICKS_PER_ROTATION = 2048d;
+        public static final double WHEEL_DIAMETER = 0.10033;
+        public static final double DRIVE_REDUCTION = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
+        public static final double STEER_REDUCTION = (14.0 / 50.0) * (10.0 / 60.0);
         public static final double MAX_DRIVETRAIN_SPEED = Units.feetToMeters(16.3); // From SDS
-        public static final ModuleConfiguration MODULE_CONFIGURATION = SdsModuleConfigurations.MK4I_L2;
         public static final double PRECISE_SPEED_SCALE = 0.2;
         public static final double DEFAULT_TIMEOUT = 15d; // For auto trajectories
         public static final double DEADBAND = 0.05;
