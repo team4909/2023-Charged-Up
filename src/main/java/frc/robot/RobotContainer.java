@@ -4,11 +4,16 @@
 
 package frc.robot;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.Drivetrain.DrivetrainStates;
 import frc.robot.subsystems.drivetrain.auto.AutoRoutines;
 
 public class RobotContainer {
@@ -32,6 +37,13 @@ public class RobotContainer {
         () -> m_driverController.getRightX());
 
     m_driverController.back().onTrue(m_drivetrain.zeroGyro());
+    m_driverController.rightBumper()
+        .onTrue(new InstantCommand(() -> m_drivetrain.setState(DrivetrainStates.PRECISE)))
+        .onFalse(new InstantCommand(() -> m_drivetrain.setState(DrivetrainStates.IDLE)));
+    m_driverController.povUp()
+        .onTrue(new InstantCommand(
+            () -> m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE, new HashMap<>(Map.of("Angle", 0d)))));
+
   }
 
   public Command getAutonomousCommand() {

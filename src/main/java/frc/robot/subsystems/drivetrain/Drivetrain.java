@@ -4,6 +4,7 @@ import static frc.robot.Constants.DrivetrainConstants.DRIVETRAIN_TRACKWIDTH_METE
 import static frc.robot.Constants.DrivetrainConstants.DRIVETRAIN_WHEELBASE_METERS;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -12,6 +13,8 @@ import java.util.stream.Stream;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -43,6 +46,7 @@ public class Drivetrain extends SubsystemBase {
 
     private DrivetrainStates m_state = DrivetrainStates.IDLE;
     private DrivetrainStates m_lastState;
+    private HashMap<String, ?> m_stateArgs;
 
     private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
     private Rotation2d m_simChassisAngle = new Rotation2d();
@@ -73,7 +77,7 @@ public class Drivetrain extends SubsystemBase {
         JOYSTICK_DRIVE("Joystick Drive"),
         AUTONOMOUS("Autonomous"), // TODO rename to traj following
         PRECISE("Precise"),
-        LOCKED("Locked");
+        SNAP_TO_ANGLE("Snapping To Angle");
 
         String stateName;
 
@@ -172,18 +176,31 @@ public class Drivetrain extends SubsystemBase {
         if (!m_state.equals(m_lastState)) {
             switch (m_state) {
                 case IDLE:
-                    currentDrivetrainCommand = StopIdle();
+                    currentDrivetrainCommand = StopIdle().repeatedly().until(this::isJoystickInputPresent)
+                            .finallyDo((interrupted) -> {
+                                if (!interrupted)
+                                    setState(DrivetrainStates.JOYSTICK_DRIVE);
+                            })
+                            .ignoringDisable(true);
                     break;
                 case JOYSTICK_DRIVE:
-                    currentDrivetrainCommand = JoystickDrive(1d, 1d, DrivetrainConstants.DEADBAND);
+                    currentDrivetrainCommand = JoystickDrive(1d, 1d, DrivetrainConstants.DEADBAND)
+                            .until(() -> !isJoystickInputPresent())
+                            .finallyDo((interrupted) -> {
+                                if (!interrupted)
+                                    setState(DrivetrainStates.IDLE);
+                            })
+                            .ignoringDisable(true);
                     break;
                 case AUTONOMOUS:
                     break;
                 case PRECISE:
+                    System.out.println("WE PRECISING NOW");
                     currentDrivetrainCommand = JoystickDrive(DrivetrainConstants.PRECISE_SPEED_SCALE,
                             DrivetrainConstants.PRECISE_SPEED_SCALE, DrivetrainConstants.DEADBAND / 2d);
                     break;
-                case LOCKED:
+                case SNAP_TO_ANGLE:
+                    currentDrivetrainCommand = SnapToAngle((double) m_stateArgs.get("Angle"));
                     break;
                 default:
                     m_state = DrivetrainStates.IDLE;
@@ -199,6 +216,11 @@ public class Drivetrain extends SubsystemBase {
 
     public void setState(DrivetrainStates state) {
         m_state = state;
+    }
+
+    public void setState(DrivetrainStates state, HashMap<String, ?> stateArgs) {
+        m_state = state;
+        m_stateArgs = stateArgs;
     }
 
     // #region State Commands
@@ -229,20 +251,27 @@ public class Drivetrain extends SubsystemBase {
                             omega * MAX_ANGULAR_SPEED,
                             getGyroYaw()));
                 },
-                this)
-                .until(() -> !isJoystickInputPresent())
-                .finallyDo((interrupted) -> {
-                    if (!interrupted)
-                        setState(DrivetrainStates.IDLE);
-                })
-                .ignoringDisable(true);
+                this);
+
     }
 
     private Command StopIdle() {
         return new InstantCommand(
-                () -> drive(new ChassisSpeeds()), this).repeatedly().until(this::isJoystickInputPresent)
-                .finallyDo((interrupted) -> setState(DrivetrainStates.JOYSTICK_DRIVE))
-                .ignoringDisable(true);
+                () -> drive(new ChassisSpeeds()), this);
+    }
+
+    private Command SnapToAngle(double angle) {
+        PIDController snapPID = new PIDController(0.02, 0.0, 0.0);
+        snapPID.enableContinuousInput(-180, 180);
+        snapPID.setSetpoint(angle);
+        return new RunCommand(
+                () -> {
+                    double omega = snapPID.calculate(
+                            -(MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180)),
+                            snapPID.getSetpoint());
+                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, omega * MAX_ANGULAR_SPEED, getGyroYaw()));
+                },
+                this).andThen(() -> snapPID.close());
     }
     // #endregion
 
