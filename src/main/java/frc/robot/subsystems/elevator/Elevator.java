@@ -28,7 +28,10 @@ public class Elevator extends SubsystemBase {
       3000.0 / 60.0, 6000.0 / 60.0);
 
   private static final ElevatorFeedforward m_elevatorFF = new ElevatorFeedforward(
-      0.1, -0.16, 1 / 5880.0);
+      0.40921, 0.12654, 1.3374, 0.031771);
+
+  // final double sensorUnitsToMetersSecondsCoeff = (1d / 2048d) * (0.0889 / 1d) *
+  // (100d / 0.1) * (60d / 1d);
 
   public enum ElevatorStates {
     IDLE("Idle"),
@@ -52,9 +55,9 @@ public class Elevator extends SubsystemBase {
     // TODO change this to CAN FD BUS constant
     m_leftExtensionMotor = new TalonFX(ElevatorConstants.LEFT_MOTOR, "CANivore1");
     m_rightExtensionMotor = new TalonFX(ElevatorConstants.RIGHT_MOTOR, "CANivore1");
+    configHardware();
     m_rightExtensionMotor.setInverted(true);
-    configElevatorMotor(m_leftExtensionMotor);
-    configElevatorMotor(m_rightExtensionMotor);
+    m_state = ElevatorStates.IDLE;
   }
 
   @Override
@@ -81,7 +84,7 @@ public class Elevator extends SubsystemBase {
           currentElevatorCommand = SetSetpoint(ElevatorConstants.MID_CONE_SETPOINT);
           break;
         case RETRACT:
-          currentElevatorCommand = Retract();
+          currentElevatorCommand = SetSetpoint(ElevatorConstants.BOTTOM_SETPOINT);
         default:
           m_state = ElevatorStates.IDLE;
       }
@@ -98,7 +101,7 @@ public class Elevator extends SubsystemBase {
     return new InstantCommand(() -> m_leftExtensionMotor.set(TalonFXControlMode.PercentOutput, 0), this);
   }
 
-  private Command Retract() {
+  private Command SetProfiledSetpoint() {
     TrapezoidProfile.State targetState, beginLState, beginRState;
     TrapezoidProfile profileL, profileR;
     targetState = new TrapezoidProfile.State(ElevatorConstants.BOTTOM_SETPOINT, 0.0);
@@ -127,19 +130,28 @@ public class Elevator extends SubsystemBase {
     }, this);
   }
 
-  private Command SetSetpoint(double distance) {
-    return new InstantCommand(() -> {
-      m_leftExtensionMotor.set(TalonFXControlMode.Position, distance);
-      m_rightExtensionMotor.set(TalonFXControlMode.Position, distance);
+  private Command SetSetpoint(double setpoint) {
+    return new RunCommand(() -> {
+      m_leftExtensionMotor.set(TalonFXControlMode.Position, setpoint);
+      m_rightExtensionMotor.set(TalonFXControlMode.Position, setpoint);
     }, this);
   }
 
-  private void configElevatorMotor(TalonFX motor) {
-    motor.configFactoryDefault();
-    motor.setSelectedSensorPosition(0);
-    motor.config_kP(0, ElevatorConstants.ELEVATOR_KP);
-    motor.config_kD(0, ElevatorConstants.ELEVATOR_KD);
-    motor.configClosedLoopPeakOutput(0, ElevatorConstants.PEAK_OUTPUT);
+  private void configHardware() {
+    m_leftExtensionMotor.configFactoryDefault();
+    m_leftExtensionMotor.setSelectedSensorPosition(0);
+    m_leftExtensionMotor.config_kP(0, ElevatorConstants.ELEVATOR_KP);
+    m_leftExtensionMotor.config_kD(0, ElevatorConstants.ELEVATOR_KD);
+    m_leftExtensionMotor.configClosedLoopPeakOutput(0, ElevatorConstants.PEAK_OUTPUT);
+
+    m_rightExtensionMotor.configFactoryDefault();
+    m_rightExtensionMotor.setInverted(true);
+    m_rightExtensionMotor.configFactoryDefault();
+    m_rightExtensionMotor.setSelectedSensorPosition(0);
+    m_rightExtensionMotor.config_kP(0, ElevatorConstants.ELEVATOR_KP);
+    m_rightExtensionMotor.config_kD(0, ElevatorConstants.ELEVATOR_KD);
+    m_rightExtensionMotor.configClosedLoopPeakOutput(0, ElevatorConstants.PEAK_OUTPUT);
+
   }
 
   public void setState(ElevatorStates state) {

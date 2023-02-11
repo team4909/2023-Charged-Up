@@ -19,7 +19,7 @@ public final class Constants {
         public static final double BOTTOM_SETPOINT = 0d;
         public static final double MID_CONE_SETPOINT = 17_488d;
         public static final double MID_CUBE_SETPOINT = 17_488d;
-        public static final double TOP_SETPOINT = 28_581d;
+        public static final double TOP_SETPOINT = 28_000d;
 
     }
 }
