@@ -70,7 +70,25 @@ public class IntakeSubsystem extends SubsystemBase {
 
     }
 
- 
+    public void setRollerSpeed(double frontRollerSpeed, double backRollerSpeed){
+        if (frontRollerSpeed > 1) {
+            frontRollerSpeed = 1;
+        }
+        else if (frontRollerSpeed < -1) {
+            frontRollerSpeed = -1;
+        }
+        if (backRollerSpeed > 1) {
+            backRollerSpeed = 1;
+        }
+        else if (backRollerSpeed < -1) {
+            backRollerSpeed = -1;
+        }
+
+        m_frontRoller.set(frontRollerSpeed);
+        m_backRoller.set(backRollerSpeed);
+    }
+
+
     @Override
     public void periodic() {
       // This method will be called once per scheduler run

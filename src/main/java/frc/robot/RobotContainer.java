@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -19,9 +20,23 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-
-    m_driverController.rightTrigger().onTrue(new IntakeDeploy(17720));
-    m_driverController.rightTrigger().onFalse(new IntakeDeploy(23));
+    //cone intake down and roller on
+    m_driverController.rightTrigger().onTrue(new IntakeDeploy(12345).andThen(new RunIntakeRollers(0.5, -0.5)));
+    //intake up and roller off
+    m_driverController.rightTrigger().onFalse(new IntakeDeploy(42).andThen(new RunIntakeRollers(0, 0)));
+    //Cube intake down and roller on
+    m_driverController.rightBumper().onTrue(new IntakeDeploy(12345).andThen(new RunIntakeRollers(0.5, 0.5)));
+    //intake up and roller off
+    m_driverController.rightBumper().onFalse(new IntakeDeploy(42).andThen(new RunIntakeRollers(0, 0)));
+    
+    //intake down and spits cone
+    m_driverController.leftTrigger().onTrue(new IntakeDeploy(12345).andThen(new RunIntakeRollers(-0.5, 0.5)));
+    //Intake up and rollers off
+    m_driverController.leftTrigger().onFalse(new IntakeDeploy(42).andThen(new RunIntakeRollers(0, 0)));
+    //Intake down and spits cube
+    m_driverController.leftBumper().onTrue(new IntakeDeploy(12345).andThen(new RunIntakeRollers(-0.5, 0.5)));
+    //Intake up and rollers off
+    m_driverController.leftBumper().onFalse(new IntakeDeploy(42).andThen(new RunIntakeRollers(0, 0)));
     // m_driverController.b().onTrue(new IntakeDeploy(28813));
     // m_driverController.y().onTrue(new IntakeDeploy(232));
   }
