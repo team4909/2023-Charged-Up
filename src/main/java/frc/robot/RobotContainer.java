@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
-
+  
   private final CommandXboxController m_driverController = new CommandXboxController(0);
   private final CommandXboxController m_operatorController = new CommandXboxController(1);
 
@@ -18,7 +18,13 @@ public class RobotContainer {
     configureBindings();
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+
+    m_driverController.rightTrigger().onTrue(new IntakeDeploy(17720));
+    m_driverController.rightTrigger().onFalse(new IntakeDeploy(23));
+    // m_driverController.b().onTrue(new IntakeDeploy(28813));
+    // m_driverController.y().onTrue(new IntakeDeploy(232));
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
