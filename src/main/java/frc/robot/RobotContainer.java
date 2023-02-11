@@ -6,27 +6,28 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Commands.cone1;
-import frc.robot.subsystems.ElevatorSubsytem;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.ElevatorStates;
 
 public class RobotContainer {
 
   private final CommandXboxController m_driverController = new CommandXboxController(0);
   private final CommandXboxController m_operatorController = new CommandXboxController(1);
-  private final ElevatorSubsytem m_elevatorSubsystem;
+
+  private final Elevator m_elevator = Elevator.getInstance();
 
   public RobotContainer() {
-    configureButtonBindings();
-    m_elevatorSubsystem = ElevatorSubsytem.getInstance();
+    configureBindings();
   }
 
-  private void configureButtonBindings() {
-    m_driverController.a().onTrue(new cone1(17720));
-    m_driverController.b().onTrue(new cone1(28813));
-    m_driverController.y().onTrue(new cone1(232));
+  private void configureBindings() {
+    m_driverController.b().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
+    m_driverController.x().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CUBE)));
+    m_driverController.y().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
+    m_driverController.a().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.RETRACT)));
   }
-    
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
