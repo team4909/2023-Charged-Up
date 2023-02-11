@@ -7,18 +7,26 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Commands.cone1;
+import frc.robot.subsystems.ElevatorSubsytem;
 
 public class RobotContainer {
 
   private final CommandXboxController m_driverController = new CommandXboxController(0);
   private final CommandXboxController m_operatorController = new CommandXboxController(1);
-
+  private final ElevatorSubsytem m_elevatorSubsystem;
 
   public RobotContainer() {
-    configureBindings();
+    configureButtonBindings();
+    m_elevatorSubsystem = ElevatorSubsytem.getInstance();
   }
 
-  private void configureBindings() {}
+  private void configureButtonBindings() {
+    m_driverController.a().onTrue(new cone1(17720));
+    m_driverController.b().onTrue(new cone1(28813));
+    m_driverController.y().onTrue(new cone1(232));
+  }
+    
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
