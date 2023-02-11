@@ -137,6 +137,13 @@ public class Elevator extends SubsystemBase {
     }, this);
   }
 
+  private Command SetProfiledSetpoint(double setpoint) {
+    return new RunCommand(() -> {
+      m_leftExtensionMotor.set(TalonFXControlMode.MotionMagic, setpoint);
+      m_rightExtensionMotor.set(TalonFXControlMode.MotionMagic, setpoint);
+    }, this);
+  }
+
   private void configHardware() {
     m_leftExtensionMotor.configFactoryDefault();
     m_leftExtensionMotor.setSelectedSensorPosition(0);
