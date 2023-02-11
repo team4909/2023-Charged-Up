@@ -44,4 +44,45 @@ public final class Constants {
         );
 
     }
+
+    public static final class DrivetrainConstants {
+        // The left-to-right distance between the drivetrain wheels, should be measured
+        // from center to center.
+        public static final double DRIVETRAIN_TRACKWIDTH_METERS = Units.inchesToMeters(32);
+        // The front-to-back distance between the drivetrain wheels, should be measured
+        // from center to center.
+        public static final double DRIVETRAIN_WHEELBASE_METERS = Units.inchesToMeters(32);
+
+        public static final String CANBUS = "CANivore1";
+        public static final double FALCON_500_FREE_SPEED = 6380d;
+        public static final double TICKS_PER_ROTATION = 2048d;
+        public static final double WHEEL_DIAMETER = 0.10033;
+        public static final double DRIVE_REDUCTION = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
+        public static final double STEER_REDUCTION = (14.0 / 50.0) * (10.0 / 60.0);
+        public static final double MAX_DRIVETRAIN_SPEED = Units.feetToMeters(16.3); // From SDS
+        public static final double PRECISE_SPEED_SCALE = 0.2;
+        public static final double DEFAULT_TIMEOUT = 15d; // For auto trajectories
+        public static final double DEADBAND = 0.05;
+
+        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = 426.9;
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = 78.4;
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = 250.0;
+        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 317.7;
+
+        // CAN IDS
+        public static final int PIGEON_ID = 20;
+        public static final int FRONT_LEFT_DRIVE_MOTOR = 7;
+        public static final int FRONT_LEFT_TURN_MOTOR = 8;
+        public static final int FRONT_LEFT_STEER_ENCODER = 14;
+        public static final int FRONT_RIGHT_DRIVE_MOTOR = 2;
+        public static final int FRONT_RIGHT_TURN_MOTOR = 1;
+        public static final int FRONT_RIGHT_STEER_ENCODER = 11;
+        public static final int BACK_LEFT_DRIVE_MOTOR = 6;
+        public static final int BACK_LEFT_TURN_MOTOR = 5;
+        public static final int BACK_LEFT_STEER_ENCODER = 13;
+        public static final int BACK_RIGHT_DRIVE_MOTOR = 4;
+        public static final int BACK_RIGHT_TURN_MOTOR = 3;
+        public static final int BACK_RIGHT_STEER_ENCODER = 12;
+
+    }
 }

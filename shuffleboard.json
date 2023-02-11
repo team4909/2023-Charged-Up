@@ -351,32 +351,6 @@
               "_glyph": 148,
               "_showGlyph": false
             }
-          },
-          "11,5": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Pos 0",
-              "_title": "Pos 0",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "12,5": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Pos 1",
-              "_title": "Pos 1",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
           }
         }
       }

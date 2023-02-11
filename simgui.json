@@ -1,19 +1,30 @@
 {
   "NTProvider": {
     "types": {
-      "/FMSInfo": "FMSInfo"
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Scheduler": "Scheduler",
+      "/SmartDashboard/SendableChooser[0]": "String Chooser"
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables": {
     "transitory": {
-      "FMSInfo": {
+      "SmartDashboard": {
         "open": true
-      },
-      "LiveWindow": {
-        "open": true
-      },
-      "Shuffleboard": {
-        "open": true
+      }
+    }
+  },
+  "Plot": {
+    "Plot <0>": {
+      "window": {
+        "visible": false
       }
     }
   }
