@@ -1,7 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 
 public class RunIntakeRollers extends CommandBase {
   IntakeSubsystem m_intake;

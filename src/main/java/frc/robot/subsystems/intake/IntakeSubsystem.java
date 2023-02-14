@@ -1,4 +1,4 @@
-package frc.robot.Intake;
+package frc.robot.subsystems.intake;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
@@ -13,36 +13,38 @@ public class IntakeSubsystem extends SubsystemBase {
     public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput;
     double m_WristSetpoint = 0;
 
-    private CANSparkMax m_wristRight;
-    private CANSparkMax m_wristLeft;
+    private CANSparkMax m_hingeRight;
+    private CANSparkMax m_hingeLeft;
 
     private CANSparkMax m_frontRoller;
     private CANSparkMax m_backRoller;
 
     private SparkMaxPIDController m_wristPIDController;
+    double frontRollerReduction;
+    double backRollerReduction;
     
     public static IntakeSubsystem getInstance(){
         return m_instance = (m_instance == null) ? new IntakeSubsystem() : m_instance;
     }
 
     private IntakeSubsystem(){
-        m_wristRight = new CANSparkMax(3, MotorType.kBrushless);
-        m_wristLeft = new CANSparkMax(2, MotorType.kBrushless);
+        m_hingeRight = new CANSparkMax(3, MotorType.kBrushless);
+        m_hingeLeft = new CANSparkMax(2, MotorType.kBrushless);
         
         
         m_frontRoller = new CANSparkMax(1, MotorType.kBrushless);
         m_backRoller = new CANSparkMax(4, MotorType.kBrushless);
        
-        m_wristLeft.restoreFactoryDefaults();
-        m_wristRight.restoreFactoryDefaults(); 
+        m_hingeLeft.restoreFactoryDefaults();
+        m_hingeRight.restoreFactoryDefaults(); 
         
         m_frontRoller.restoreFactoryDefaults();
         m_backRoller.restoreFactoryDefaults(); 
 
-        m_wristPIDController = m_wristLeft.getPIDController();
+        m_wristPIDController = m_hingeLeft.getPIDController();
 
 
-        m_wristRight.follow(m_wristLeft);
+        m_hingeRight.follow(m_hingeLeft);
         kP = 0.1;
         kI = 1e-4;
         kD = 1;
@@ -92,7 +94,7 @@ public class IntakeSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
       // This method will be called once per scheduler run
-      double encPosition = m_wristLeft.getEncoder().getPosition();
+      double encPosition = m_hingeLeft.getEncoder().getPosition();
       double positionError = encPosition - m_WristSetpoint;
       
       
