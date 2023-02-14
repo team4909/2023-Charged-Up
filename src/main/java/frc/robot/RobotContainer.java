@@ -7,8 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.intake.IntakeDeploy;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 
 public class RobotContainer {
   
@@ -40,6 +42,10 @@ public class RobotContainer {
     m_driverController.leftBumper().onFalse(new IntakeDeploy(42).andThen(new RunIntakeRollers(0, 0)));
     // m_driverController.b().onTrue(new IntakeDeploy(28813));
     // m_driverController.y().onTrue(new IntakeDeploy(232));
+ 
+    m_driverController.x()
+      .onTrue(new RunCommand(()-> IntakeSubsystem.getInstance().intakeOut(), IntakeSubsystem.getInstance()))
+      .onFalse(new RunCommand(()-> IntakeSubsystem.getInstance().intakeIn(), IntakeSubsystem.getInstance()));
   }
 
   public Command getAutonomousCommand() {
