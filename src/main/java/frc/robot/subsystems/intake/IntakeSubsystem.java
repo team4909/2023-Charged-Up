@@ -22,8 +22,12 @@ public class IntakeSubsystem extends SubsystemBase {
     public enum IntakeStates {
 
         IN("IN"),
-        OUT("OUT"),
-        CALIBRATE("CALIBRATE");
+        CALIBRATE("CALIBRATE"),
+        CUBE_IN("CUBE_IN"),
+        CUBE_SPIT("CUBE_SPIT"),
+        CONE_IN("CONE_IN"),
+        CONE_SPIT("CONE_SPIT");
+       
 
         String stateName;
 
@@ -42,6 +46,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private static IntakeSubsystem m_instance;
     public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput;
     double m_WristSetpoint = 0;
+    final double intakeSpeed = 0.25; 
 
     private CANSparkMax m_hingeRight;
     private CANSparkMax m_hingeLeft;
@@ -136,18 +141,41 @@ public class IntakeSubsystem extends SubsystemBase {
         }
 
         switch (m_currentState) {
-            case OUT:
+            case CUBE_IN:
                 // PID Refrence set to out setpoint, ~30
                 m_positionController.setReference(10, ControlType.kPosition);
+                m_frontRoller.set(intakeSpeed);
+                m_backRoller.set(-intakeSpeed);
                 break;
-            case IN:
+
+            case CUBE_SPIT:
                 // PID Refrence set to zero
-                m_positionController.setReference(2, ControlType.kPosition);
+                m_positionController.setReference(10, ControlType.kPosition);
+                m_frontRoller.set(-intakeSpeed);
+                m_backRoller.set(intakeSpeed);
+                break;
+            case CONE_IN:
+                // PID Refrence set to zero
+                m_positionController.setReference(10, ControlType.kPosition);
+                m_frontRoller.set(intakeSpeed);
+                m_backRoller.set(intakeSpeed);
+                break;
+            case CONE_SPIT:
+                // PID Refrence set to zero
+                m_positionController.setReference(10, ControlType.kPosition);
+                m_frontRoller.set(intakeSpeed);
+                m_backRoller.set(-intakeSpeed);
                 break;
             case CALIBRATE:
                 // Calls the calibrate method
                 calibrateIntake();
                 break;
+            case IN:
+                // PID Refrence set to zero
+                m_positionController.setReference(2, ControlType.kPosition);
+                m_frontRoller.set(0);
+                m_backRoller.set(0);
+                break;   
         }
 
         m_lastState = m_currentState;
@@ -164,6 +192,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 .withTimeout(0.75)
                 .andThen(new InstantCommand(() -> {
                     m_hingeLeft.getEncoder().setPosition(0);
+                    m_positionController.setReference(0, ControlType.kPosition);
                 })).schedule();
     }
     
@@ -171,8 +200,20 @@ public class IntakeSubsystem extends SubsystemBase {
         m_currentState = IntakeStates.CALIBRATE;
     }
 
-    public void intakeOut(){
-        m_currentState = IntakeStates.OUT;
+    public void cubeIn(){
+        m_currentState = IntakeStates.CUBE_IN;
+    }
+
+    public void cubeSpit(){
+        m_currentState = IntakeStates.CUBE_SPIT;
+    }
+
+    public void coneIn(){
+        m_currentState = IntakeStates.CONE_IN;
+    }
+
+    public void coneSpit(){
+        m_currentState = IntakeStates.CONE_SPIT;
     }
 
     public void intakeIn(){
