@@ -26,8 +26,8 @@ public class IntakeSubsystem extends SubsystemBase {
         CUBE_IN("CUBE_IN"),
         CUBE_SPIT("CUBE_SPIT"),
         CONE_IN("CONE_IN"),
-        CONE_SPIT("CONE_SPIT");
-       
+        CONE_SPIT("CONE_SPIT"),
+        HANDOFF("HANDOFF");
 
         String stateName;
 
@@ -45,16 +45,15 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private static IntakeSubsystem m_instance;
     public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput;
-    double m_WristSetpoint = 0;
-    final double intakeSpeed = 0.25; 
+    final double intakeSpeed = 0.25;
 
     private CANSparkMax m_hingeRight;
     private CANSparkMax m_hingeLeft;
+    private double m_hinge_setpoint;
 
     private CANSparkMax m_frontRoller;
     private CANSparkMax m_backRoller;
 
-    private SparkMaxPIDController m_wristPIDController;
     double frontRollerReduction;
     double backRollerReduction;
     private SparkMaxPIDController m_positionController;
@@ -76,8 +75,6 @@ public class IntakeSubsystem extends SubsystemBase {
         m_frontRoller.restoreFactoryDefaults();
         m_backRoller.restoreFactoryDefaults();
 
-        m_wristPIDController = m_hingeLeft.getPIDController();
-
         m_hingeRight.follow(m_hingeLeft);
         kP = 1;
         kI = 0;
@@ -87,50 +84,30 @@ public class IntakeSubsystem extends SubsystemBase {
         kMaxOutput = 0.4;
         kMinOutput = -1;
 
-        m_wristPIDController.setP(kP);
-        m_wristPIDController.setI(kI);
-        m_wristPIDController.setD(kD);
-        m_wristPIDController.setIZone(kIz);
-        m_wristPIDController.setFF(kFF);
-        m_wristPIDController.setOutputRange(kMinOutput, kMaxOutput);
-
         m_positionController = m_hingeLeft.getPIDController();
-    }
 
-    public void setWristSetpoint(double distance) {
+        m_positionController.setP(kP);
+        m_positionController.setI(kI);
+        m_positionController.setD(kD);
+        m_positionController.setIZone(kIz);
+        m_positionController.setFF(kFF);
+        m_positionController.setOutputRange(kMinOutput, kMaxOutput);
 
-        m_wristPIDController.setReference(distance, CANSparkMax.ControlType.kPosition);
-        m_WristSetpoint = distance;
+        m_hingeLeft.setSmartCurrentLimit(25, 40);
 
-    }
-
-    public void setRollerSpeed(double frontRollerSpeed, double backRollerSpeed) {
-        if (frontRollerSpeed > 1) {
-            frontRollerSpeed = 1;
-        } else if (frontRollerSpeed < -1) {
-            frontRollerSpeed = -1;
-        }
-        if (backRollerSpeed > 1) {
-            backRollerSpeed = 1;
-        } else if (backRollerSpeed < -1) {
-            backRollerSpeed = -1;
-        }
-
-        m_frontRoller.set(frontRollerSpeed);
-        m_backRoller.set(backRollerSpeed);
     }
 
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
         double encPosition = m_hingeLeft.getEncoder().getPosition();
-        double positionError = encPosition - m_WristSetpoint;
+        double positionError = encPosition - m_hinge_setpoint;
 
-        SmartDashboard.putNumber("wrist error", positionError);
-        SmartDashboard.putNumber("WristSetpoint", m_WristSetpoint);
-        SmartDashboard.putNumber("left wrist encoderPosition", encPosition);
-        
-        
+        SmartDashboard.putNumber("Hinge error", positionError);
+        SmartDashboard.putNumber("Hinge Setpoint", m_hinge_setpoint);
+        SmartDashboard.putNumber("Hinge Encoder Position", encPosition);
+        SmartDashboard.putString("Intake State", m_currentState == null ? "null" : m_currentState.toString());
+
         stateMachine();
     }
 
@@ -143,26 +120,27 @@ public class IntakeSubsystem extends SubsystemBase {
         switch (m_currentState) {
             case CUBE_IN:
                 // PID Refrence set to out setpoint, ~30
-                m_positionController.setReference(10, ControlType.kPosition);
+                m_hinge_setpoint = 10;
+                m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                 m_frontRoller.set(intakeSpeed);
                 m_backRoller.set(-intakeSpeed);
                 break;
 
             case CUBE_SPIT:
-                // PID Refrence set to zero
-                m_positionController.setReference(10, ControlType.kPosition);
+                m_hinge_setpoint = 10;
+                m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                 m_frontRoller.set(-intakeSpeed);
                 m_backRoller.set(intakeSpeed);
                 break;
             case CONE_IN:
-                // PID Refrence set to zero
-                m_positionController.setReference(10, ControlType.kPosition);
+                m_hinge_setpoint = 10;
+                m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                 m_frontRoller.set(intakeSpeed);
                 m_backRoller.set(intakeSpeed);
                 break;
             case CONE_SPIT:
-                // PID Refrence set to zero
-                m_positionController.setReference(10, ControlType.kPosition);
+                m_hinge_setpoint = 10;
+                m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                 m_frontRoller.set(intakeSpeed);
                 m_backRoller.set(-intakeSpeed);
                 break;
@@ -171,11 +149,23 @@ public class IntakeSubsystem extends SubsystemBase {
                 calibrateIntake();
                 break;
             case IN:
-                // PID Refrence set to zero
-                m_positionController.setReference(2, ControlType.kPosition);
+                m_hinge_setpoint = 1;
+                m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                 m_frontRoller.set(0);
                 m_backRoller.set(0);
-                break;   
+                break;
+            case HANDOFF:
+                if (m_lastState.toString() == "CUBE_IN") {
+                    m_hinge_setpoint = 7.73;
+                    m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
+                    m_frontRoller.set(0.1);
+                    m_backRoller.set(-0.1);
+                } else if (m_lastState.toString() == "CONE_IN") {
+                    m_hinge_setpoint = 7.55;
+                    m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
+                    m_frontRoller.set(0.1);
+                    m_backRoller.set(0.1);
+                }
         }
 
         m_lastState = m_currentState;
@@ -187,37 +177,45 @@ public class IntakeSubsystem extends SubsystemBase {
         // to 0
         new RunCommand(() -> {
             // m_positionController.setReference(-.2, ControlType.kDutyCycle);
-            m_hingeLeft.set(-.2);
+            m_hingeLeft.setSmartCurrentLimit(5, 40);
+            m_hingeLeft.set(-.1);
         }, this)
                 .withTimeout(0.75)
                 .andThen(new InstantCommand(() -> {
                     m_hingeLeft.getEncoder().setPosition(0);
-                    m_positionController.setReference(0, ControlType.kPosition);
+                    m_hinge_setpoint = 0;
+                    m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
+                    m_currentState = IntakeStates.IN;
+                    m_hingeLeft.setSmartCurrentLimit(20, 40);
                 })).schedule();
     }
-    
-    public void intakeZero(){
+
+    public void intakeZero() {
         m_currentState = IntakeStates.CALIBRATE;
     }
 
-    public void cubeIn(){
+    public void cubeIn() {
         m_currentState = IntakeStates.CUBE_IN;
     }
 
-    public void cubeSpit(){
+    public void cubeSpit() {
         m_currentState = IntakeStates.CUBE_SPIT;
     }
 
-    public void coneIn(){
+    public void coneIn() {
         m_currentState = IntakeStates.CONE_IN;
     }
 
-    public void coneSpit(){
+    public void coneSpit() {
         m_currentState = IntakeStates.CONE_SPIT;
     }
 
-    public void intakeIn(){
+    public void intakeIn() {
         m_currentState = IntakeStates.IN;
+    }
+
+    public void handOff() {
+        m_currentState = IntakeStates.HANDOFF;
     }
 
 }
