@@ -7,6 +7,14 @@ package frc.robot;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.arm.Arm.ArmStates;
+import frc.robot.subsystems.arm.Claw;
+import frc.robot.subsystems.arm.Claw.ClawStates;
+
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -14,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.Elevator.ElevatorStates;
+
 
 
 public class RobotContainer {
@@ -24,12 +33,20 @@ public class RobotContainer {
   private final CommandXboxController m_operatorController = new CommandXboxController(1);
   private final Elevator m_elevator = Elevator.getInstance();
 
+  private final Arm m_arm = Arm.getInstance();
+  private final Claw m_claw = Claw.getInstance();
 
   public RobotContainer() {
     configureBindings();
   }
 
   private void configureBindings() {
+
+    m_driverController.a().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)));
+    m_driverController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CUBE)));
+    m_driverController.x().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)));
+    m_driverController.y().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
+
 
     m_driverController.leftTrigger()
         .onTrue(new RunCommand(() -> m_intakeSubsytem.cubeIn(), m_intakeSubsytem))
@@ -53,6 +70,7 @@ public class RobotContainer {
     m_driverController.x().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CUBE)));
     m_driverController.y().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
     m_driverController.a().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.RETRACT)));
+
 
   }
 

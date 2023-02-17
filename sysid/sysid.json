@@ -1,0 +1,11 @@
+{
+  "SysId": {
+    "Analysis Type": "General Mechanism",
+    "AnalyzerJSONLocation": "C:\\Users\\Robotics\\Downloads\\shooter-sysid-config.json",
+    "NetworkTables Settings": {
+      "serverTeam": "4909"
+    },
+    "mode": "Client (NT4)",
+    "serverTeam": "4909"
+  }
+}
