@@ -4,24 +4,18 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Arm.ArmStates;
 import frc.robot.subsystems.arm.Claw;
 import frc.robot.subsystems.arm.Claw.ClawStates;
-
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.intake.IntakeSubsystem;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.Elevator.ElevatorStates;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 
 
 
@@ -66,10 +60,10 @@ public class RobotContainer {
     m_driverController.x()
         .onTrue(new RunCommand(() -> m_intakeSubsytem.intakeIn(), m_intakeSubsytem));
 
-    m_driverController.b().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
-    m_driverController.x().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CUBE)));
-    m_driverController.y().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
-    m_driverController.a().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.RETRACT)));
+    m_operatorController.b().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
+    m_operatorController.x().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CUBE)));
+    m_operatorController.y().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
+    m_operatorController.a().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.RETRACT)));
 
 
   }
