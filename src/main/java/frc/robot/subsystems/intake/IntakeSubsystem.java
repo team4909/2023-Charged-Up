@@ -45,7 +45,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private static IntakeSubsystem m_instance;
     public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput;
-    final double intakeSpeed = 0.25;
+    final double intakeSpeed = 0.5;
 
     private CANSparkMax m_hingeRight;
     private CANSparkMax m_hingeLeft;
@@ -123,7 +123,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 m_hinge_setpoint = 10;
                 m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                 m_frontRoller.set(intakeSpeed);
-                m_backRoller.set(-intakeSpeed);
+                m_backRoller.set(-intakeSpeed/2.0);
                 break;
 
             case CUBE_SPIT:
@@ -136,7 +136,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 m_hinge_setpoint = 10;
                 m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                 m_frontRoller.set(intakeSpeed);
-                m_backRoller.set(intakeSpeed);
+                m_backRoller.set(intakeSpeed/2.0);
                 break;
             case CONE_SPIT:
                 m_hinge_setpoint = 10;
@@ -158,12 +158,12 @@ public class IntakeSubsystem extends SubsystemBase {
                 if (m_lastState.toString() == "CUBE_IN") {
                     m_hinge_setpoint = 7.73;
                     m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
-                    m_frontRoller.set(0.1);
+                    m_frontRoller.set(0.2);
                     m_backRoller.set(-0.1);
                 } else if (m_lastState.toString() == "CONE_IN") {
                     m_hinge_setpoint = 7.55;
                     m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
-                    m_frontRoller.set(0.1);
+                    m_frontRoller.set(0.2);
                     m_backRoller.set(0.1);
                 }
         }
