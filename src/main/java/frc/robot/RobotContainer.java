@@ -81,11 +81,12 @@ public class RobotContainer {
     .andThen(new WaitCommand(0.5))
     .andThen(() -> m_claw.setState(ClawStates.OPEN))
     .andThen(new WaitCommand(0.2))
+    // .andThen(() -> m_arm.setState(ArmStates.TOP))
     .andThen(() -> m_elevator.setState(ElevatorStates.RETRACT)));
 
     m_operatorController.rightTrigger().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
     m_operatorController.rightBumper().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
-    m_operatorController.povUp().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
+    m_operatorController.povDown().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
     m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.TOP)));
     m_operatorController.leftTrigger().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING)));
     // m_operatorController.leftTrigger()
@@ -118,9 +119,18 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    // PathPlannerTrajectory t = PathPlanner.loadPath("StraightPath", null);
-    // return m_drivetrain.traj(null, true);
-    return null;
+    return new SequentialCommandGroup(
+      new InstantCommand(() -> m_drivetrain.setGyro(180)),
+      new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)),
+      Commands.waitSeconds(2),
+      new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING))
+    .andThen(new WaitCommand(0.5))
+    .andThen(() -> m_claw.setState(ClawStates.OPEN))
+    .andThen(new WaitCommand(0.2))
+    // .andThen(() -> m_arm.setState(ArmStates.TOP))
+    .andThen(() -> m_elevator.setState(ElevatorStates.RETRACT))
+    );
+    // return null;
   }
 
   private double deadband(double value, double deadband) {

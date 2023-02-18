@@ -266,6 +266,10 @@ public class Drivetrain extends SubsystemBase {
         backLeftModule.setModuleState(backLeft);
     }
 
+    public Command resetOdometry() {
+        return new InstantCommand(() -> this.m_odometry.resetPosition(getGyroHeading(), getModulePositions(), getPose()));
+    }
+
     public Command traj(PathPlannerTrajectory traj, boolean isFirstPath) {
 
         PIDController xyController = new PIDController(5, 0, 0);
@@ -295,6 +299,10 @@ public class Drivetrain extends SubsystemBase {
     }
     public double getDriveRate() {
         return g_driveRate;
+    }
+
+    public void setGyro(double d) {
+        pigeon.setYaw(d);
     }
 
 }
