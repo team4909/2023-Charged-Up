@@ -47,8 +47,8 @@ public class IntakeSubsystem extends SubsystemBase {
     public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput;
     final double intakeSpeed = 0.5;
 
-    private CANSparkMax m_hingeRight;
-    private CANSparkMax m_hingeLeft;
+    private final CANSparkMax m_hingeRight;
+    private final CANSparkMax m_hingeLeft;
     private double m_hinge_setpoint;
 
     private CANSparkMax m_frontRoller;
@@ -63,6 +63,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     private IntakeSubsystem() {
+        m_currentState = IntakeStates.IN;
         m_hingeRight = new CANSparkMax(3, MotorType.kBrushless);
         m_hingeLeft = new CANSparkMax(2, MotorType.kBrushless);
 
@@ -112,63 +113,61 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     private void stateMachine() {
-
-        if (m_currentState == m_lastState) {
-            return; // nothing to do
-        }
-
-        switch (m_currentState) {
-            case CUBE_IN:
-                // PID Refrence set to out setpoint, ~30
-                m_hinge_setpoint = 10.5;
-                m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
-                m_frontRoller.set(intakeSpeed);
-                m_backRoller.set(-intakeSpeed/2.0);
-                break;
-
-            case CUBE_SPIT:
-                m_hinge_setpoint = 10;
-                m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
-                m_frontRoller.set(-intakeSpeed);
-                m_backRoller.set(intakeSpeed);
-                break;
-            case CONE_IN:
-                m_hinge_setpoint = 11;
-                m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
-                m_frontRoller.set(intakeSpeed);
-                m_backRoller.set(intakeSpeed/2.0);
-                break;
-            case CONE_SPIT:
-                m_hinge_setpoint = 2;
-                m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
-                m_frontRoller.set(intakeSpeed);
-                m_backRoller.set(-intakeSpeed);
-                break;
-            case CALIBRATE:
-                // Calls the calibrate method
-                calibrateIntake();
-                break;
-            case IN:
-                m_hinge_setpoint = 1;
-                m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
-                m_frontRoller.set(0);
-                m_backRoller.set(0);
-                break;
-            case HANDOFF:
-                if (m_lastState.toString() == "CUBE_IN") {
-                    m_hinge_setpoint = 7.73;
+        if (!m_currentState.equals(m_lastState)) {
+            switch (m_currentState) {
+                case CUBE_IN:
+                    // PID Refrence set to out setpoint, ~30
+                    m_hinge_setpoint = 10.5;
                     m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
-                    m_frontRoller.set(0.2);
-                    m_backRoller.set(-.05);
-                } else if (m_lastState.toString() == "CONE_IN") {
-                    m_hinge_setpoint = 4.88;
-                    m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
-                    m_frontRoller.set(0.2);
-                    m_backRoller.set(0.1);
-                }
-        }
+                    m_frontRoller.set(intakeSpeed);
+                    m_backRoller.set(-intakeSpeed / 2.0);
+                    break;
 
-        m_lastState = m_currentState;
+                case CUBE_SPIT:
+                    m_hinge_setpoint = 10;
+                    m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
+                    m_frontRoller.set(-intakeSpeed);
+                    m_backRoller.set(intakeSpeed);
+                    break;
+                case CONE_IN:
+                    m_hinge_setpoint = 11;
+                    m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
+                    m_frontRoller.set(intakeSpeed);
+                    m_backRoller.set(intakeSpeed / 2.0);
+                    break;
+                case CONE_SPIT:
+                    m_hinge_setpoint = 2;
+                    m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
+                    m_frontRoller.set(intakeSpeed);
+                    m_backRoller.set(-intakeSpeed);
+                    break;
+                case CALIBRATE:
+                    // Calls the calibrate method
+                    calibrateIntake();
+                    break;
+                case IN:
+                    m_hinge_setpoint = 1;
+                    m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
+                    m_frontRoller.set(0);
+                    m_backRoller.set(0);
+                    break;
+                case HANDOFF:
+                    if (m_lastState.toString() == "CUBE_IN") {
+                        m_hinge_setpoint = 7.73;
+                        m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
+                        m_frontRoller.set(0.2);
+                        m_backRoller.set(-.05);
+                    } else if (m_lastState.toString() == "CONE_IN") {
+                        m_hinge_setpoint = 4.88;
+                        m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
+                        m_frontRoller.set(0.2);
+                        m_backRoller.set(0.1);
+                    }
+                    break;
+            }
+
+            m_lastState = m_currentState;
+        }
 
     }
 

@@ -71,13 +71,16 @@ public class Arm extends SubsystemBase {
                     currentWristCommand = Zero();
                     break;
                 case TOP:
-                    currentWristCommand = Handoff(110);
+                    currentWristCommand = SetWristPosition(110);
                     break;
                 case HANDOFF_CONE:
-                    currentWristCommand = Handoff(-37.361);
+                    currentWristCommand = SetWristPosition(-37.361);
                     break;
                 case HANDOFF_CUBE:
-                    currentWristCommand = Handoff(-7.966);
+                    currentWristCommand = SetWristPosition(-7.966);
+                    break;
+                case DROPPING: 
+                    currentWristCommand = SetWristPosition(-40);
                     break;
                 case RETRACTED:
                     currentWristCommand = Retract();
@@ -109,7 +112,7 @@ public class Arm extends SubsystemBase {
         }, this);
     }
 
-    private Command Handoff(double setpoint) {
+    private Command SetWristPosition(double setpoint) {
         return new InstantCommand(() -> {
             setWristSetpoint(setpoint);
         }, this);

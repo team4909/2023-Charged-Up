@@ -5,6 +5,10 @@
 package frc.robot;
 
 import java.lang.constant.DirectMethodHandleDesc;
+import java.time.Instant;
+
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -43,37 +47,24 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    // #region Driver Controls
+    // m_driverController.leftTrigger() Intake Cube
+    m_driverController.leftBumper().onTrue(new InstantCommand(() -> m_intakeSubsytem.coneSpit()));
+    m_driverController.rightTrigger().onTrue(new InstantCommand(() -> m_intakeSubsytem.coneIn()))
+    // m_driverController.leftTrigger()
+    .onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
+
+    m_driverController.start().onTrue(new InstantCommand(() -> m_intakeSubsytem.intakeZero()));
+    m_driverController.x().onTrue(new InstantCommand(() -> m_intakeSubsytem.intakeIn()));
+
     m_operatorController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.TOP)));
     m_operatorController.a().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)));
     m_operatorController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CUBE)));
     m_operatorController.x().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)));
     m_operatorController.y().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
 
-    m_driverController.leftTrigger()
-        .onTrue(new RunCommand(() -> m_intakeSubsytem.cubeIn(), m_intakeSubsytem))
-        .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
-
-    m_driverController.leftBumper()
-        .onTrue(new RunCommand(() -> m_intakeSubsytem.cubeSpit(), m_intakeSubsytem))
-        .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
-
-    m_driverController.rightTrigger()
-        .onTrue(new RunCommand(() -> m_intakeSubsytem.coneIn(), m_intakeSubsytem))
-        .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
-
-    m_driverController.rightBumper()
-        .onTrue(new RunCommand(() -> m_intakeSubsytem.coneSpit(), m_intakeSubsytem))
-        .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
-        m_driverController.x()
-        .onTrue(new RunCommand(() -> m_intakeSubsytem.intakeIn(), m_intakeSubsytem));
-
-    m_operatorController.rightTrigger().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
-    m_operatorController.rightBumper().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CUBE)));
-    m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
-    m_operatorController.leftTrigger().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.RETRACT)));
-
-    //Mid Cone Sequence
-    m_operatorController.povRight().onTrue(
+    // Mid Cone Sequence
+    m_operatorController.a().onTrue(
         new SequentialCommandGroup(
             new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)),
             new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)),
@@ -85,10 +76,51 @@ public class RobotContainer {
             new InstantCommand(() -> m_arm.setState(ArmStates.TOP)))
 
     );
+
+    m_operatorController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING))
+    .andThen(new WaitCommand(0.5))
+    .andThen(() -> m_claw.setState(ClawStates.OPEN))
+    .andThen(new WaitCommand(0.2))
+    .andThen(() -> m_elevator.setState(ElevatorStates.RETRACT)));
+
+    m_operatorController.rightTrigger().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
+    m_operatorController.rightBumper().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
+    m_operatorController.povUp().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
+    m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.TOP)));
+    m_operatorController.leftTrigger().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING)));
+    // m_operatorController.leftTrigger()
+    // .onTrue(new RunCommand(() -> m_intakeSubsytem.cubeIn(), m_intakeSubsytem))
+    // .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
+
+    // m_driverController.leftBumper()
+    // .onTrue(new RunCommand(() -> m_intakeSubsytem.cubeSpit(), m_intakeSubsytem))
+    // .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
+
+    // m_driverController.rightTrigger()
+    // .onTrue(new RunCommand(() -> m_intakeSubsytem.coneIn(), m_intakeSubsytem))
+    // .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
+
+    // m_driverController.rightBumper()
+    // .onTrue(new RunCommand(() -> m_intakeSubsytem.coneSpit(), m_intakeSubsytem))
+    // .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
+    // m_driverController.x()
+    // .onTrue(new RunCommand(() -> m_intakeSubsytem.intakeIn(), m_intakeSubsytem));
+
+    // m_operatorController.rightTrigger().onTrue(new InstantCommand(() ->
+    // m_elevator.setState(ElevatorStates.TOP)));
+    // m_operatorController.rightBumper().onTrue(new InstantCommand(() ->
+    // m_elevator.setState(ElevatorStates.MID_CUBE)));
+    // m_operatorController.leftBumper().onTrue(new InstantCommand(() ->
+    // m_elevator.setState(ElevatorStates.MID_CONE)));
+    // m_operatorController.leftTrigger().onTrue(new InstantCommand(() ->
+    // m_elevator.setState(ElevatorStates.RETRACT)));
+
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    // PathPlannerTrajectory t = PathPlanner.loadPath("StraightPath", null);
+    // return m_drivetrain.traj(null, true);
+    return null;
   }
 
   private double deadband(double value, double deadband) {
