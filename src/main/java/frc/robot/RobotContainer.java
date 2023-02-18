@@ -21,8 +21,6 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.Elevator.ElevatorStates;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 
-
-
 public class RobotContainer {
 
   private final IntakeSubsystem m_intakeSubsytem = IntakeSubsystem.getInstance();
@@ -42,12 +40,11 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-
+    m_driverController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.TOP)));
     m_driverController.a().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)));
     m_driverController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CUBE)));
     m_driverController.x().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)));
     m_driverController.y().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
-
 
     m_driverController.leftTrigger()
         .onTrue(new RunCommand(() -> m_intakeSubsytem.cubeIn(), m_intakeSubsytem))
@@ -71,7 +68,6 @@ public class RobotContainer {
     m_operatorController.x().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CUBE)));
     m_operatorController.y().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
     m_operatorController.a().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.RETRACT)));
-
 
   }
 

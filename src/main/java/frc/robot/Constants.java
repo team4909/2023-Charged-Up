@@ -5,7 +5,7 @@ public final class Constants {
 
     public static final class ClawConstants {
 
-        public static final double kP = 0.05;
+        public static final double kP = 5;
 
         public static final double OUTPUT_LIMIT = 0.09;
     }
