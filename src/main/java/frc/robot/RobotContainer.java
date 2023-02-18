@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Arm.ArmStates;
@@ -66,20 +67,21 @@ public class RobotContainer {
         m_driverController.x()
         .onTrue(new RunCommand(() -> m_intakeSubsytem.intakeIn(), m_intakeSubsytem));
 
-    m_operatorController.b().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
-    m_operatorController.x().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CUBE)));
-    m_operatorController.y().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
-    // m_operatorController.a().onTrue(new InstantCommand(() ->
-    // m_elevator.setState(ElevatorStates.RETRACT)));
+    m_operatorController.rightTrigger().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
+    m_operatorController.rightBumper().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CUBE)));
+    m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
+    m_operatorController.leftTrigger().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.RETRACT)));
 
-    // Mid Cone Sequence
-    m_operatorController.a().onTrue(
+    //Mid Cone Sequence
+    m_operatorController.povRight().onTrue(
         new SequentialCommandGroup(
             new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)),
-            new InstantCommand(() -> m_intakeSubsytem.handOff()),
             new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)),
-            new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)).withTimeout(3),
+            new WaitCommand(1),
+            new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)),
+            new WaitCommand(1),
             new InstantCommand(() -> m_intakeSubsytem.coneSpit()),
+            new WaitCommand(1),
             new InstantCommand(() -> m_arm.setState(ArmStates.TOP)))
 
     );

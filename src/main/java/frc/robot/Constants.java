@@ -5,9 +5,9 @@ public final class Constants {
 
     public static final class ClawConstants {
 
-        public static final double kP = 5;
+        public static final double kP = 6;
 
-        public static final double OUTPUT_LIMIT = 0.09;
+        public static final double OUTPUT_LIMIT = 0.5;
     }
 
     public static final class WristConstants {
