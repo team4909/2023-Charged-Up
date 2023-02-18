@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Arm.ArmStates;
@@ -20,6 +21,7 @@ import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.Elevator.ElevatorStates;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem.IntakeStates;
 
 public class RobotContainer {
 
@@ -67,8 +69,20 @@ public class RobotContainer {
     m_operatorController.b().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
     m_operatorController.x().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CUBE)));
     m_operatorController.y().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
-    m_operatorController.a().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.RETRACT)));
+    // m_operatorController.a().onTrue(new InstantCommand(() ->
+    // m_elevator.setState(ElevatorStates.RETRACT)));
 
+    // Mid Cone Sequence
+    m_operatorController.a().onTrue(
+        new SequentialCommandGroup(
+            new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)),
+            new InstantCommand(() -> m_intakeSubsytem.handOff()),
+            new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)),
+            new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)).withTimeout(3),
+            new InstantCommand(() -> m_intakeSubsytem.coneSpit()),
+            new InstantCommand(() -> m_arm.setState(ArmStates.TOP)))
+
+    );
   }
 
   public Command getAutonomousCommand() {
