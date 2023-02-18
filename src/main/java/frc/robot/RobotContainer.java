@@ -40,11 +40,11 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    m_driverController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.TOP)));
-    m_driverController.a().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)));
-    m_driverController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CUBE)));
-    m_driverController.x().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)));
-    m_driverController.y().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
+    m_operatorController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.TOP)));
+    m_operatorController.a().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)));
+    m_operatorController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CUBE)));
+    m_operatorController.x().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)));
+    m_operatorController.y().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
 
     m_driverController.leftTrigger()
         .onTrue(new RunCommand(() -> m_intakeSubsytem.cubeIn(), m_intakeSubsytem))
@@ -61,7 +61,7 @@ public class RobotContainer {
     m_driverController.rightBumper()
         .onTrue(new RunCommand(() -> m_intakeSubsytem.coneSpit(), m_intakeSubsytem))
         .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
-    m_driverController.x()
+        m_driverController.x()
         .onTrue(new RunCommand(() -> m_intakeSubsytem.intakeIn(), m_intakeSubsytem));
 
     m_operatorController.b().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));

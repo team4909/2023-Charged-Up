@@ -139,7 +139,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 m_backRoller.set(intakeSpeed/2.0);
                 break;
             case CONE_SPIT:
-                m_hinge_setpoint = 10;
+                m_hinge_setpoint = 2;
                 m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                 m_frontRoller.set(intakeSpeed);
                 m_backRoller.set(-intakeSpeed);
@@ -161,7 +161,7 @@ public class IntakeSubsystem extends SubsystemBase {
                     m_frontRoller.set(0.2);
                     m_backRoller.set(-.05);
                 } else if (m_lastState.toString() == "CONE_IN") {
-                    m_hinge_setpoint = 7.55;
+                    m_hinge_setpoint = 4.88;
                     m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                     m_frontRoller.set(0.2);
                     m_backRoller.set(0.1);
