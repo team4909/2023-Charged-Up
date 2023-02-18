@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ClawConstants;
 import frc.robot.Constants.WristConstants;
 
 public class Arm extends SubsystemBase {
@@ -24,6 +23,7 @@ public class Arm extends SubsystemBase {
     public enum ArmStates {
         IDLE("Idle"),
         ZERO("Zero"),
+        TOP("Top"),
         HANDOFF_CONE("Handoff Cone"),
         HANDOFF_CUBE("Handoff Cube"),
         RETRACTED("Retracted"),
@@ -69,6 +69,9 @@ public class Arm extends SubsystemBase {
                     break;
                 case ZERO:
                     currentWristCommand = Zero();
+                    break;
+                case TOP:
+                    currentWristCommand = Handoff(110);
                     break;
                 case HANDOFF_CONE:
                     currentWristCommand = Handoff(-37.361);
@@ -125,10 +128,6 @@ public class Arm extends SubsystemBase {
         m_wristMotor.getPIDController().setReference(setpoint, ControlType.kPosition);
         // m_wristMotor.getPIDController().setReference(setpoint,
         // ControlType.kSmartMotion);
-    }
-
-    private double mapValue(double oldVal, double oldMin, double oldMax, double newMin, double newMax) {
-        return (((oldVal - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
     }
 
     public void setState(ArmStates state) {

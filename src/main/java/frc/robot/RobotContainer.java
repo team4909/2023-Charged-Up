@@ -26,10 +26,12 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    m_driverController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.TOP)));
     m_driverController.a().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)));
     m_driverController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CUBE)));
     m_driverController.x().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)));
     m_driverController.y().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
+
   }
 
   public Command getAutonomousCommand() {
