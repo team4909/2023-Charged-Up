@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.lang.constant.DirectMethodHandleDesc;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -13,6 +15,8 @@ import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.arm.Arm.ArmStates;
 import frc.robot.subsystems.arm.Claw;
 import frc.robot.subsystems.arm.Claw.ClawStates;
+import frc.robot.subsystems.drivetrain.DefaultDriveCommand;
+import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.Elevator.ElevatorStates;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -29,9 +33,12 @@ public class RobotContainer {
 
   private final Arm m_arm = Arm.getInstance();
   private final Claw m_claw = Claw.getInstance();
+  private final Drivetrain m_drivetrain = Drivetrain.getInstance();
 
   public RobotContainer() {
     configureBindings();
+
+    m_drivetrain.setDefaultCommand(new DefaultDriveCommand(m_driverController));
   }
 
   private void configureBindings() {

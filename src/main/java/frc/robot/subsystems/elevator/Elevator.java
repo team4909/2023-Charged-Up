@@ -2,6 +2,7 @@ package frc.robot.subsystems.elevator;
 
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -134,7 +135,6 @@ public class Elevator extends SubsystemBase {
   private Command SetSetpoint(double setpoint) {
     return new RunCommand(() -> {
       m_leftExtensionMotor.set(TalonFXControlMode.Position, setpoint);
-      m_rightExtensionMotor.set(TalonFXControlMode.Position, setpoint);
     }, this);
   }
 
@@ -151,15 +151,11 @@ public class Elevator extends SubsystemBase {
     m_leftExtensionMotor.config_kP(0, ElevatorConstants.ELEVATOR_KP);
     m_leftExtensionMotor.config_kD(0, ElevatorConstants.ELEVATOR_KD);
     m_leftExtensionMotor.configClosedLoopPeakOutput(0, ElevatorConstants.PEAK_OUTPUT);
+    m_leftExtensionMotor.setInverted(false);
 
     m_rightExtensionMotor.configFactoryDefault();
-    m_rightExtensionMotor.setInverted(true);
-    m_rightExtensionMotor.configFactoryDefault();
-    m_rightExtensionMotor.setSelectedSensorPosition(0);
-    m_rightExtensionMotor.config_kP(0, ElevatorConstants.ELEVATOR_KP);
-    m_rightExtensionMotor.config_kD(0, ElevatorConstants.ELEVATOR_KD);
-    m_rightExtensionMotor.configClosedLoopPeakOutput(0, ElevatorConstants.PEAK_OUTPUT);
-
+    m_rightExtensionMotor.setInverted(TalonFXInvertType.OpposeMaster);
+    m_rightExtensionMotor.follow(m_leftExtensionMotor);
   }
 
   public void setState(ElevatorStates state) {

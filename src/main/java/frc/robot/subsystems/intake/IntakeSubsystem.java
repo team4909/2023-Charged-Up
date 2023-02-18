@@ -120,7 +120,7 @@ public class IntakeSubsystem extends SubsystemBase {
         switch (m_currentState) {
             case CUBE_IN:
                 // PID Refrence set to out setpoint, ~30
-                m_hinge_setpoint = 10;
+                m_hinge_setpoint = 10.5;
                 m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                 m_frontRoller.set(intakeSpeed);
                 m_backRoller.set(-intakeSpeed/2.0);
@@ -133,7 +133,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 m_backRoller.set(intakeSpeed);
                 break;
             case CONE_IN:
-                m_hinge_setpoint = 10;
+                m_hinge_setpoint = 11;
                 m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                 m_frontRoller.set(intakeSpeed);
                 m_backRoller.set(intakeSpeed/2.0);
@@ -159,7 +159,7 @@ public class IntakeSubsystem extends SubsystemBase {
                     m_hinge_setpoint = 7.73;
                     m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                     m_frontRoller.set(0.2);
-                    m_backRoller.set(-0.1);
+                    m_backRoller.set(-.05);
                 } else if (m_lastState.toString() == "CONE_IN") {
                     m_hinge_setpoint = 7.55;
                     m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);

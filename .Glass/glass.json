@@ -1,6 +1,6 @@
 {
   "NetworkTables": {
-    "Retained Values": {
+    "Persistent Values": {
       "open": false
     },
     "transitory": {
