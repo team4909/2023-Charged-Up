@@ -27,7 +27,8 @@ public class Arm extends SubsystemBase {
         HANDOFF_CONE("Handoff Cone"),
         HANDOFF_CUBE("Handoff Cube"),
         RETRACTED("Retracted"),
-        DROPPING("Dropping");
+        DROPPING("Dropping"),
+        DROPPING_FLICK("Dropping Flick");
 
         String stateName;
 
@@ -74,12 +75,15 @@ public class Arm extends SubsystemBase {
                     currentWristCommand = SetWristPosition(110);
                     break;
                 case HANDOFF_CONE:
-                    currentWristCommand = SetWristPosition(-37.361);
+                    currentWristCommand = SetWristPosition(-40.361);
                     break;
                 case HANDOFF_CUBE:
                     currentWristCommand = SetWristPosition(-7.966);
                     break;
                 case DROPPING: 
+                    currentWristCommand = SetWristPosition(0);
+                    break;
+                case DROPPING_FLICK:
                     currentWristCommand = SetWristPosition(-40);
                     break;
                 case RETRACTED:

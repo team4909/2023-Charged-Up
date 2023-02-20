@@ -270,6 +270,20 @@ public class Drivetrain extends SubsystemBase {
         return new InstantCommand(() -> this.m_odometry.resetPosition(getGyroHeading(), getModulePositions(), getPose()));
     }
 
+    public Command runPath(PathPlannerTrajectory traj) {
+        PIDController xyController = new PIDController(5, 0, 0);
+
+        return new PPSwerveControllerCommand(
+                        traj,
+                        this::getPose,
+                        this.m_kinematics,
+                        xyController,
+                        xyController,
+                        new PIDController(5, 0, 0),
+                        this::setModuleStates,
+                        this);
+    }
+
     public Command traj(PathPlannerTrajectory traj, boolean isFirstPath) {
 
         PIDController xyController = new PIDController(5, 0, 0);

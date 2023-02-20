@@ -77,11 +77,16 @@ public class RobotContainer {
 
     );
 
+    m_operatorController.start().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING_FLICK))
+    .andThen(new WaitCommand(0.5))
+    .andThen(() -> m_claw.setState(ClawStates.OPEN))
+    .andThen(new WaitCommand(0.2))
+    .andThen(() -> m_elevator.setState(ElevatorStates.RETRACT)));
+
     m_operatorController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING))
     .andThen(new WaitCommand(0.5))
     .andThen(() -> m_claw.setState(ClawStates.OPEN))
     .andThen(new WaitCommand(0.2))
-    // .andThen(() -> m_arm.setState(ArmStates.TOP))
     .andThen(() -> m_elevator.setState(ElevatorStates.RETRACT)));
 
     m_operatorController.rightTrigger().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
@@ -129,8 +134,10 @@ public class RobotContainer {
     .andThen(new WaitCommand(0.2))
     // .andThen(() -> m_arm.setState(ArmStates.TOP))
     .andThen(() -> m_elevator.setState(ElevatorStates.RETRACT))
+    // .andThen(new WaitCommand(3))
+    // .andThen(() -> m_drivetrain.traj(PathPlanner.loadPath("StraightPath", 3, 2), false))
     );
-    // return null;
+    // return new InstantCommand(() -> m_drivetrain.runPath(PathPlanner.loadPath("StraightPath", 3, 2)));
   }
 
   private double deadband(double value, double deadband) {
