@@ -27,6 +27,7 @@ public class IntakeSubsystem extends SubsystemBase {
         CUBE_SPIT("CUBE_SPIT"),
         CONE_IN("CONE_IN"),
         CONE_SPIT("CONE_SPIT"),
+        SPIT("SPIT"),
         HANDOFF("HANDOFF");
 
         String stateName;
@@ -151,13 +152,19 @@ public class IntakeSubsystem extends SubsystemBase {
                     m_frontRoller.set(0);
                     m_backRoller.set(0);
                     break;
+                case SPIT:
+                    if (m_lastState.equals(IntakeStates.CONE_IN)) {
+                        m_currentState = IntakeStates.CONE_SPIT;
+                    } else if  (m_lastState.equals(IntakeStates.CUBE_IN)) {
+                        m_currentState = IntakeStates.CONE_SPIT;
+                    }
                 case HANDOFF:
-                    if (m_lastState.toString() == "CUBE_IN") {
+                    if (m_lastState.equals(IntakeStates.CUBE_IN)) {
                         m_hinge_setpoint = 7.73;
                         m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                         m_frontRoller.set(0.2);
                         m_backRoller.set(-.05);
-                    } else if (m_lastState.toString() == "CONE_IN") {
+                    } else if (m_lastState.equals(IntakeStates.CONE_IN)) {
                         m_hinge_setpoint = 4.88;
                         m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                         m_frontRoller.set(0.2);
@@ -189,32 +196,8 @@ public class IntakeSubsystem extends SubsystemBase {
                 })).schedule();
     }
 
-    public void intakeZero() {
-        m_currentState = IntakeStates.CALIBRATE;
-    }
-
-    public void cubeIn() {
-        m_currentState = IntakeStates.CUBE_IN;
-    }
-
-    public void cubeSpit() {
-        m_currentState = IntakeStates.CUBE_SPIT;
-    }
-
-    public void coneIn() {
-        m_currentState = IntakeStates.CONE_IN;
-    }
-
-    public void coneSpit() {
-        m_currentState = IntakeStates.CONE_SPIT;
-    }
-
-    public void intakeIn() {
-        m_currentState = IntakeStates.IN;
-    }
-
-    public void handOff() {
-        m_currentState = IntakeStates.HANDOFF;
+    public InstantCommand setState(IntakeStates desiredState) {
+        return new InstantCommand(() -> m_currentState = desiredState);
     }
 
 }

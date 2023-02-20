@@ -4,6 +4,7 @@ import com.ctre.phoenix.sensors.Pigeon2;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter; 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -235,6 +237,13 @@ public class Drivetrain extends SubsystemBase {
 
     }
 
+    public void drive (ChassisSpeeds speeds){
+        // Convert to module states
+        SwerveModuleState[] moduleStates = m_kinematics.toSwerveModuleStates(speeds);
+
+        setModuleStates(moduleStates);
+    }
+
     public void DriveWithVelocity(double fwdBackDir, double leftRightDir, double turn) {
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
             fwdBackDir * Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
@@ -250,6 +259,7 @@ public class Drivetrain extends SubsystemBase {
 
     public static final double MAX_VELOCITY_METERS_PER_SECOND = 4;
     public static final double MAX_OMEGA_RADIANS_PER_SECOND = 2.5;
+    private static final double MAX_ANGULAR_SPEED = 4;  // rads per sec
 
     public void setModuleStates(SwerveModuleState[] moduleStates) {
 
@@ -318,5 +328,17 @@ public class Drivetrain extends SubsystemBase {
     public void setGyro(double d) {
         pigeon.setYaw(d);
     }
-
+    private Command SnapToAngle(double angle) {
+        PIDController snapPID = new PIDController(0.005, 0.0, 0.0);
+        snapPID.enableContinuousInput(-180, 180);
+        snapPID.setSetpoint(angle);
+        return new RunCommand(
+                () -> {
+                    double omega = snapPID.calculate(
+                            (MathUtil.inputModulus(getGyroHeading().getDegrees(), -180, 180)),
+                            snapPID.getSetpoint());
+                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, omega * MAX_ANGULAR_SPEED, getGyroHeading()));
+                },
+                this).andThen(() -> snapPID.close());
+    }
 }
