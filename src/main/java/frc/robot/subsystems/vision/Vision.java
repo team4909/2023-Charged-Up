@@ -1,9 +1,8 @@
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.limelight.LimelightHelpers;
 import frc.lib.limelight.LimelightHelpers.LimelightResults;
@@ -12,6 +11,27 @@ public class Vision extends SubsystemBase {
 
     private static Vision m_instance = null;
     private LimelightResults m_visionResults;
+    private SwerveDrivePoseEstimator m_swerveDrivePoseEstimator;
+
+    private VisionStates m_state = VisionStates.IDLE;
+    private VisionStates m_lastState;
+
+    final double REACH_DISTANCE = 5d;
+
+    public enum VisionStates {
+        IDLE("Idle"),
+        LOCALIZING("Localizing");
+
+        String stateName;
+
+        private VisionStates(String name) {
+            this.stateName = name;
+        }
+
+        public String toString() {
+            return this.stateName;
+        }
+    }
 
     private Vision() {
 
@@ -19,8 +39,8 @@ public class Vision extends SubsystemBase {
 
     @Override
     public void periodic() {
+        stateMachine();
         m_visionResults = LimelightHelpers.getLatestResults("limelight");
-        SmartDashboard.putString("Vision Pose", this.generatePose().toString());
     }
 
     public static Vision getInstance() {
@@ -30,11 +50,32 @@ public class Vision extends SubsystemBase {
         return m_instance;
     }
 
-    private Pose3d generatePose() {
-        double[] poseCoords = m_visionResults.targetingResults.botpose;
-        return new Pose3d(
-                new Translation3d(poseCoords[0], poseCoords[1], poseCoords[2]),
-                new Rotation3d(poseCoords[3], poseCoords[4], poseCoords[5]));
+    private double getThetaToTurn() {
+        var xError = 0;
+        return Math.acos(xError / REACH_DISTANCE);
+    }
+
+    private void stateMachine() {
+        Command currentVisionCommand = null;
+        if (!m_state.equals(m_lastState)) {
+            switch (m_state) {
+                case IDLE:
+                    currentVisionCommand = new InstantCommand();
+                    break;
+                case LOCALIZING:
+                    currentVisionCommand = new InstantCommand();
+                    break;
+                default:
+                    m_state = VisionStates.IDLE;
+                    break;
+            }
+        }
+
+        m_lastState = m_state;
+
+        if (currentVisionCommand != null) {
+            currentVisionCommand.schedule();
+        }
     }
 
 }
