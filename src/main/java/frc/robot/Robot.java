@@ -13,13 +13,11 @@ import frc.robot.subsystems.vision.DriveCamera;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
-  private DriveCamera m_driveCamera;
 
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    m_driveCamera = new DriveCamera();
-    m_driveCamera.startPipeline();
+    new DriveCamera();
   }
 
   @Override
