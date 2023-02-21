@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drivetrain;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
@@ -56,10 +58,10 @@ public class Drivetrain extends SubsystemBase {
 
     Joystick js0 = new Joystick(0);
 
-    private final double FRONT_LEFT_ENC_OFFSET = 282.7;
-    private final double FRONT_RIGHT_ENC_OFFSET = 186.2;
-    private final double BACK_RIGHT_ENC_OFFSET = 180 + 91.2;
-    private final double BACK_LEFT_ENC_OFFSET = 251.2;
+    private final double FRONT_LEFT_ENC_OFFSET = 426.9;// 282.7;
+    private final double FRONT_RIGHT_ENC_OFFSET = 78.4;// 186.2;
+    private final double BACK_RIGHT_ENC_OFFSET = 317.7;// 180 + 91.2;
+    private final double BACK_LEFT_ENC_OFFSET = 250;// 251.2;
 
     Module leftModule = new Module("FrontLeft", 7, 8, 14, FRONT_LEFT_ENC_OFFSET);
     Module rightModule = new Module("FrontRight", 2, 1, 11, FRONT_RIGHT_ENC_OFFSET);
@@ -72,7 +74,9 @@ public class Drivetrain extends SubsystemBase {
     SlewRateLimiter leftRightRateLimiter = new SlewRateLimiter(0.5);
     SlewRateLimiter turnRateLimiter = new SlewRateLimiter(0.5);
 
-    Pigeon2 pigeon = new Pigeon2(20);
+    private DoubleSupplier m_joystickTranslationX, m_joystickTranslationY, m_joystickRotationOmega;
+
+    Pigeon2 pigeon = new Pigeon2(20, "CANivore1");
     // Global variable for drive rate speed
     double g_driveRate;
 
@@ -255,6 +259,12 @@ public class Drivetrain extends SubsystemBase {
         setModuleStates(moduleStates);
     }
 
+    public void setJoystickSuppliers(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega) {
+        m_joystickTranslationX = x;
+        m_joystickTranslationY = y;
+        m_joystickRotationOmega = omega;
+    }
+
     public static final double MAX_VELOCITY_METERS_PER_SECOND = 4;
     public static final double MAX_OMEGA_RADIANS_PER_SECOND = 2.5;
     private static final double MAX_ANGULAR_SPEED = 4; // rads per sec
@@ -331,16 +341,21 @@ public class Drivetrain extends SubsystemBase {
     public void setGyro(double d) {
         pigeon.setYaw(d);
     }
+
     public Command SnapToAngle(double angle) {
         PIDController snapPID = new PIDController(0.005, 0.0, 0.0);
         snapPID.enableContinuousInput(-180, 180);
         snapPID.setSetpoint(angle);
+        snapPID.setTolerance(2);
         return new RunCommand(
                 () -> {
                     double omega = snapPID.calculate(
                             (MathUtil.inputModulus(getGyroHeading().getDegrees(), -180, 180)),
                             snapPID.getSetpoint());
-                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, omega * MAX_ANGULAR_SPEED, getGyroHeading()));
+                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(
+                            -m_joystickTranslationX.getAsDouble() * Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+                            -m_joystickTranslationY.getAsDouble() * Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+                            (m_joystickRotationOmega.getAsDouble() + omega) * MAX_ANGULAR_SPEED, getGyroHeading()));
                 },
                 this).finallyDo((i) -> snapPID.close()).until(() -> snapPID.atSetpoint());
     }
