@@ -6,7 +6,7 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.filter.SlewRateLimiter; 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -56,11 +56,10 @@ public class Drivetrain extends SubsystemBase {
 
     Joystick js0 = new Joystick(0);
 
-
     private final double FRONT_LEFT_ENC_OFFSET = 282.7;
     private final double FRONT_RIGHT_ENC_OFFSET = 186.2;
-    private final double BACK_RIGHT_ENC_OFFSET = 180+91.2;
-    private final double BACK_LEFT_ENC_OFFSET = 251.2;   
+    private final double BACK_RIGHT_ENC_OFFSET = 180 + 91.2;
+    private final double BACK_LEFT_ENC_OFFSET = 251.2;
 
     Module leftModule = new Module("FrontLeft", 7, 8, 14, FRONT_LEFT_ENC_OFFSET);
     Module rightModule = new Module("FrontRight", 2, 1, 11, FRONT_RIGHT_ENC_OFFSET);
@@ -74,7 +73,7 @@ public class Drivetrain extends SubsystemBase {
     SlewRateLimiter turnRateLimiter = new SlewRateLimiter(0.5);
 
     Pigeon2 pigeon = new Pigeon2(20);
-    //Global variable for drive rate speed
+    // Global variable for drive rate speed
     double g_driveRate;
 
     public Rotation2d getGyroHeading() {
@@ -102,23 +101,25 @@ public class Drivetrain extends SubsystemBase {
         }
         return m_inst;
     }
-    private SwerveModulePosition[] getModulePositions () {
+
+    private SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
-        positions[0] = leftModule.getPosition();  
-        positions[1] = rightModule.getPosition();  
+        positions[0] = leftModule.getPosition();
+        positions[1] = rightModule.getPosition();
         positions[2] = backRightModule.getPosition();
-        positions[3] = backLeftModule.getPosition();  
-       return positions;
-        
+        positions[3] = backLeftModule.getPosition();
+        return positions;
+
     }
+
     private Drivetrain() {
         pigeon.setYaw(0);
 
         m_odometry = new SwerveDriveOdometry(
                 m_kinematics,
                 getGyroHeading(),
-             getModulePositions());
-        
+                getModulePositions());
+
         SmartDashboard.putBoolean("Done", false);
     }
 
@@ -145,7 +146,7 @@ public class Drivetrain extends SubsystemBase {
         rightModule.periodic();
         backLeftModule.periodic();
         backRightModule.periodic();
-       
+
         SmartDashboard.putNumber("Pidgeon yaw", pigeon.getYaw());
         field.setRobotPose(m_odometry.getPoseMeters());
         SmartDashboard.putData(field);
@@ -161,12 +162,11 @@ public class Drivetrain extends SubsystemBase {
         if (js0.getRawButton(7)) {
             pigeon.setYaw(0);
         }
-        //Button 6 is right bumper/slow button
-        //Speed is multiplied by 0.3 when held down
+        // Button 6 is right bumper/slow button
+        // Speed is multiplied by 0.3 when held down
         if (js0.getRawButton(6)) {
             setDriveRate(0.3);
-        }
-        else {
+        } else {
             setDriveRate(1);
         }
 
@@ -222,8 +222,6 @@ public class Drivetrain extends SubsystemBase {
         // counteclockwise.
         // ChassisSpeeds speeds = new ChassisSpeeds(fwdBackDir, leftRightDir, turn);
 
-        
-
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                 fwdBackDir * Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
                 leftRightDir * Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
@@ -237,7 +235,7 @@ public class Drivetrain extends SubsystemBase {
 
     }
 
-    public void drive (ChassisSpeeds speeds){
+    public void drive(ChassisSpeeds speeds) {
         // Convert to module states
         SwerveModuleState[] moduleStates = m_kinematics.toSwerveModuleStates(speeds);
 
@@ -246,10 +244,10 @@ public class Drivetrain extends SubsystemBase {
 
     public void DriveWithVelocity(double fwdBackDir, double leftRightDir, double turn) {
         ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-            fwdBackDir * Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            leftRightDir * Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
-            turn * Drivetrain.MAX_OMEGA_RADIANS_PER_SECOND,
-            Rotation2d.fromDegrees(pigeon.getYaw()));
+                fwdBackDir * Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+                leftRightDir * Drivetrain.MAX_VELOCITY_METERS_PER_SECOND,
+                turn * Drivetrain.MAX_OMEGA_RADIANS_PER_SECOND,
+                Rotation2d.fromDegrees(pigeon.getYaw()));
 
         // Convert to module states
         SwerveModuleState[] moduleStates = m_kinematics.toSwerveModuleStates(speeds);
@@ -259,7 +257,7 @@ public class Drivetrain extends SubsystemBase {
 
     public static final double MAX_VELOCITY_METERS_PER_SECOND = 4;
     public static final double MAX_OMEGA_RADIANS_PER_SECOND = 2.5;
-    private static final double MAX_ANGULAR_SPEED = 4;  // rads per sec
+    private static final double MAX_ANGULAR_SPEED = 4; // rads per sec
 
     public void setModuleStates(SwerveModuleState[] moduleStates) {
 
@@ -277,21 +275,22 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public Command resetOdometry() {
-        return new InstantCommand(() -> this.m_odometry.resetPosition(getGyroHeading(), getModulePositions(), getPose()));
+        return new InstantCommand(
+                () -> this.m_odometry.resetPosition(getGyroHeading(), getModulePositions(), getPose()));
     }
 
     public Command runPath(PathPlannerTrajectory traj) {
         PIDController xyController = new PIDController(5, 0, 0);
 
         return new PPSwerveControllerCommand(
-                        traj,
-                        this::getPose,
-                        this.m_kinematics,
-                        xyController,
-                        xyController,
-                        new PIDController(5, 0, 0),
-                        this::setModuleStates,
-                        this);
+                traj,
+                this::getPose,
+                this.m_kinematics,
+                xyController,
+                xyController,
+                new PIDController(5, 0, 0),
+                this::setModuleStates,
+                this);
     }
 
     public Command traj(PathPlannerTrajectory traj, boolean isFirstPath) {
@@ -301,8 +300,9 @@ public class Drivetrain extends SubsystemBase {
         return new SequentialCommandGroup(
                 new InstantCommand(() -> {
                     if (isFirstPath)
-                        this.m_odometry.resetPosition(getGyroHeading(),getModulePositions(),traj.getInitialHolonomicPose());
-            
+                        this.m_odometry.resetPosition(getGyroHeading(), getModulePositions(),
+                                traj.getInitialHolonomicPose());
+
                 }),
                 new PPSwerveControllerCommand(
                         traj,
@@ -315,12 +315,15 @@ public class Drivetrain extends SubsystemBase {
                         this),
                 new InstantCommand(() -> {
                     SmartDashboard.putBoolean("Done", true);
-                })).andThen(new InstantCommand(() -> {setModuleStates(m_kinematics.toSwerveModuleStates(new ChassisSpeeds(0,0,0)));}));
+                })).andThen(new InstantCommand(() -> {
+                    setModuleStates(m_kinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0)));
+                }));
     }
 
     public void setDriveRate(double driveRate) {
         g_driveRate = driveRate;
     }
+
     public double getDriveRate() {
         return g_driveRate;
     }
@@ -339,6 +342,6 @@ public class Drivetrain extends SubsystemBase {
                             snapPID.getSetpoint());
                     drive(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, omega * MAX_ANGULAR_SPEED, getGyroHeading()));
                 },
-                this).andThen(() -> snapPID.close());
+                this).finallyDo((i) -> snapPID.close()).until(() -> snapPID.atSetpoint());
     }
 }
