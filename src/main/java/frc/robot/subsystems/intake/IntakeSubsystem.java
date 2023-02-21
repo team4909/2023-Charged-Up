@@ -178,7 +178,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     }
 
-    private void calibrateIntake() {
+    public void calibrateIntake() {
         // Runs the intake backwards for .75 seconds, and then sets the encoder position
         // to 0
         new RunCommand(() -> {

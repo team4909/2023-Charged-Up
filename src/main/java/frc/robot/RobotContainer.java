@@ -60,8 +60,12 @@ public class RobotContainer {
       .onFalse(m_intakeSubsytem.setState(IntakeStates.HANDOFF));
 
     m_driverController.povDown().onTrue(m_intakeSubsytem.setState(IntakeStates.CALIBRATE));
-    m_driverController.x().onTrue(m_intakeSubsytem.setState(IntakeStates.IN));
-
+    
+    
+    // m_driverController.x().onTrue(m_drivetrain.SnapToAngle(0));
+    // m_driverController.y().onTrue(m_drivetrain.SnapToAngle(90));
+    // m_driverController.b().onTrue(m_drivetrain.SnapToAngle(180));
+    // m_driverController.a().onTrue(m_drivetrain.SnapToAngle(-90));
     // -----------------------------------
 
     m_operatorController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.TOP)));

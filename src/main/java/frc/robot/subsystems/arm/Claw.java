@@ -111,6 +111,7 @@ public class Claw extends SubsystemBase {
     }
 
     public void setState(ClawStates state) {
+        System.out.println(state);
         m_state = state;
     }
 

@@ -328,7 +328,7 @@ public class Drivetrain extends SubsystemBase {
     public void setGyro(double d) {
         pigeon.setYaw(d);
     }
-    private Command SnapToAngle(double angle) {
+    public Command SnapToAngle(double angle) {
         PIDController snapPID = new PIDController(0.005, 0.0, 0.0);
         snapPID.enableContinuousInput(-180, 180);
         snapPID.setSetpoint(angle);
