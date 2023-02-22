@@ -58,10 +58,10 @@ public class Drivetrain extends SubsystemBase {
 
     Joystick js0 = new Joystick(0);
 
-    private final double FRONT_LEFT_ENC_OFFSET = 426.9;// 282.7;
-    private final double FRONT_RIGHT_ENC_OFFSET = 78.4;// 186.2;
-    private final double BACK_RIGHT_ENC_OFFSET = 317.7;// 180 + 91.2;
-    private final double BACK_LEFT_ENC_OFFSET = 250;// 251.2;
+    private final double FRONT_LEFT_ENC_OFFSET = 282.7;
+    private final double FRONT_RIGHT_ENC_OFFSET = 186.2;
+    private final double BACK_RIGHT_ENC_OFFSET = 91.2;
+    private final double BACK_LEFT_ENC_OFFSET = 251.2;
 
     Module leftModule = new Module("FrontLeft", 7, 8, 14, FRONT_LEFT_ENC_OFFSET);
     Module rightModule = new Module("FrontRight", 2, 1, 11, FRONT_RIGHT_ENC_OFFSET);
@@ -76,7 +76,7 @@ public class Drivetrain extends SubsystemBase {
 
     private DoubleSupplier m_joystickTranslationX, m_joystickTranslationY, m_joystickRotationOmega;
 
-    Pigeon2 pigeon = new Pigeon2(20, "CANivore1");
+    Pigeon2 pigeon = new Pigeon2(20);
     // Global variable for drive rate speed
     double g_driveRate;
 
@@ -343,7 +343,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public Command SnapToAngle(double angle) {
-        PIDController snapPID = new PIDController(0.005, 0.0, 0.0);
+        PIDController snapPID = new PIDController(0.012, 0.0, 0.0);
         snapPID.enableContinuousInput(-180, 180);
         snapPID.setSetpoint(angle);
         snapPID.setTolerance(2);
