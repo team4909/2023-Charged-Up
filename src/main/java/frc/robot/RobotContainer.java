@@ -50,6 +50,11 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    m_drivetrain.setJoystickSuppliers(
+        () -> m_driverController.getLeftY(),
+        () -> m_driverController.getLeftX(),
+        () -> m_driverController.getRightX());
+
     // #region Driver Controls
     // m_driverController.leftTrigger() Intake Cube
     m_driverController.leftBumper().onTrue(m_intakeSubsytem.setState(IntakeStates.SPIT));
@@ -62,10 +67,10 @@ public class RobotContainer {
     m_driverController.povDown().onTrue(m_intakeSubsytem.setState(IntakeStates.CALIBRATE));
     
     
-    // m_driverController.x().onTrue(m_drivetrain.SnapToAngle(0));
-    // m_driverController.y().onTrue(m_drivetrain.SnapToAngle(90));
-    // m_driverController.b().onTrue(m_drivetrain.SnapToAngle(180));
-    // m_driverController.a().onTrue(m_drivetrain.SnapToAngle(-90));
+    m_driverController.x().onTrue(m_drivetrain.SnapToAngle(-90));
+    m_driverController.y().onTrue(m_drivetrain.SnapToAngle(0));
+    m_driverController.b().onTrue(m_drivetrain.SnapToAngle(90));
+    m_driverController.a().onTrue(m_drivetrain.SnapToAngle(180));
     // -----------------------------------
 
     m_operatorController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.TOP)));
