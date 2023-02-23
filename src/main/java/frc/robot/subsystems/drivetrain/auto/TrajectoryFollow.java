@@ -42,7 +42,7 @@ public class TrajectoryFollow extends CommandBase {
     public void initialize() {
         timer.start();
         m_drivetrain.setState(DrivetrainStates.AUTONOMOUS);
-        m_trajectory = PathPlanner.loadPath(m_pathName, DrivetrainConstants.MAX_DRIVETRAIN_SPEED, 3);
+        m_trajectory = PathPlanner.loadPath(m_pathName, DrivetrainConstants.MAX_DRIVETRAIN_SPEED / 10, 3);
         if (m_trajectory == null) {
             DriverStation.reportError("Path not loaded correctly!", Thread.currentThread().getStackTrace());
             return;

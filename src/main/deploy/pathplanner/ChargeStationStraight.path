@@ -1,0 +1,59 @@
+{
+  "waypoints": [
+    {
+      "anchorPoint": {
+        "x": 1.768311431359705,
+        "y": 3.28
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.7683114313597024,
+        "y": 3.28
+      },
+      "holonomicAngle": 0.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.44,
+        "y": 3.28
+      },
+      "prevControl": {
+        "x": 3.4400000000000004,
+        "y": 3.28
+      },
+      "nextControl": null,
+      "holonomicAngle": 0.0,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    }
+  ],
+  "maxVelocity": 3.0,
+  "maxAcceleration": null,
+  "isReversed": null,
+  "markers": [
+    {
+      "position": 0.43636363636363645,
+      "names": [
+        "KingOfWorld"
+      ]
+    }
+  ]
+}

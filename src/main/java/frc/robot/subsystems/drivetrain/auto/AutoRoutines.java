@@ -6,6 +6,6 @@ public class AutoRoutines {
 
   public ParallelCommandGroup testCommand() {
     return new ParallelCommandGroup(
-        new TrajectoryFollow("Test", true));
+        new TrajectoryFollow("ChargeStationStraight", true));
   }
 }
