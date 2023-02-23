@@ -120,22 +120,6 @@ public class Drivetrain extends SubsystemBase {
         SmartDashboard.putBoolean("Done", false);
     }
 
-    // private Drivetrain() {
-    // drivetrainTab = Shuffleboard.getTab("drivetrain");
-
-    // }
-
-    // public static Drivetrain getInstance() {
-    // if (instance == null) {
-    // instance = new Drivetrain();
-    // }
-    // return instance;
-    // }
-
-    // public ShuffleboardTab getTab() {
-    // return drivetrainTab;
-    // }
-
     // this is alled every loop of the scheduler (~20ms)
     @Override
     public void periodic() {
@@ -248,7 +232,8 @@ public class Drivetrain extends SubsystemBase {
         setModuleStates(moduleStates);
     }
 
-    public static final double MAX_VELOCITY_METERS_PER_SECOND = 4;
+    // SDS Modules can go 16.3 ft/s at the L2 gear ratio
+    public static final double MAX_VELOCITY_METERS_PER_SECOND = 16.3 / 3.281;
     public static final double MAX_OMEGA_RADIANS_PER_SECOND = 2.5;
 
     public void setModuleStates(SwerveModuleState[] moduleStates) {

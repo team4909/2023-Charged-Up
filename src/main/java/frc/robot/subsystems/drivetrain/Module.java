@@ -14,95 +14,88 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 
 public class Module {
-    TalonFX driveMotor;
-    TalonFX turnMotor;
-    double m_offset ; 
-    CANCoder enc;
-    String m_name;
+    private TalonFX m_driveMotor;
+    private TalonFX m_turnMotor;
+    private double m_offset ; 
+    private CANCoder m_enc;
+    private String m_name;
     // ShuffleboardTab tab;
 
     public Module(String name, int driveMotorCanId, int turnMotorCanId, int encoderCanId, double encOffset) {
-        this.m_name = name;
+        m_name = name;
         m_offset = encOffset;
-        // this.tab = DrivetrainSubsystem.getInstance().getTab();
 
-        driveMotor = new TalonFX(driveMotorCanId, "CANivore1"); 
-        turnMotor = new TalonFX(turnMotorCanId, "CANivore1");
-        enc = new CANCoder(encoderCanId, "CANivore1");
+        m_driveMotor = new TalonFX(driveMotorCanId, "CANivore1"); 
+        m_turnMotor = new TalonFX(turnMotorCanId, "CANivore1");
+        m_enc = new CANCoder(encoderCanId, "CANivore1");
 
-        enc.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
+        m_enc.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
 
-        // enc.setStatusFramePeriod(statusFrame, periodMs)
+        m_turnMotor.configFactoryDefault();
+        m_driveMotor.configFactoryDefault();
 
-        turnMotor.configFactoryDefault();
-        driveMotor.configFactoryDefault();
-        // set motor encoder to 0 when robot code starts
-
-        var currentHeadingTicks = -1 * Drivetrain.convertDegreesToTicks(getHeading());
-        turnMotor.setSelectedSensorPosition(currentHeadingTicks);
-        turnMotor.set(ControlMode.Position, currentHeadingTicks);
+        double currentHeadingTicks = -1 * Drivetrain.convertDegreesToTicks(getHeading());
+        m_turnMotor.setSelectedSensorPosition(currentHeadingTicks);
+        m_turnMotor.set(ControlMode.Position, currentHeadingTicks);
         SmartDashboard.putNumber(m_name + " initial heading", getHeading());
 
-        turnMotor.setInverted(true);
+        m_turnMotor.setInverted(true);
 
         double turnMotorKp = .2;
         double turnMotorKI = 0;
         double turnMotorKD = 0.1;
 
-        turnMotor.config_kP(0, turnMotorKp);
-        turnMotor.config_kI(0, turnMotorKI);
-        turnMotor.config_kD(0, turnMotorKD);
-        turnMotor.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Unsigned_0_to_360);
-        //turnMotor.setNeutralMode(NeutralMode.Brake);
+        double driveMotorkP = 0.05;
+        double driveMotorkI = 0.0;
+        double driveMotorkD = 0.0;
 
+        m_turnMotor.config_kP(0, turnMotorKp);
+        m_turnMotor.config_kI(0, turnMotorKI);
+        m_turnMotor.config_kD(0, turnMotorKD);
+        m_turnMotor.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Unsigned_0_to_360);
 
-        driveMotor.setInverted(false);
-        driveMotor.setNeutralMode(NeutralMode.Brake);
+        m_driveMotor.config_kP(0, driveMotorkP);
+        m_driveMotor.config_kI(0, driveMotorkI);
+        m_driveMotor.config_kD(0, driveMotorkD);
+
+        m_driveMotor.setInverted(false);
+        m_driveMotor.setNeutralMode(NeutralMode.Brake);
 
     }
   
     public double getHeading() {
-        double v = Math.floorMod((int)enc.getPosition(), 360);
+        double encoderReading = Math.floorMod((int) m_enc.getPosition(), 360);
         
-       return v - m_offset;
+       return encoderReading - m_offset;
     }
 
 
     public void periodic() {
-        SmartDashboard.putNumber(m_name + " Cancoder",  enc.getPosition());
+        SmartDashboard.putNumber(m_name + " Cancoder",  m_enc.getPosition());
         SmartDashboard.putNumber(m_name + " Cancoder with offset",  getHeading());
-        SmartDashboard.putNumber(m_name + " error", turnMotor.getClosedLoopError());
-        SmartDashboard.putNumber(m_name + " error deg", Drivetrain.convertTicksToDegrees(turnMotor.getClosedLoopError()));
-        SmartDashboard.putNumber(m_name + " turnMotor", Drivetrain.convertTicksToDegrees(turnMotor.getSelectedSensorPosition()));
+        SmartDashboard.putNumber(m_name + " error", m_turnMotor.getClosedLoopError());
+        SmartDashboard.putNumber(m_name + " error deg", Drivetrain.convertTicksToDegrees(m_turnMotor.getClosedLoopError()));
+        SmartDashboard.putNumber(m_name + " m_turnMotor", Drivetrain.convertTicksToDegrees(m_turnMotor.getSelectedSensorPosition()));
     }
 
-    public final double MAX_VOLTAGE = 8;
-    public final double NOMINAL_VOLTAGE = 12;
-
     public void setModuleState(SwerveModuleState desiredState) {
-
-        // tab.add(name + " cancoder", getHeading());
-        // tab.add(name + " cancoder",  getHeading());
-        
-        
 
         desiredState = SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(getHeading()));
 
         SmartDashboard.putNumber(m_name + " Heading", desiredState.angle.getDegrees());
 
-        double desiredPercentOutput = (desiredState.speedMetersPerSecond / Drivetrain.MAX_VELOCITY_METERS_PER_SECOND) * (MAX_VOLTAGE / NOMINAL_VOLTAGE);
-        SmartDashboard.putNumber(m_name + " desiredVoltage", desiredPercentOutput);
+        double desiredMetersPerSecond = (desiredState.speedMetersPerSecond / Drivetrain.MAX_VELOCITY_METERS_PER_SECOND);
+        SmartDashboard.putNumber(m_name + " desiredMetersPerSecond", desiredMetersPerSecond);
 
-        driveMotor.set(ControlMode.PercentOutput, desiredPercentOutput);
-        turnMotor.set(ControlMode.Position, Drivetrain.convertDegreesToTicks(desiredState.angle.getDegrees()));
+        m_driveMotor.set(ControlMode.Velocity, desiredMetersPerSecond / getDriveMotorReduction());
+        m_turnMotor.set(ControlMode.Position, Drivetrain.convertDegreesToTicks(desiredState.angle.getDegrees()));
     }
 
     public SwerveModuleState getState() {
 
-        double speedTicksPer100miliSeconds = driveMotor.getSelectedSensorVelocity();
+        double speedTicksPer100miliSeconds = m_driveMotor.getSelectedSensorVelocity();
 
-        double speedMetersPerSecond = speedTicksPer100miliSeconds * (1 / 100d) * (1_000 / 1d) * (1 / 2048d) * (1 / 6.75)
-                * ((4.0 * Math.PI) / 1d) * (.0254 / 1);
+        double speedMetersPerSecond = speedTicksPer100miliSeconds * getDriveMotorReduction();
 
         SmartDashboard.putNumber(m_name + "St", speedTicksPer100miliSeconds);
         SmartDashboard.putNumber(m_name + "Sm", speedMetersPerSecond);
@@ -114,14 +107,20 @@ public class Module {
         // 2048 ticks per rotation
         // 6.75:1 gear ratio
         // 4" wheels
-        double distanceMeters = (1 / 2048d) * (1 / 6.75) * ((4.0 * Math.PI) / 1d) * (.0254 / 1) * driveMotor.getSelectedSensorPosition();
+        double distanceMeters = (1 / 2048d) * (1 / 6.75) * ((4.0 * Math.PI) / 1d) * (.0254 / 1) * m_driveMotor.getSelectedSensorPosition();
         Rotation2d angle = Rotation2d.fromDegrees( getHeading());
-        ;
         return new SwerveModulePosition(distanceMeters, angle);
     }
     public void resetTurnEncoders() {
-        // enc.setPosition(0);
-        // turnMotor.setSelectedSensorPosition(DrivetrainSubsystem.convertDegreesToTicks(0));
-        turnMotor.set(ControlMode.Position, 0);
+        // m_enc.setPosition(0);
+        // m_turnMotor.setSelectedSensorPosition(DrivetrainSubsystem.convertDegreesToTicks(0));
+        m_turnMotor.set(ControlMode.Position, 0);
+    }
+
+    /**
+     * @return Ticks of the drive motor per revolution of the wheel
+     */
+    private double getDriveMotorReduction(){
+        return (1 / 100d) * (1_000 / 1d) * (1 / 2048d) * (1 / 6.75) * ((4.0 * Math.PI) / 1d) * (.0254 / 1);
     }
 }
