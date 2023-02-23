@@ -62,10 +62,7 @@ public class Drivetrain extends SubsystemBase {
             new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0) // BR
     };
     private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(m_moduleTranslations);
-    private final double MAX_ANGULAR_SPEED = DrivetrainConstants.MAX_DRIVETRAIN_SPEED
-            / Arrays.stream(m_moduleTranslations)
-                    .map(t -> t.getNorm())
-                    .max(Double::compare).get();
+    private final double MAX_ANGULAR_SPEED = 4;
     // #endregion
 
     public Consumer<SwerveModuleState[]> m_swerveModuleConsumer = (states) -> drive(
