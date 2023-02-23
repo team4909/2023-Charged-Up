@@ -40,9 +40,23 @@ public class RobotContainer {
     m_driverController.rightBumper()
         .onTrue(new InstantCommand(() -> m_drivetrain.setState(DrivetrainStates.PRECISE)))
         .onFalse(new InstantCommand(() -> m_drivetrain.setState(DrivetrainStates.IDLE)));
+
     m_driverController.povUp()
         .onTrue(new InstantCommand(
-            () -> m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE, new HashMap<>(Map.of("Angle", 0d)))));
+            () -> m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE, new HashMap<>(Map.of("Angle", 0d)))))
+        .onFalse(new InstantCommand(() -> m_drivetrain.setState(DrivetrainStates.IDLE)));
+    m_driverController.povRight()
+        .onTrue(new InstantCommand(
+            () -> m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE, new HashMap<>(Map.of("Angle", 270d)))))
+        .onFalse(new InstantCommand(() -> m_drivetrain.setState(DrivetrainStates.IDLE)));
+    m_driverController.povDown()
+        .onTrue(new InstantCommand(
+            () -> m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE, new HashMap<>(Map.of("Angle", 180d)))))
+        .onFalse(new InstantCommand(() -> m_drivetrain.setState(DrivetrainStates.IDLE)));
+    m_driverController.povLeft()
+        .onTrue(new InstantCommand(
+            () -> m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE, new HashMap<>(Map.of("Angle", 90d)))))
+        .onFalse(new InstantCommand(() -> m_drivetrain.setState(DrivetrainStates.IDLE)));
 
   }
 

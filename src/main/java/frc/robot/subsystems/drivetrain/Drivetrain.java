@@ -110,11 +110,7 @@ public class Drivetrain extends SubsystemBase {
                         new Rotation2d(
                                 m_chassisSpeeds.omegaRadiansPerSecond * dt)));
         m_simChassisAngle = m_simChassisAngle.plus(new Rotation2d(dModuleState.dtheta));
-        ChassisSpeeds adjustedSpeeds = new ChassisSpeeds(
-                dModuleState.dx / dt,
-                dModuleState.dy / dt,
-                dModuleState.dtheta / dt);
-        SwerveModuleState[] setpointModuleStates = m_kinematics.toSwerveModuleStates(adjustedSpeeds);
+        SwerveModuleState[] setpointModuleStates = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(setpointModuleStates, DrivetrainConstants.MAX_DRIVETRAIN_SPEED);
 
         for (int i = 0; i < 4; i++) {
@@ -258,13 +254,13 @@ public class Drivetrain extends SubsystemBase {
     }
 
     private Command SnapToAngle(double angle) {
-        PIDController snapPID = new PIDController(0.02, 0.0, 0.0);
+        PIDController snapPID = new PIDController(0.005, 0.0, 0.0);
         snapPID.enableContinuousInput(-180, 180);
         snapPID.setSetpoint(angle);
         return new RunCommand(
                 () -> {
                     double omega = snapPID.calculate(
-                            -(MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180)),
+                            (MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180)),
                             snapPID.getSetpoint());
                     drive(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, omega * MAX_ANGULAR_SPEED, getGyroYaw()));
                 },

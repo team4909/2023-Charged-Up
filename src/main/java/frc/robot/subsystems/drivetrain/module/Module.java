@@ -41,7 +41,8 @@ public final class Module {
             desiredState = SwerveModuleState.optimize(state, getModuleAngle());
             m_module.setTurn(m_simTurnPID.calculate(getModuleAngle().getRadians(), desiredState.angle.getRadians()));
         } else {
-            desiredState = CTREModuleState.optimize(state, getModuleAngle());
+            desiredState = SwerveModuleState.optimize(state, getModuleAngle());
+            // desiredState = CTREModuleState.optimize(state, getModuleAngle());
             m_module.setTurn(convertDegreesToTicks(desiredState.angle.getDegrees()));
         }
         m_module.setDriveVolts(desiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE);
