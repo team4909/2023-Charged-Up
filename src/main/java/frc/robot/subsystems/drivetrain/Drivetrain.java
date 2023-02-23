@@ -3,7 +3,6 @@ package frc.robot.subsystems.drivetrain;
 import static frc.robot.Constants.DrivetrainConstants.DRIVETRAIN_TRACKWIDTH_METERS;
 import static frc.robot.Constants.DrivetrainConstants.DRIVETRAIN_WHEELBASE_METERS;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
@@ -13,8 +12,11 @@ import java.util.stream.Stream;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 
+import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -22,7 +24,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -51,10 +52,10 @@ public class Drivetrain extends SubsystemBase {
     private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
     private Rotation2d m_simChassisAngle = new Rotation2d();
     private DoubleSupplier m_joystickTranslationX, m_joystickTranslationY, m_joystickRotationOmega;
-    private SwerveDriveOdometry m_odometry;
+    private SwerveDrivePoseEstimator m_poseEstimator;
     private Pose2d m_pose;
 
-    private final Pigeon2 m_pigeon = new Pigeon2(DrivetrainConstants.PIGEON_ID, "CANivore1");
+    private final Pigeon2 m_pigeon = new Pigeon2(DrivetrainConstants.PIGEON_ID);
     private final Translation2d[] m_moduleTranslations = new Translation2d[] {
             new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0), // FL
             new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0), // FR
@@ -91,8 +92,11 @@ public class Drivetrain extends SubsystemBase {
         m_pigeon.clearStickyFaults();
         for (int i = 0; i < m_modules.length; i++)
             m_modules[i] = new Module(i);
-        m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroYaw(), getSwerveModulePositions());
-        m_pose = m_odometry.getPoseMeters();
+        m_pose = new Pose2d();
+        // Using default std deviations values
+        m_poseEstimator = new SwerveDrivePoseEstimator(m_kinematics, getGyroYaw(), getSwerveModulePositions(), m_pose,
+                new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1),
+                new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.9, 0.9, 0.9));
         SmartDashboard.putData(m_field);
     }
 
@@ -118,7 +122,7 @@ public class Drivetrain extends SubsystemBase {
             m_modules[i].set(setpointModuleStates[i]);
         }
 
-        m_pose = m_odometry.update(getGyroYaw(), getSwerveModulePositions());
+        m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
         telem();
     }
 
@@ -267,6 +271,10 @@ public class Drivetrain extends SubsystemBase {
                 this).andThen(() -> snapPID.close());
     }
     // #endregion
+
+    public void resetPose(Pose2d pose) {
+        m_poseEstimator.resetPosition(getGyroYaw(), getSwerveModulePositions(), pose);
+    }
 
     public Command zeroGyro() {
         return new InstantCommand(() -> m_pigeon.setYaw(0d));
