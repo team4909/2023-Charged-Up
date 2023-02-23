@@ -59,15 +59,15 @@ public final class Constants {
         public static final double WHEEL_DIAMETER = 0.10033;
         public static final double DRIVE_REDUCTION = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
         public static final double STEER_REDUCTION = (14.0 / 50.0) * (10.0 / 60.0);
-        public static final double MAX_DRIVETRAIN_SPEED = Units.feetToMeters(16.3); // From SDS
+    public static final double MAX_DRIVETRAIN_SPEED = Units.feetToMeters(16.3); // From SDS
         public static final double PRECISE_SPEED_SCALE = 0.2;
         public static final double DEFAULT_TIMEOUT = 15d; // For auto trajectories
         public static final double DEADBAND = 0.05;
 
-        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = 426.9;
-        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = 78.4;
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = 250.0;
-        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 317.7;
+        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = 282.7;
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = 186.2;
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = 251.2;
+        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 91.2;
 
         // CAN IDS
         public static final int PIGEON_ID = 20;

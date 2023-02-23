@@ -55,7 +55,7 @@ public class Drivetrain extends SubsystemBase {
     private SwerveDrivePoseEstimator m_poseEstimator;
     private Pose2d m_pose;
 
-    private final Pigeon2 m_pigeon = new Pigeon2(DrivetrainConstants.PIGEON_ID, "CANivore1");
+    private final Pigeon2 m_pigeon = new Pigeon2(DrivetrainConstants.PIGEON_ID);
     private final Translation2d[] m_moduleTranslations = new Translation2d[] {
             new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0), // FL
             new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0), // FR

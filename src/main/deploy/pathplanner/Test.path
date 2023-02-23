@@ -24,15 +24,15 @@
     },
     {
       "anchorPoint": {
-        "x": 4.0,
-        "y": 0.0
+        "x": 2.143546572807432,
+        "y": 1.0449762328096084
       },
       "prevControl": {
-        "x": 2.7116731376319896,
-        "y": -0.01431474291519974
+        "x": 0.8552197104394215,
+        "y": 1.0306614898944086
       },
       "nextControl": null,
-      "holonomicAngle": 0,
+      "holonomicAngle": 90.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,

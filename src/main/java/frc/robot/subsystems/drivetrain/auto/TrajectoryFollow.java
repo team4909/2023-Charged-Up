@@ -56,13 +56,18 @@ public class TrajectoryFollow extends CommandBase {
                 m_trajectory,
                 m_drivetrain.m_poseSupplier,
                 m_drivetrain.getKinematics(),
-                new PIDController(6, 0, 0),
-                new PIDController(6, 0, 0),
-                new PIDController(6, 0, 0),
+                new PIDController(15, 0, 0),
+                new PIDController(10, 0, 0),
+                new PIDController(5, 0, 0),
                 m_drivetrain.m_swerveModuleConsumer,
-                true,
+                false,
                 m_drivetrain)
                 .withTimeout(m_timeout).schedule();
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        m_drivetrain.setState(DrivetrainStates.IDLE);
     }
 
 }
