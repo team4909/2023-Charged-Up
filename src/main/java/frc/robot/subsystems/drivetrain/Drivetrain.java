@@ -59,8 +59,8 @@ public class Drivetrain extends SubsystemBase {
 
     private final double FRONT_LEFT_ENC_OFFSET = 282.7;
     private final double FRONT_RIGHT_ENC_OFFSET = 186.2;
-    private final double BACK_RIGHT_ENC_OFFSET = 180+91.2;
-    private final double BACK_LEFT_ENC_OFFSET = 251.2;   
+    private final double BACK_RIGHT_ENC_OFFSET = 91.2;
+    private final double BACK_LEFT_ENC_OFFSET = 251.2; 
 
     Module leftModule = new Module("FrontLeft", 7, 8, 14, FRONT_LEFT_ENC_OFFSET);
     Module rightModule = new Module("FrontRight", 2, 1, 11, FRONT_RIGHT_ENC_OFFSET);
