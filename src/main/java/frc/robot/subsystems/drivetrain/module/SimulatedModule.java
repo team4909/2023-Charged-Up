@@ -17,8 +17,8 @@ public final class SimulatedModule extends ModuleBase {
 
     public SimulatedModule() {
         // Ratios: https://www.swervedrivespecialties.com/products/mk4i-swerve-module
-        driveMotor = new FlywheelSim(DCMotor.getFalcon500(1), 6.75, 0.08);
-        turnMotor = new FlywheelSim(DCMotor.getFalcon500(1), 150d / 7d, 0.004);
+        driveMotor = new FlywheelSim(DCMotor.getFalcon500(1), 6.75, 8e-10);
+        turnMotor = new FlywheelSim(DCMotor.getFalcon500(1), 150d / 7d, 4e-11);
     }
 
     @Override
