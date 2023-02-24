@@ -105,7 +105,7 @@ public class Drivetrain extends SubsystemBase {
         stateMachine();
         m_field.setRobotPose(m_pose);
 
-        double dt = Constants.PERIODIC_LOOP_DURATION;
+        final double dt = Constants.PERIODIC_LOOP_DURATION;
 
         Twist2d dModuleState = new Pose2d()
                 .log(new Pose2d(
@@ -176,23 +176,20 @@ public class Drivetrain extends SubsystemBase {
                     currentDrivetrainCommand = StopIdle().repeatedly().until(this::isJoystickInputPresent)
                             .finallyDo((interrupted) -> {
                                 if (!interrupted)
-                                    setState(DrivetrainStates.JOYSTICK_DRIVE);
-                            })
-                            .ignoringDisable(true);
+                                    setState(DrivetrainStates.JOYSTICK_DRIVE).schedule();
+                            });
                     break;
                 case JOYSTICK_DRIVE:
                     currentDrivetrainCommand = JoystickDrive(1d, 1d, DrivetrainConstants.DEADBAND)
                             .until(() -> !isJoystickInputPresent())
                             .finallyDo((interrupted) -> {
                                 if (!interrupted)
-                                    setState(DrivetrainStates.IDLE);
-                            })
-                            .ignoringDisable(true);
+                                    setState(DrivetrainStates.IDLE).schedule();
+                            });
                     break;
                 case AUTONOMOUS:
                     break;
                 case PRECISE:
-                    System.out.println("WE PRECISING NOW");
                     currentDrivetrainCommand = JoystickDrive(DrivetrainConstants.PRECISE_SPEED_SCALE,
                             DrivetrainConstants.PRECISE_SPEED_SCALE, DrivetrainConstants.DEADBAND / 2d);
                     break;
@@ -211,13 +208,15 @@ public class Drivetrain extends SubsystemBase {
         }
     }
 
-    public void setState(DrivetrainStates state) {
-        m_state = state;
+    public Command setState(DrivetrainStates state) {
+        return new InstantCommand(() -> m_state = state);
     }
 
-    public void setState(DrivetrainStates state, HashMap<String, ?> stateArgs) {
-        m_state = state;
-        m_stateArgs = stateArgs;
+    public Command setState(DrivetrainStates state, HashMap<String, ?> stateArgs) {
+        return new InstantCommand(() -> {
+            m_state = state;
+            m_stateArgs = stateArgs;
+        });
     }
 
     // #region State Commands
@@ -232,8 +231,8 @@ public class Drivetrain extends SubsystemBase {
 
                     magnitude = deadband(magnitude, deadband);
                     omega = deadband(omega, deadband);
-                    magnitude = squareAxis(magnitude);
-                    omega = squareAxis(omega);
+                    magnitude = cubeAxis(magnitude);
+                    omega = cubeAxis(omega);
 
                     magnitude *= linearSpeedScale;
                     omega *= angularSpeedScale;
@@ -258,7 +257,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     private Command SnapToAngle(double angle) {
-        PIDController snapPID = new PIDController(0.005, 0.0, 0.0);
+        PIDController snapPID = new PIDController(0.012, 0.0, 0.0);
         snapPID.enableContinuousInput(-180, 180);
         snapPID.setSetpoint(angle);
         return new RunCommand(
@@ -266,7 +265,11 @@ public class Drivetrain extends SubsystemBase {
                     double omega = snapPID.calculate(
                             (MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180)),
                             snapPID.getSetpoint());
-                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, omega * MAX_ANGULAR_SPEED, getGyroYaw()));
+                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(
+                            // TODO This needs to deal with deadband
+                            -m_joystickTranslationX.getAsDouble() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
+                            -m_joystickTranslationY.getAsDouble() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
+                            (m_joystickRotationOmega.getAsDouble() + omega) * MAX_ANGULAR_SPEED, getGyroYaw()));
                 },
                 this).andThen(() -> snapPID.close());
     }
@@ -291,8 +294,8 @@ public class Drivetrain extends SubsystemBase {
         }
     }
 
-    private double squareAxis(double value) {
-        return Math.copySign(value * value, value);
+    private double cubeAxis(double value) {
+        return Math.copySign(Math.pow(value, 3), value);
     }
 
     public final static Drivetrain getInstance() {

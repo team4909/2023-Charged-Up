@@ -1,6 +1,9 @@
 package frc.robot.subsystems.vision;
 
+import java.util.Optional;
+
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -11,7 +14,6 @@ public class Vision extends SubsystemBase {
 
     private static Vision m_instance = null;
     private LimelightResults m_visionResults;
-    private SwerveDrivePoseEstimator m_swerveDrivePoseEstimator;
 
     private VisionStates m_state = VisionStates.IDLE;
     private VisionStates m_lastState;
@@ -34,13 +36,22 @@ public class Vision extends SubsystemBase {
     }
 
     private Vision() {
-
+        NetworkTableInstance.create().close();
     }
 
     @Override
     public void periodic() {
         stateMachine();
-        m_visionResults = LimelightHelpers.getLatestResults("limelight");
+        if (NetworkTableInstance.getDefault().getTable("limelight").getKeys().size() != 0)
+            m_visionResults = LimelightHelpers.getLatestResults("limelight");
+    }
+
+    public Optional<LimelightResults> getVisionResults() {
+        NetworkTableInstance nt = NetworkTableInstance.getDefault();
+        if (nt.getTable("limelight").getKeys().size() != 0
+                && nt.getTable("limelight").getEntry("tv").getInteger(0) == 1)
+            return Optional.of(LimelightHelpers.getLatestResults("limelight"));
+        return Optional.empty();
     }
 
     public static Vision getInstance() {
