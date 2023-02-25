@@ -2,7 +2,6 @@ package frc.robot.subsystems.vision;
 
 import java.util.Optional;
 
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -11,6 +10,8 @@ import frc.lib.limelight.LimelightHelpers;
 import frc.lib.limelight.LimelightHelpers.LimelightResults;
 
 public class Vision extends SubsystemBase {
+
+    private final NetworkTableInstance NT = NetworkTableInstance.getDefault();
 
     private static Vision m_instance = null;
     private LimelightResults m_visionResults;
@@ -47,9 +48,9 @@ public class Vision extends SubsystemBase {
     }
 
     public Optional<LimelightResults> getVisionResults() {
-        NetworkTableInstance nt = NetworkTableInstance.getDefault();
-        if (nt.getTable("limelight").getKeys().size() != 0
-                && nt.getTable("limelight").getEntry("tv").getInteger(0) == 1)
+        final NetworkTableInstance NT = NetworkTableInstance.getDefault();
+        if (NT.getTable("limelight").getKeys().size() != 0
+                && NT.getTable("limelight").getEntry("tv").getInteger(0) == 1)
             return Optional.of(LimelightHelpers.getLatestResults("limelight"));
         return Optional.empty();
     }

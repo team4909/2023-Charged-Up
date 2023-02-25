@@ -60,7 +60,7 @@ public class RobotContainer {
     }
 
     private void configureSendableChooser() {
-        m_chooser.setDefaultOption("Test Auto", m_routines.testCommand());
+        m_chooser.setDefaultOption("Test Auto", m_routines.CHARGE_STATION);
         SmartDashboard.putData(m_chooser);
     }
 }

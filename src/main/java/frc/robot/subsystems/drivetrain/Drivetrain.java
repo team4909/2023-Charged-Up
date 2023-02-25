@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.ctre.phoenix.sensors.Pigeon2;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathUtil;
@@ -73,7 +75,7 @@ public class Drivetrain extends SubsystemBase {
     public enum DrivetrainStates {
         IDLE("Idle"),
         JOYSTICK_DRIVE("Joystick Drive"),
-        AUTONOMOUS("Autonomous"), // TODO rename to traj following
+        TRAJECTORY_DRIVE("Trajectory Drive"),
         PRECISE("Precise"),
         SNAP_TO_ANGLE("Snapping To Angle");
 
@@ -187,7 +189,10 @@ public class Drivetrain extends SubsystemBase {
                                     setState(DrivetrainStates.IDLE).schedule();
                             });
                     break;
-                case AUTONOMOUS:
+                case TRAJECTORY_DRIVE:
+                    currentDrivetrainCommand = TrajectoryDrive(
+                            (PathPlannerTrajectory) m_stateArgs.get("Trajectory"),
+                            (double) m_stateArgs.get("Timeout")).andThen(setState(DrivetrainStates.IDLE));
                     break;
                 case PRECISE:
                     currentDrivetrainCommand = JoystickDrive(DrivetrainConstants.PRECISE_SPEED_SCALE,
@@ -254,6 +259,21 @@ public class Drivetrain extends SubsystemBase {
     private Command StopIdle() {
         return new InstantCommand(
                 () -> drive(new ChassisSpeeds()), this);
+    }
+
+    private Command TrajectoryDrive(PathPlannerTrajectory trajectory, double timeout) {
+        return new InstantCommand(() -> setFieldTrajectory(trajectory)).andThen(
+                new PPSwerveControllerCommand(
+                        trajectory,
+                        m_poseSupplier,
+                        getKinematics(),
+                        new PIDController(10, 0, 0),
+                        new PIDController(10, 0, 0),
+                        new PIDController(5, 0, 0),
+                        m_swerveModuleConsumer,
+                        false,
+                        this)
+                        .withTimeout(timeout));
     }
 
     private Command SnapToAngle(double angle) {
