@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import java.lang.constant.DirectMethodHandleDesc;
@@ -34,6 +30,8 @@ public class RobotContainer {
 
   private final CommandXboxController m_driverController = new CommandXboxController(0);
   private final CommandXboxController m_operatorController = new CommandXboxController(1);
+  private final SendableChooser<Command> m_chooser = new SendableChooser<>();
+  private final AutoRoutines m_routines = new AutoRoutines();
   private final Elevator m_elevator = Elevator.getInstance();
 
   private final Arm m_arm = Arm.getInstance();
@@ -42,12 +40,35 @@ public class RobotContainer {
 
   public RobotContainer() {
     configureBindings();
-
+    configureSendableChooser();
     m_drivetrain.setDefaultCommand(new DefaultDriveCommand(m_driverController));
   }
 
   private void configureBindings() {
     // #region Driver Controls
+    
+        m_drivetrain.setJoystickSuppliers(
+                () -> m_driverController.getLeftY(),
+                () -> m_driverController.getLeftX(),
+                () -> m_driverController.getRightX());
+
+        m_driverController.back().onTrue(m_drivetrain.zeroGyro());
+        m_driverController.rightBumper()
+                .onTrue(m_drivetrain.setState(DrivetrainStates.PRECISE))
+                .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+
+        m_driverController.y()
+                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE, new HashMap<>(Map.of("Angle", 0d))))
+                .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+        m_driverController.b()
+                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE, new HashMap<>(Map.of("Angle", 270d))))
+                .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+        m_driverController.a()
+                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE, new HashMap<>(Map.of("Angle", 180d))))
+                .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+        m_driverController.x()
+                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE, new HashMap<>(Map.of("Angle", 90d))))
+                .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
     // m_driverController.leftTrigger() Intake Cube
     m_driverController.leftBumper().onTrue(new InstantCommand(() -> m_intakeSubsytem.coneSpit()));
     m_driverController.rightTrigger().onTrue(new InstantCommand(() -> m_intakeSubsytem.coneIn()))
@@ -133,7 +154,7 @@ public class RobotContainer {
 
   }
 
-  public Command getAutonomousCommand() {
+  public Command getOtherAutonomousCommand() {
     return new SequentialCommandGroup(
         new InstantCommand(() -> m_drivetrain.setGyro(180)),
         new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)),
@@ -152,21 +173,12 @@ public class RobotContainer {
     // m_drivetrain.runPath(PathPlanner.loadPath("StraightPath", 3, 2)));
   }
 
-  private double deadband(double value, double deadband) {
-    if (Math.abs(value) > deadband) {
-      if (value > 0d)
-        return (value - deadband) / (1d - deadband);
-      else
-        return (value + deadband) / (1d - deadband);
-    } else {
-      return 0d;
+    private void configureSendableChooser() {
+        m_chooser.setDefaultOption("Test Auto", m_routines.CHARGE_STATION);
+        SmartDashboard.putData(m_chooser);
     }
-  }
-
-  private double modifyAxis(double value) {
-    value = deadband(value, 0.05);
-    // Square the axis
-    value = Math.copySign(value * value, value);
-    return value;
-  }
+    
+     public Command getAutonomousCommand() {
+        return m_chooser.getSelected();
+    }
 }

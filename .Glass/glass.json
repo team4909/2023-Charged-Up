@@ -3,6 +3,9 @@
     "transitory": {
       "SmartDashboard": {
         "open": true
+      },
+      "limelight": {
+        "open": true
       }
     },
     "types": {
