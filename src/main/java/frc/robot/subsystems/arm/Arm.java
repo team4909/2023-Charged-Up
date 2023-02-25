@@ -10,6 +10,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.WristConstants;
 
@@ -19,6 +20,7 @@ public class Arm extends SubsystemBase {
 
     private final CANSparkMax m_wristMotor;
     private final ArmFeedforward m_armFeedForward;
+    private double m_arbFF;
 
     public enum ArmStates {
         IDLE("Idle"),
@@ -58,7 +60,8 @@ public class Arm extends SubsystemBase {
         SmartDashboard.putNumber("Velocity (ticks)", m_wristMotor.getEncoder().getVelocity());
         SmartDashboard.putNumber("smart motion allowed close loop error",
                 m_wristMotor.getPIDController().getSmartMotionAllowedClosedLoopError(0));
-        SmartDashboard.putNumber("Output", m_wristMotor.get());
+        SmartDashboard.putNumber("Wrist Output", m_wristMotor.getAppliedOutput());
+        SmartDashboard.putNumber("Arb FF", m_arbFF);
     }
 
     private void stateMachine() {
@@ -80,7 +83,7 @@ public class Arm extends SubsystemBase {
                 case HANDOFF_CUBE:
                     currentWristCommand = SetWristPosition(-7.966);
                     break;
-                case DROPPING: 
+                case DROPPING:
                     currentWristCommand = SetWristPosition(0);
                     break;
                 case DROPPING_FLICK:
@@ -119,6 +122,7 @@ public class Arm extends SubsystemBase {
     private Command SetWristPosition(double setpoint) {
         return new InstantCommand(() -> {
             setWristSetpoint(setpoint);
+            SmartDashboard.putNumber("Wrist Setpoint", setpoint);
         }, this);
     }
 
@@ -128,13 +132,17 @@ public class Arm extends SubsystemBase {
     }
 
     private void setWristSetpoint(double setpoint) {
-        double arbFF = m_armFeedForward.calculate(getWristEncoderPos(),
-                Units.rotationsPerMinuteToRadiansPerSecond(m_wristMotor.getEncoder().getVelocity()));
+        // m_arbFF = m_armFeedForward.calculate(getWristEncoderPos(),
+        // Units.rotationsPerMinuteToRadiansPerSecond(m_wristMotor.getEncoder().getVelocity())
+        // * (180d / Math.PI));
+
         // m_wristMotor.getPIDController().setReference(setpoint,
-        // ControlType.kSmartMotion, 0, arbFF);
-        m_wristMotor.getPIDController().setReference(setpoint, ControlType.kPosition);
+        // ControlType.kSmartMotion, 0, m_arbFF);
         // m_wristMotor.getPIDController().setReference(setpoint,
-        // ControlType.kSmartMotion);
+        // ControlType.kPosition);
+        double ff = -calcFF(m_wristMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("Wrist FF", ff);
+        m_wristMotor.getPIDController().setReference(setpoint, ControlType.kPosition, 0, ff);
     }
 
     public void setState(ArmStates state) {
@@ -144,15 +152,19 @@ public class Arm extends SubsystemBase {
     private void configureHardware() {
 
         m_wristMotor.restoreFactoryDefaults();
+        m_wristMotor.setInverted(true);
         m_wristMotor.getPIDController().setP(WristConstants.kP);
-        m_wristMotor.getPIDController().setFF(0.005);
+        m_wristMotor.getPIDController().setFF(0.0);
+        m_wristMotor.getPIDController().setSmartMotionMaxVelocity(1000, 0);
+        m_wristMotor.getPIDController().setSmartMotionMaxAccel(750, 0);
         m_wristMotor.getPIDController().setOutputRange(-WristConstants.OUTPUT_LIMIT, WristConstants.OUTPUT_LIMIT);
         m_wristMotor.setIdleMode(IdleMode.kBrake);
-        // m_wristMotor.getPIDController().setSmartMotionMaxVelocity(2, 0);
+        m_wristMotor.getPIDController().setSmartMotionAllowedClosedLoopError(200, 0); // m_wristMotor.getPIDController().setSmartMotionMaxVelocity(2,
+        // 0);
         // m_wristMotor.getPIDController().setSmartMotionMaxAccel(1, 0);
         // m_wristMotor.getEncoder().setPosition(0);
         m_wristMotor.getEncoder().setPositionConversionFactor(WristConstants.DEGREES_PER_TICK);
-        m_wristMotor.setInverted(true);
+        m_wristMotor.getEncoder().setPosition(121);
 
     }
 
@@ -166,6 +178,12 @@ public class Arm extends SubsystemBase {
         }
         return m_instance;
 
+    }
+
+    private double calcFF(double theta) {
+        double ff = WristConstants.kG * Math.cos(theta);
+        SmartDashboard.putNumber("Intake FF", ff);
+        return ff;
     }
 
 }

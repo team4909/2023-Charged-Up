@@ -1,13 +1,22 @@
 package frc.robot;
 
-public final class Constants {
+import edu.wpi.first.math.util.Units;
 
+public final class Constants {
 
     public static final class ClawConstants {
 
         public static final double kP = 6;
 
         public static final double OUTPUT_LIMIT = 0.5;
+    }
+
+    public static final class IntakeConstants {
+        public static final double kG = 0.66;
+
+        public static final double DEGREE_RANGE = 110d; // from cad
+        public static final double TICK_RANGE = 11.428633; // emperically measured
+        public static final double DEGREES_PER_TICK = DEGREE_RANGE / TICK_RANGE;
     }
 
     public static final class WristConstants {
@@ -22,25 +31,28 @@ public final class Constants {
         public static final double kV = 0.28;
         public static final double kA = 0.02;
 
-        public static final double OUTPUT_LIMIT = 0.2;
+        public static final double OUTPUT_LIMIT = 0.15;
         public static final double DEGREE_RANGE = 191d; // from cad
         public static final double TICK_RANGE = 7.976211547851562; // emperically measured
         public static final double DEGREES_PER_TICK = DEGREE_RANGE / TICK_RANGE;
 
-    public static final class ElevatorConstants {
+        public static final class ElevatorConstants {
 
-        public static final int LEFT_MOTOR = 9;
-        public static final int RIGHT_MOTOR = 10;
+            public static final int LEFT_MOTOR = 9;
+            public static final int RIGHT_MOTOR = 10;
 
-        public static final double ELEVATOR_KP = 0.15;
-        public static final double ELEVATOR_KD = 0.1;
-        public static final double PEAK_OUTPUT = 0.25;
+            public static final double ELEVATOR_KP = 0.15;
+            public static final double ELEVATOR_KD = 0.1;
+            public static final double PEAK_OUTPUT = 0.25;
 
-        public static final double BOTTOM_SETPOINT = 0d;
-        public static final double MID_CONE_SETPOINT = 13_982d;
-        public static final double MID_CUBE_SETPOINT = 13_908d;
-        public static final double TOP_SETPOINT = 28_500d;
+            public static final double METER_RANGE = Units.inchesToMeters(42); // from cad
+            public static final double TICK_RANGE = 28500d; // emperically measured
+            public static final double METERS_PER_TICK = METER_RANGE / TICK_RANGE;
 
+            public static final double BOTTOM_SETPOINT = 0d;
+            public static final double MID_CONE_SETPOINT = 13_982d * METERS_PER_TICK;
+            public static final double MID_CUBE_SETPOINT = 13_908d * METERS_PER_TICK;;
+            public static final double TOP_SETPOINT = 28_500d * METERS_PER_TICK;;
+        }
     }
-}
 }

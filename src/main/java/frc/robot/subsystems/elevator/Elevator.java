@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.WristConstants.ElevatorConstants;
 
-
 public class Elevator extends SubsystemBase {
 
   private static Elevator m_instance = null;
@@ -66,7 +65,8 @@ public class Elevator extends SubsystemBase {
   public void periodic() {
     stateMachine();
     SmartDashboard.putNumber("elevatorError", m_leftExtensionMotor.getClosedLoopError());
-    SmartDashboard.putNumber("elevatorEncoder", m_leftExtensionMotor.getSelectedSensorPosition());
+    SmartDashboard.putNumber("elevatorEncoder",
+        m_leftExtensionMotor.getSelectedSensorPosition() * ElevatorConstants.METERS_PER_TICK);
   }
 
   private void stateMachine() {
@@ -132,9 +132,13 @@ public class Elevator extends SubsystemBase {
     }, this);
   }
 
-  private Command SetSetpoint(double setpoint) {
+  private Command SetSetpoint(double setpointMeters) {
+    double ff = m_elevatorFF
+        .calculate(m_leftExtensionMotor.getSelectedSensorVelocity() * 10 * ElevatorConstants.METERS_PER_TICK);
+    SmartDashboard.putNumber("Elevator Setpoint", setpointMeters);
     return new RunCommand(() -> {
-      m_leftExtensionMotor.set(TalonFXControlMode.Position, setpoint);
+      SmartDashboard.putNumber("Elevator FF", ff);
+      m_leftExtensionMotor.set(TalonFXControlMode.Position, setpointMeters / ElevatorConstants.METERS_PER_TICK);
     }, this);
   }
 
