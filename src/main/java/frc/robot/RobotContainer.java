@@ -53,6 +53,8 @@ public class RobotContainer {
     m_driverController.rightTrigger().onTrue(new InstantCommand(() -> m_intakeSubsytem.coneIn()))
     // m_driverController.leftTrigger()
     .onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
+    m_driverController.rightStick().onTrue(new InstantCommand(() -> m_intakeSubsytem.cubeInn()));
+    m_driverController.leftStick().onTrue(new InstantCommand(() -> m_intakeSubsytem.cubeInnn()));
 
     m_driverController.start().onTrue(new InstantCommand(() -> m_intakeSubsytem.intakeZero()));
     m_driverController.x().onTrue(new InstantCommand(() -> m_intakeSubsytem.intakeIn()));
