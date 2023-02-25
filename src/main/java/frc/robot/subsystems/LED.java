@@ -4,39 +4,51 @@
 
 package frc.robot.subsystems;
 
-import java.awt.Color;
+// import java.awt.Color;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LED extends SubsystemBase {
-    private AddressableLED leds;
-    private AddressableLEDBuffer ledBuffer;
-    private final int led_length = 60;
+    private static LED m_instance;
+    private AddressableLED m_leds;
+    private AddressableLEDBuffer m_ledBuffer;
+    private final int m_led_length = 60;
 
     
     
-    public LED
-        
-        leds = new AddressableLED(0);
-        ledBuffer = new AddressableLEDBuffer(led_length);
-        leds.setLength(ledBuffer.getLength());
-        leds.start();
+    private LED() {
+        m_leds = new AddressableLED(0);
+        m_ledBuffer = new AddressableLEDBuffer(m_led_length);
+        m_leds.setLength(m_ledBuffer.getLength());
+        m_leds.start();
+    }
+
+    public static LED getInstance() {
+        if (m_instance == null) {
+            m_instance = new LED();
+        }
+        return m_instance;
     }
 
     @Override
     public void periodic() {
-        // This method will be calledce per scheduler run
-        for (int i = 0; i < led_length; i++) {
-            ledBuffer.setRGB(i, 0, 255, 0);
-        }
+        // for (int i = 0; i < m_led_length; i++) {
+        //     m_ledBuffer.setRGB(i, 0, 255, 0);
+        // }
+        // m_leds.setData(m_ledBuffer);
     }
 
-    private void a() {
-     
+    
+    public void setLedColor(Color color) {
+        for (int i = 0; i < m_led_length; i++) {
+            m_ledBuffer.setLED(i, color);
+        }
+        m_leds.setData(m_ledBuffer);
     }
 }

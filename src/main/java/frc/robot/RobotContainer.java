@@ -6,6 +6,8 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.subsystems.LED;
 
 public class RobotContainer {
@@ -19,7 +21,10 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-
+        // Temp button binds for cube/cone indication for human player
+        m_driverController.a().onTrue(new InstantCommand(() -> m_LED.setLedColor(Color.kPurple)));
+        m_driverController.b().onTrue(new InstantCommand(() -> m_LED.setLedColor(Color.kYellow)));
+        
     }
 
     public Command getAutonomousCommand() {
