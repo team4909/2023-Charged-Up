@@ -130,7 +130,7 @@ public class IntakeSubsystem extends SubsystemBase {
                     m_hinge_setpoint = 5;
                     setSetpoint(m_hinge_setpoint);
                     m_frontRoller.set(intakeSpeed);
-                    m_backRoller.set(-intakeSpeed / 6.0);
+                    m_backRoller.set(-intakeSpeed);
                     break;
 
                 case CUBE_SPIT:

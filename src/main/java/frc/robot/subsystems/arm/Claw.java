@@ -47,10 +47,9 @@ public class Claw extends SubsystemBase {
         m_clawMotor.getPIDController().setP(ClawConstants.kP);
         m_clawMotor.getPIDController().setOutputRange(-ClawConstants.OUTPUT_LIMIT, ClawConstants.OUTPUT_LIMIT);
         m_clawMotor.setIdleMode(IdleMode.kCoast);
-        // m_clawMotor.getPIDController().setSmartMotionMinOutputVelocity(100, 0);
         m_clawMotor.setInverted(false);
         m_clawMotor.setSmartCurrentLimit(10);
-        m_clawEncoder.setZeroOffset(0.655);
+        m_clawEncoder.setZeroOffset(0.64);
 
         // m_clawMotor.getEncoder().setPosition(0);
     }
@@ -73,7 +72,7 @@ public class Claw extends SubsystemBase {
                     currentClawCommand = SetClawPos(0);
                     break;
                 case OPEN:
-                    currentClawCommand = SetClawPos(0.095);
+                    currentClawCommand = SetClawPos(0.109);
                     break;
                 case CUBE:
                     currentClawCommand = SetClawPos(0);
