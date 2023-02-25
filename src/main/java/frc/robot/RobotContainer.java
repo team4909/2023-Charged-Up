@@ -53,9 +53,19 @@ public class RobotContainer {
     m_driverController.rightTrigger().onTrue(new InstantCommand(() -> m_intakeSubsytem.coneIn()))
     // m_driverController.leftTrigger()
     .onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
-    m_driverController.rightStick().onTrue(new InstantCommand(() -> m_intakeSubsytem.cubeInn()));
-    m_driverController.leftStick().onTrue(new InstantCommand(() -> m_intakeSubsytem.cubeInnn()));
 
+    m_driverController.povDown().onTrue(new InstantCommand(() -> m_intakeSubsytem.cubeInn()))
+    .onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
+
+    m_driverController.povUp().onTrue(new InstantCommand(() -> m_intakeSubsytem.cubeInnn()))
+    .onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
+
+    m_driverController.povRight().onTrue(new InstantCommand(() -> m_intakeSubsytem.cubeIn()))
+    .onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
+    
+    m_driverController.povLeft().onTrue(new InstantCommand(() -> m_intakeSubsytem.coneInn()))
+    .onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
+    
     m_driverController.start().onTrue(new InstantCommand(() -> m_intakeSubsytem.intakeZero()));
     m_driverController.x().onTrue(new InstantCommand(() -> m_intakeSubsytem.intakeIn()));
 
@@ -96,9 +106,7 @@ public class RobotContainer {
     m_operatorController.povDown().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
     m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.TOP)));
     m_operatorController.leftTrigger().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING)));
-    // m_operatorController.leftTrigger()
-    // .onTrue(new RunCommand(() -> m_intakeSubsytem.cubeIn(), m_intakeSubsytem))
-    // .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
+
 
     // m_driverController.leftBumper()
     // .onTrue(new RunCommand(() -> m_intakeSubsytem.cubeSpit(), m_intakeSubsytem))

@@ -28,6 +28,7 @@ public class IntakeSubsystem extends SubsystemBase {
         CUBE_INN("CUBE_INN"),
         CUBE_INNN("CUBE_INNN"),
         CONE_IN("CONE_IN"),
+        CONE_INN("CONE_INN"),
         CONE_SPIT("CONE_SPIT"),
         HANDOFF("HANDOFF");
 
@@ -122,7 +123,7 @@ public class IntakeSubsystem extends SubsystemBase {
                     m_hinge_setpoint = 10.5;
                     m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                     m_frontRoller.set(intakeSpeed);
-                    m_backRoller.set(-intakeSpeed / 2.0);
+                    m_backRoller.set(-intakeSpeed / 6.0);
                     break;
 
                 case CUBE_SPIT:
@@ -148,6 +149,12 @@ public class IntakeSubsystem extends SubsystemBase {
                     m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
                     m_frontRoller.set(intakeSpeed);
                     m_backRoller.set(intakeSpeed / 2.0);
+                    break;
+                case CONE_INN:
+                    m_hinge_setpoint = 11;
+                    m_positionController.setReference(m_hinge_setpoint, ControlType.kPosition);
+                    m_frontRoller.set(intakeSpeed);
+                    m_backRoller.set(-intakeSpeed / 2.0);
                     break;
                 case CONE_SPIT:
                     m_hinge_setpoint = 2;
@@ -222,9 +229,13 @@ public class IntakeSubsystem extends SubsystemBase {
     public void cubeInnn() {
         m_currentState = IntakeStates.CUBE_INNN;
     }
-    
+
     public void coneIn() {
         m_currentState = IntakeStates.CONE_IN;
+    }
+
+    public void coneInn() {
+        m_currentState = IntakeStates.CONE_INN;
     }
 
     public void coneSpit() {
