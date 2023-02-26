@@ -142,26 +142,9 @@ public class RobotContainer {
 
     }
 
-    public Command getOtherAutonomousCommand() {
-        return new SequentialCommandGroup(
-                new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)),
-                Commands.waitSeconds(2),
-                new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING))
-                        .andThen(new WaitCommand(0.5))
-                        .andThen(() -> m_claw.setState(ClawStates.OPEN))
-                        .andThen(new WaitCommand(0.2))
-                        .andThen(() -> m_arm.setState(ArmStates.TOP))
-                        .andThen(() -> m_elevator.setState(ElevatorStates.RETRACT))
-        // .andThen(new WaitCommand(3))
-        // .andThen(() -> m_drivetrain.traj(PathPlanner.loadPath("StraightPath", 3, 2),
-        // false))
-        );
-        // return new InstantCommand(() ->
-        // m_drivetrain.runPath(PathPlanner.loadPath("StraightPath", 3, 2)));
-    }
-
     private void configureSendableChooser() {
         m_chooser.setDefaultOption("Test Auto", m_routines.CHARGE_STATION);
+        m_chooser.addOption("Score Cone & Balance Charge Station", m_routines.SCORE_CONE_CHARGE_STATION_COMMUNITY);
         SmartDashboard.putData(m_chooser);
     }
 

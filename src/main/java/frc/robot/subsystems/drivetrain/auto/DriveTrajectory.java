@@ -19,11 +19,11 @@ public class DriveTrajectory {
         this(new Pair<String, Double>(pathName, DrivetrainConstants.DEFAULT_TIMEOUT), isFirstPath);
     }
 
-    public DriveTrajectory(Pair<String, Double> traj, boolean isFirstPath) {
-        m_pathName = traj.getFirst();
-        m_timeout = traj.getSecond();
+    public DriveTrajectory(Pair<String, Double> trajectory, boolean isFirstPath) {
+        m_pathName = trajectory.getFirst();
+        m_timeout = trajectory.getSecond();
         m_isFirstPath = isFirstPath;
-        m_trajectory = PathPlanner.loadPath(m_pathName, DrivetrainConstants.MAX_DRIVETRAIN_SPEED / 10, 3);
+        m_trajectory = PathPlanner.loadPath(m_pathName, DrivetrainConstants.MAX_DRIVETRAIN_SPEED / 4, 3);
         if (m_trajectory == null) {
             DriverStation.reportError("Path not loaded correctly!", Thread.currentThread().getStackTrace());
             return;
@@ -31,6 +31,7 @@ public class DriveTrajectory {
 
         if (m_isFirstPath)
             m_drivetrain.resetPose(m_trajectory.getInitialHolonomicPose());
+        // m_drivetrain.resetGyro(m_trajectory.getInitialHolonomicPose().getRotation());
     }
 
     public PathPlannerTrajectory getTrajectory() {
