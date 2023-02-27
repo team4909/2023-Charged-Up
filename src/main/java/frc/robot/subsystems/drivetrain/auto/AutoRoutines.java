@@ -50,7 +50,7 @@ public class AutoRoutines {
                 Commands.waitSeconds(0.5),
                 Commands.runOnce(() -> m_claw.setState(ClawStates.OPEN)),
                 Commands.waitSeconds(0.2),
-                Commands.runOnce(() -> m_arm.setState(ArmStates.TOP)),
+                Commands.runOnce(() -> m_arm.setState(ArmStates.RETRACTED)),
                 Commands.runOnce(() -> m_elevator.setState(ElevatorStates.RETRACT)));
     }
 }
