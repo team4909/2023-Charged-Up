@@ -49,7 +49,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     private static IntakeSubsystem m_instance;
     public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput;
-    final double intakeSpeed = 0.5;
+    final double intakeSpeed = 0.75;
 
     private final CANSparkMax m_hingeRight;
     private final CANSparkMax m_hingeLeft;
@@ -154,8 +154,8 @@ public class IntakeSubsystem extends SubsystemBase {
                 case CONE_IN:
                     m_hinge_setpoint = 11;
                     setSetpoint(m_hinge_setpoint);
-                    m_frontRoller.set(intakeSpeed);
-                    m_backRoller.set(intakeSpeed / 2.0);
+                    m_frontRoller.set(0.5);
+                    m_backRoller.set(0.75);
                     break;
                 case CONE_INN:
                     m_hinge_setpoint = 11;
@@ -189,7 +189,7 @@ public class IntakeSubsystem extends SubsystemBase {
                         m_hinge_setpoint = 66;
                         setSetpoint(m_hinge_setpoint);
                         m_frontRoller.set(0.2);
-                        m_backRoller.set(0.1);
+                        m_backRoller.set(0.25);
                     }
                     break;
             }
