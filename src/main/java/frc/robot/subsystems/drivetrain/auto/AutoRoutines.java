@@ -32,15 +32,6 @@ public class AutoRoutines {
             loadTrajectory(new DriveTrajectory(new Pair<String, Double>("PastChargeStation", 2d), false)),
             loadTrajectory(new DriveTrajectory(new Pair<String, Double>("BackChargeStation", 2d), false)));
 
-    // private Command loadTrajectory(DriveTrajectory traj) {
-    // return m_drivetrain.setState(DrivetrainStates.TRAJECTORY_DRIVE,
-    // new HashMap<>(Map.of("Trajectory", traj.getTrajectory(), "Timeout",
-    // traj.getTimeout())))
-    // .deadlineWith(new
-    // InstantCommand().repeatedly().until(m_drivetrain.isTrajectoryFinished))
-    // .finallyDo((e) -> System.out.println("What are you doing " + e));
-    // }
-
     private Command loadTrajectory(DriveTrajectory traj) {
         return new InstantCommand().repeatedly().until(m_drivetrain.isTrajectoryFinished)
                 .deadlineWith(m_drivetrain.setState(DrivetrainStates.TRAJECTORY_DRIVE,
@@ -61,8 +52,7 @@ public class AutoRoutines {
                 Commands.waitSeconds(0.5),
                 Commands.runOnce(() -> m_claw.setState(ClawStates.OPEN)),
                 Commands.waitSeconds(0.2),
-                Commands.runOnce(() -> m_arm.setState(ArmStates.TOP)),
-                Commands.runOnce(() -> m_elevator.setState(ElevatorStates.RETRACT)),
-                Commands.waitSeconds(3));
+                Commands.runOnce(() -> m_arm.setState(ArmStates.RETRACTED)),
+                Commands.runOnce(() -> m_elevator.setState(ElevatorStates.RETRACT)));
     }
 }

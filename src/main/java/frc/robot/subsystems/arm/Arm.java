@@ -24,13 +24,10 @@ public class Arm extends SubsystemBase {
 
     public enum ArmStates {
         IDLE("Idle"),
-        ZERO("Zero"),
-        TOP("Top"),
+        RETRACTED("Top"),
         HANDOFF_CONE("Handoff Cone"),
         HANDOFF_CUBE("Handoff Cube"),
-        RETRACTED("Retracted"),
-        DROPPING("Dropping"),
-        DROPPING_FLICK("Dropping Flick");
+        DROPPING("Dropping");
 
         String stateName;
 
@@ -71,10 +68,7 @@ public class Arm extends SubsystemBase {
                 case IDLE:
                     currentWristCommand = Idle();
                     break;
-                case ZERO:
-                    currentWristCommand = Zero();
-                    break;
-                case TOP:
+                case RETRACTED:
                     currentWristCommand = SetWristPosition(110);
                     break;
                 case HANDOFF_CONE:
@@ -85,12 +79,6 @@ public class Arm extends SubsystemBase {
                     break;
                 case DROPPING:
                     currentWristCommand = SetWristPosition(0);
-                    break;
-                case DROPPING_FLICK:
-                    currentWristCommand = SetWristPosition(-40);
-                    break;
-                case RETRACTED:
-                    currentWristCommand = Retract();
                     break;
                 default:
                     m_state = ArmStates.IDLE;
@@ -106,16 +94,7 @@ public class Arm extends SubsystemBase {
 
     private Command Idle() {
         return new InstantCommand(() -> {
-        }, this).repeatedly().withTimeout(WristConstants.ZERO_TIME)
-                .andThen(() -> {
-                    // m_clawMotor.getEncoder().setPosition(0d);
-                    // m_wristMotor.getEncoder().setPosition(0d);
-                }, this);
-    }
-
-    private Command Zero() {
-        return new InstantCommand(() -> {
-            // m_wristMotor.getEncoder().setPosition(0);
+            m_wristMotor.set(0);
         }, this);
     }
 
@@ -123,11 +102,6 @@ public class Arm extends SubsystemBase {
         return new InstantCommand(() -> {
             setWristSetpoint(setpoint);
             SmartDashboard.putNumber("Wrist Setpoint", setpoint);
-        }, this);
-    }
-
-    private Command Retract() {
-        return new InstantCommand(() -> {
         }, this);
     }
 
@@ -159,10 +133,9 @@ public class Arm extends SubsystemBase {
         m_wristMotor.getPIDController().setSmartMotionMaxAccel(750, 0);
         m_wristMotor.getPIDController().setOutputRange(-WristConstants.OUTPUT_LIMIT, WristConstants.OUTPUT_LIMIT);
         m_wristMotor.setIdleMode(IdleMode.kBrake);
-        m_wristMotor.getPIDController().setSmartMotionAllowedClosedLoopError(200, 0); // m_wristMotor.getPIDController().setSmartMotionMaxVelocity(2,
-        // 0);
-        // m_wristMotor.getPIDController().setSmartMotionMaxAccel(1, 0);
-        // m_wristMotor.getEncoder().setPosition(0);
+
+        m_wristMotor.getPIDController().setSmartMotionAllowedClosedLoopError(200, 0);
+
         m_wristMotor.getEncoder().setPositionConversionFactor(WristConstants.DEGREES_PER_TICK);
         m_wristMotor.getEncoder().setPosition(121);
 
