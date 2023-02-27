@@ -4,6 +4,7 @@ import static frc.robot.Constants.DrivetrainConstants.DRIVETRAIN_TRACKWIDTH_METE
 import static frc.robot.Constants.DrivetrainConstants.DRIVETRAIN_WHEELBASE_METERS;
 
 import java.util.HashMap;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -38,6 +39,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.drivetrain.module.Module;
+import frc.robot.subsystems.vision.Vision;
 
 public class Drivetrain extends SubsystemBase {
 
@@ -66,11 +68,14 @@ public class Drivetrain extends SubsystemBase {
     };
     private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(m_moduleTranslations);
     private final double MAX_ANGULAR_SPEED = 4;
+    private final Vision m_vision = new Vision();
+
+    private Consumer<SwerveModuleState[]> m_swerveModuleConsumer = (states) -> drive(
+            m_kinematics.toChassisSpeeds(states));
+    private Supplier<Pose2d> m_poseSupplier = () -> m_pose;
     // #endregion
 
-    public Consumer<SwerveModuleState[]> m_swerveModuleConsumer = (states) -> drive(
-            m_kinematics.toChassisSpeeds(states));
-    public Supplier<Pose2d> m_poseSupplier = () -> m_pose;
+    public BooleanSupplier isTrajectoryFinished = () -> !m_state.equals(DrivetrainStates.TRAJECTORY_DRIVE);
 
     public enum DrivetrainStates {
         IDLE("Idle"),
@@ -125,10 +130,9 @@ public class Drivetrain extends SubsystemBase {
         }
 
         m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
-        telem();
-    }
+        if (m_vision.robotPose.get() != null || m_vision.latency.get() != null)
+            m_poseEstimator.addVisionMeasurement(m_vision.robotPose.get(), m_vision.latency.get());
 
-    public void telem() {
         SmartDashboard.putString("DrivetrainState", m_state.toString());
         SmartDashboard.putBoolean("Joystick", isJoystickInputPresent());
     }
@@ -271,7 +275,7 @@ public class Drivetrain extends SubsystemBase {
                         new PIDController(10, 0, 0),
                         new PIDController(5, 0, 0),
                         m_swerveModuleConsumer,
-                        false,
+                        true,
                         this)
                         .withTimeout(timeout));
     }
@@ -297,6 +301,10 @@ public class Drivetrain extends SubsystemBase {
 
     public void resetPose(Pose2d pose) {
         m_poseEstimator.resetPosition(getGyroYaw(), getSwerveModulePositions(), pose);
+    }
+
+    public void resetGyro(Rotation2d rot) {
+        m_pigeon.setYaw(rot.getDegrees());
     }
 
     public Command zeroGyro() {

@@ -39,8 +39,7 @@ public final class Constants {
 
         public static final Transform3d ROBOT_TO_CAM_DIST = new Transform3d(
                 new Translation3d(Units.inchesToMeters(13.0), Units.inchesToMeters(4.75), Units.inchesToMeters(4.0)),
-                new Rotation3d(0.0, 0.0, 0.0)
-        );
+                new Rotation3d(0.0, 0.0, 0.0));
     }
 
     public static final class DrivetrainConstants {
@@ -83,7 +82,7 @@ public final class Constants {
         public static final int BACK_RIGHT_STEER_ENCODER = 12;
 
     }
-    
+
     public static final class ClawConstants {
 
         public static final double kP = 6;
@@ -101,8 +100,6 @@ public final class Constants {
 
     public static final class WristConstants {
 
-        public static final double ZERO_TIME = 3; // seconds
-
         public static final double kS = 0.01;
         public static final double kP = 0.035;
 
@@ -115,24 +112,24 @@ public final class Constants {
         public static final double DEGREE_RANGE = 191d; // from cad
         public static final double TICK_RANGE = 7.976211547851562; // emperically measured
         public static final double DEGREES_PER_TICK = DEGREE_RANGE / TICK_RANGE;
+    }
 
-        public static final class ElevatorConstants {
+    public static final class ElevatorConstants {
 
-            public static final int LEFT_MOTOR = 9;
-            public static final int RIGHT_MOTOR = 10;
+        public static final int LEFT_MOTOR = 9;
+        public static final int RIGHT_MOTOR = 10;
 
-            public static final double ELEVATOR_KP = 0.15;
-            public static final double ELEVATOR_KD = 0.1;
-            public static final double PEAK_OUTPUT = 0.25;
+        public static final double ELEVATOR_KP = 0.15;
+        public static final double ELEVATOR_KD = 0.1;
+        public static final double PEAK_OUTPUT = 0.25;
 
-            public static final double METER_RANGE = Units.inchesToMeters(42); // from cad
-            public static final double TICK_RANGE = 28500d; // emperically measured
-            public static final double METERS_PER_TICK = METER_RANGE / TICK_RANGE;
+        public static final double METER_RANGE = Units.inchesToMeters(42); // from cad
+        public static final double TICK_RANGE = 28500d; // emperically measured
+        public static final double METERS_PER_TICK = METER_RANGE / TICK_RANGE;
 
-            public static final double BOTTOM_SETPOINT = 0d;
-            public static final double MID_CONE_SETPOINT = 13_982d * METERS_PER_TICK;
-            public static final double MID_CUBE_SETPOINT = 13_908d * METERS_PER_TICK;;
-            public static final double TOP_SETPOINT = 28_500d * METERS_PER_TICK;;
-        }
+        public static final double BOTTOM_SETPOINT = 0d;
+        public static final double MID_CONE_SETPOINT = 13_982d * METERS_PER_TICK;
+        public static final double MID_CUBE_SETPOINT = 13_908d * METERS_PER_TICK;;
+        public static final double TOP_SETPOINT = 28_500d * METERS_PER_TICK;;
     }
 }

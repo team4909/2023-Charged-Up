@@ -6,7 +6,6 @@ import java.util.Map;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -55,16 +54,20 @@ public class RobotContainer {
                 .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
 
         m_driverController.y()
-                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE, new HashMap<>(Map.of("Angle", 0d))))
+                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+                        new HashMap<>(Map.of("Angle", 0d))))
                 .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
         m_driverController.b()
-                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE, new HashMap<>(Map.of("Angle", 270d))))
+                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+                        new HashMap<>(Map.of("Angle", 270d))))
                 .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
         m_driverController.a()
-                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE, new HashMap<>(Map.of("Angle", 180d))))
+                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+                        new HashMap<>(Map.of("Angle", 180d))))
                 .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
         m_driverController.x()
-                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE, new HashMap<>(Map.of("Angle", 90d))))
+                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+                        new HashMap<>(Map.of("Angle", 90d))))
                 .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
         // m_driverController.leftTrigger() Intake Cube
         m_driverController.leftBumper().onTrue(new InstantCommand(() -> m_intakeSubsytem.coneSpit()));
@@ -82,7 +85,7 @@ public class RobotContainer {
 
         m_driverController.start().onTrue(new InstantCommand(() -> m_intakeSubsytem.intakeZero()));
 
-        m_operatorController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.TOP)));
+        m_operatorController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)));
         m_operatorController.back().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)));
         // m_operatorController.b().onTrue(new InstantCommand(() ->
         // m_arm.setState(ArmStates.HANDOFF_CUBE)));
@@ -99,7 +102,7 @@ public class RobotContainer {
                         new WaitCommand(1),
                         new InstantCommand(() -> m_intakeSubsytem.coneSpit()),
                         new WaitCommand(1),
-                        new InstantCommand(() -> m_arm.setState(ArmStates.TOP)))
+                        new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)))
 
         );
 
@@ -108,13 +111,14 @@ public class RobotContainer {
                 .andThen(() -> m_claw.setState(ClawStates.OPEN))
                 .andThen(new WaitCommand(0.2))
                 .andThen(() -> m_elevator.setState(ElevatorStates.RETRACT))
-                .andThen(() -> m_arm.setState(ArmStates.TOP)));
+                .andThen(() -> m_arm.setState(ArmStates.RETRACTED)));
 
         m_operatorController.rightTrigger()
                 .onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
-        m_operatorController.rightBumper().onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
+        m_operatorController.rightBumper()
+                .onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
         m_operatorController.povDown().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
-        m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.TOP)));
+        m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)));
         m_operatorController.leftTrigger().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING)));
 
         // m_driverController.leftBumper()
@@ -142,26 +146,9 @@ public class RobotContainer {
 
     }
 
-    public Command getOtherAutonomousCommand() {
-        return new SequentialCommandGroup(
-                new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)),
-                Commands.waitSeconds(2),
-                new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING))
-                        .andThen(new WaitCommand(0.5))
-                        .andThen(() -> m_claw.setState(ClawStates.OPEN))
-                        .andThen(new WaitCommand(0.2))
-                        .andThen(() -> m_arm.setState(ArmStates.TOP))
-                        .andThen(() -> m_elevator.setState(ElevatorStates.RETRACT))
-        // .andThen(new WaitCommand(3))
-        // .andThen(() -> m_drivetrain.traj(PathPlanner.loadPath("StraightPath", 3, 2),
-        // false))
-        );
-        // return new InstantCommand(() ->
-        // m_drivetrain.runPath(PathPlanner.loadPath("StraightPath", 3, 2)));
-    }
-
     private void configureSendableChooser() {
         m_chooser.setDefaultOption("Test Auto", m_routines.CHARGE_STATION);
+        m_chooser.addOption("Score Cone & Balance Charge Station", m_routines.SCORE_CONE_CHARGE_STATION_COMMUNITY);
         SmartDashboard.putData(m_chooser);
     }
 
