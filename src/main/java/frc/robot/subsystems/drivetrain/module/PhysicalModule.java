@@ -8,6 +8,8 @@ import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.DrivetrainConstants;
 
@@ -20,6 +22,7 @@ public final class PhysicalModule extends ModuleBase {
 
     private final double TICKS_PER_ROTATION = 2048d;
     private final double nominalVoltage = 12d;
+    private final SimpleMotorFeedforward m_driveFeedforward;
 
     public PhysicalModule(int index) {
         switch (index) {
@@ -50,7 +53,7 @@ public final class PhysicalModule extends ModuleBase {
             default:
                 throw new RuntimeException("Invalid Module index");
         }
-
+        m_driveFeedforward = new SimpleMotorFeedforward(DrivetrainConstants.kS, DrivetrainConstants.kV);
         configHardware();
     }
 
@@ -76,7 +79,10 @@ public final class PhysicalModule extends ModuleBase {
 
     @Override
     void setDriveVolts(double volts) {
-        m_driveMotor.set(TalonFXControlMode.PercentOutput, volts / nominalVoltage);
+        var ffVolts = m_driveFeedforward
+                .calculate(super.driveVelocityRadPerSec * (DrivetrainConstants.WHEEL_DIAMETER / 2));
+        var voltageAsPercent = MathUtil.clamp((volts + ffVolts) / nominalVoltage, -12d, 12d);
+        m_driveMotor.set(TalonFXControlMode.PercentOutput, voltageAsPercent);
     }
 
     @Override
@@ -92,6 +98,7 @@ public final class PhysicalModule extends ModuleBase {
         m_driveMotor.setInverted(false);
         m_driveMotor.setNeutralMode(NeutralMode.Brake);
         m_driveMotor.setSelectedSensorPosition(0);
+        m_driveMotor.config_kP(0, DrivetrainConstants.kP);
 
         m_turnMotor.configFactoryDefault();
         m_turnMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 1));
@@ -101,7 +108,6 @@ public final class PhysicalModule extends ModuleBase {
         m_turnMotor.setNeutralMode(NeutralMode.Brake);
         m_turnMotor.setSelectedSensorPosition(-1 * Module.convertDegreesToTicks(getWheelHeading()));
         m_turnMotor.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Unsigned_0_to_360);
-
         m_turnMotor.config_kP(0, 0.2);
         m_turnMotor.config_kD(0, 0.1);
 
