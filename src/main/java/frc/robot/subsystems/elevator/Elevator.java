@@ -38,7 +38,8 @@ public class Elevator extends SubsystemBase {
     TOP("Top Node Extension"),
     MID_CUBE("Mid Cube"),
     MID_CONE("Mid Cone"),
-    RETRACT("Retracted");
+    RETRACT("Retracted"),
+    SUBSTATION("Substation");
 
     String stateName;
 
@@ -163,6 +164,9 @@ public class Elevator extends SubsystemBase {
 
   public void setState(ElevatorStates state) {
     m_state = state;
+  }
+  public ElevatorStates getState(){
+    return m_state;
   }
 
   public static Elevator getInstance() {

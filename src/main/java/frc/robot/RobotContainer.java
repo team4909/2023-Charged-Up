@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -75,6 +76,10 @@ public class RobotContainer {
                 // m_driverController.leftTrigger()
                 .onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
 
+        m_driverController.leftTrigger().onTrue(new InstantCommand(() -> m_intakeSubsytem.cubeIn()))
+                // m_driverController.leftTrigger()
+                .onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
+
         m_driverController.povDown().onTrue(new InstantCommand(() -> m_intakeSubsytem.intakeIn()));
 
         m_driverController.povRight().onTrue(new InstantCommand(() -> m_intakeSubsytem.cubeIn()))
@@ -121,6 +126,12 @@ public class RobotContainer {
         m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)));
         m_operatorController.leftTrigger().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING)));
 
+        m_operatorController.start().onTrue(substationToggle());
+
+      }
+
+
+
         // m_driverController.leftBumper()
         // .onTrue(new RunCommand(() -> m_intakeSubsytem.cubeSpit(), m_intakeSubsytem))
         // .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
@@ -144,8 +155,6 @@ public class RobotContainer {
         // m_operatorController.leftTrigger().onTrue(new InstantCommand(() ->
         // m_elevator.setState(ElevatorStates.RETRACT)));
 
-    }
-
     private void configureSendableChooser() {
         m_chooser.setDefaultOption("Test Auto", m_routines.CHARGE_STATION);
         m_chooser.addOption("Score Cone & Balance Charge Station", m_routines.SCORE_CONE_CHARGE_STATION_COMMUNITY);
@@ -156,5 +165,21 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return m_chooser.getSelected();
+    }
+
+    private Command substationToggle() {
+
+      if(m_elevator.getState() != ElevatorStates.SUBSTATION){
+        return new InstantCommand(() -> m_elevator.setState(ElevatorStates.SUBSTATION))
+        .alongWith(new InstantCommand(() -> m_claw.setState(ClawStates.OPEN))
+                    .andThen(() -> m_arm.setState(ArmStates.DROPPING))
+        );
+      }
+      else{
+        return new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED))
+        .andThen(() -> m_arm.setState(ArmStates.RETRACTED))
+        .andThen(() -> m_elevator.setState(ElevatorStates.RETRACT));
+      }
+
     }
 }
