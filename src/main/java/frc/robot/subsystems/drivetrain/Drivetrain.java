@@ -196,7 +196,8 @@ public class Drivetrain extends SubsystemBase {
                 case TRAJECTORY_DRIVE:
                     currentDrivetrainCommand = TrajectoryDrive(
                             (PathPlannerTrajectory) m_stateArgs.get("Trajectory"),
-                            (double) m_stateArgs.get("Timeout")).andThen(setState(DrivetrainStates.IDLE));
+                            (double) m_stateArgs.get("Timeout"), (boolean) m_stateArgs.get("IsFirstPath"))
+                            .andThen(setState(DrivetrainStates.IDLE));
                     break;
                 case PRECISE:
                     currentDrivetrainCommand = JoystickDrive(DrivetrainConstants.PRECISE_SPEED_SCALE,
@@ -265,17 +266,23 @@ public class Drivetrain extends SubsystemBase {
                 () -> drive(new ChassisSpeeds()), this);
     }
 
-    private Command TrajectoryDrive(PathPlannerTrajectory trajectory, double timeout) {
-        return new InstantCommand(() -> setFieldTrajectory(trajectory)).andThen(
+    private Command TrajectoryDrive(PathPlannerTrajectory trajectory, double timeout, boolean isFirstPath) {
+        return new InstantCommand(() -> {
+            setFieldTrajectory(trajectory);
+            if (isFirstPath) {
+                resetPose(trajectory.getInitialHolonomicPose());
+                resetGyro(trajectory.getInitialHolonomicPose().getRotation());
+            }
+        }).andThen(
                 new PPSwerveControllerCommand(
                         trajectory,
                         m_poseSupplier,
                         getKinematics(),
-                        new PIDController(10, 0, 0),
-                        new PIDController(10, 0, 0),
                         new PIDController(5, 0, 0),
+                        new PIDController(5, 0, 0),
+                        new PIDController(1, 0, 1),
                         m_swerveModuleConsumer,
-                        true,
+                        false,
                         this)
                         .withTimeout(timeout));
     }

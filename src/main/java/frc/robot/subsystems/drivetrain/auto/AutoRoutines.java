@@ -24,6 +24,8 @@ public class AutoRoutines {
     private final Arm m_arm = Arm.getInstance();
     private final Claw m_claw = Claw.getInstance();
 
+    public final Auto ONE_METER_TEST = new Auto(
+            loadTrajectory(new DriveTrajectory(new Pair<String, Double>("Test", 5d), true)));
     public final Auto CHARGE_STATION = new Auto(
             loadTrajectory(new DriveTrajectory(new Pair<String, Double>("ChargeStationStraight", 2d), true)));
     public final Auto SCORE_CONE_CHARGE_STATION_COMMUNITY = new Auto(
@@ -35,7 +37,7 @@ public class AutoRoutines {
     private Command loadTrajectory(DriveTrajectory traj) {
         return new InstantCommand().repeatedly().until(m_drivetrain.isTrajectoryFinished)
                 .deadlineWith(m_drivetrain.setState(DrivetrainStates.TRAJECTORY_DRIVE,
-                        new HashMap<>(Map.of("Trajectory", traj.getTrajectory(), "Timeout", traj.getTimeout()))));
+                        new HashMap<>(Map.of("Trajectory", traj.getTrajectory(), "Timeout", traj.getTimeout(), "IsFirstPath", traj.getIsFirstPath()))));
     }
 
     private class Auto extends SequentialCommandGroup {
