@@ -127,10 +127,10 @@ public class IntakeSubsystem extends SubsystemBase {
             switch (m_currentState) {
                 case CUBE_IN:
                     // PID Refrence set to out setpoint, ~30
-                    m_hinge_setpoint = 5;
+                    m_hinge_setpoint = 16;
                     setSetpoint(m_hinge_setpoint);
-                    m_frontRoller.set(intakeSpeed);
-                    m_backRoller.set(-intakeSpeed);
+                    m_frontRoller.set(0.5);
+                    m_backRoller.set(-0.5);
                     break;
 
                 case CUBE_SPIT:
@@ -154,7 +154,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 case CONE_IN:
                     m_hinge_setpoint = 11;
                     setSetpoint(m_hinge_setpoint);
-                    m_frontRoller.set(0.5);
+                    m_frontRoller.set(0.75/2);
                     m_backRoller.set(0.75);
                     break;
                 case CONE_INN:
