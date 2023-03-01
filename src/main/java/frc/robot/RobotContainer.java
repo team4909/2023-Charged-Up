@@ -150,6 +150,7 @@ public class RobotContainer {
         m_chooser.setDefaultOption("Test Auto", m_routines.CHARGE_STATION);
         m_chooser.addOption("Score Cone & Balance Charge Station", m_routines.SCORE_CONE_CHARGE_STATION_COMMUNITY);
         m_chooser.addOption("One Meter Test", m_routines.ONE_METER_TEST);
+        m_chooser.addOption("One Piece + Charge Station", m_routines.ONE_PIECE_CHARGE_STATION);
         SmartDashboard.putData(m_chooser);
     }
 

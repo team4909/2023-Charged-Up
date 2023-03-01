@@ -196,7 +196,7 @@ public class Drivetrain extends SubsystemBase {
                 case TRAJECTORY_DRIVE:
                     currentDrivetrainCommand = TrajectoryDrive(
                             (PathPlannerTrajectory) m_stateArgs.get("Trajectory"),
-                            (double) m_stateArgs.get("Timeout"), (boolean) m_stateArgs.get("IsFirstPath"))
+                            (boolean) m_stateArgs.get("IsFirstPath"))
                             .andThen(setState(DrivetrainStates.IDLE));
                     break;
                 case PRECISE:
@@ -266,7 +266,7 @@ public class Drivetrain extends SubsystemBase {
                 () -> drive(new ChassisSpeeds()), this);
     }
 
-    private Command TrajectoryDrive(PathPlannerTrajectory trajectory, double timeout, boolean isFirstPath) {
+    private Command TrajectoryDrive(PathPlannerTrajectory trajectory, boolean isFirstPath) {
         return new InstantCommand(() -> {
             setFieldTrajectory(trajectory);
             if (isFirstPath) {
@@ -284,7 +284,7 @@ public class Drivetrain extends SubsystemBase {
                         m_swerveModuleConsumer,
                         false,
                         this)
-                        .withTimeout(timeout));
+                        .withTimeout(trajectory.getTotalTimeSeconds() + 1));
     }
 
     private Command SnapToAngle(double angle) {

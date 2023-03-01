@@ -109,7 +109,6 @@ public class Arm extends SubsystemBase {
         // m_arbFF = m_armFeedForward.calculate(getWristEncoderPos(),
         // Units.rotationsPerMinuteToRadiansPerSecond(m_wristMotor.getEncoder().getVelocity())
         // * (180d / Math.PI));
-
         // m_wristMotor.getPIDController().setReference(setpoint,
         // ControlType.kSmartMotion, 0, m_arbFF);
         // m_wristMotor.getPIDController().setReference(setpoint,
