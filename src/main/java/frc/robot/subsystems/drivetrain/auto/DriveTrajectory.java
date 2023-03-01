@@ -14,7 +14,7 @@ public class DriveTrajectory {
     public DriveTrajectory(String trajectory, boolean isFirstPath) {
         m_pathName = trajectory;
         m_isFirstPath = isFirstPath;
-        m_trajectory = PathPlanner.loadPath(m_pathName, DrivetrainConstants.MAX_DRIVETRAIN_SPEED, 3);
+        m_trajectory = PathPlanner.loadPath(m_pathName, DrivetrainConstants.MAX_DRIVETRAIN_SPEED / 2, 1);
         if (m_trajectory == null) {
             DriverStation.reportError("Path not loaded correctly!", Thread.currentThread().getStackTrace());
             return;

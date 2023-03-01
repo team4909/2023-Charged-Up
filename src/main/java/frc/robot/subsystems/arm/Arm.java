@@ -114,8 +114,9 @@ public class Arm extends SubsystemBase {
         // m_wristMotor.getPIDController().setReference(setpoint,
         // ControlType.kPosition);
         // double ff = -calcFF(m_wristMotor.getEncoder().getPosition());
-        m_wristMotor.getPIDController().setReference(setpoint, ControlType.kPosition, 0, 
-        calcFF(Units.degreesToRadians(m_wristMotor.getEncoder().getPosition()), Units.rotationsPerMinuteToRadiansPerSecond(m_wristMotor.getEncoder().getVelocity())));
+        m_wristMotor.getPIDController().setReference(setpoint, ControlType.kPosition, 0,
+                calcFF(Units.degreesToRadians(m_wristMotor.getEncoder().getPosition()),
+                        Units.rotationsPerMinuteToRadiansPerSecond(m_wristMotor.getEncoder().getVelocity())));
     }
 
     public void setState(ArmStates state) {
@@ -126,7 +127,7 @@ public class Arm extends SubsystemBase {
 
         m_wristMotor.restoreFactoryDefaults();
         m_wristMotor.setInverted(true);
-        m_wristMotor.getPIDController().setP(WristConstants.kP); 
+        m_wristMotor.getPIDController().setP(WristConstants.kP);
         m_wristMotor.getPIDController().setOutputRange(-WristConstants.OUTPUT_LIMIT, WristConstants.OUTPUT_LIMIT);
         m_wristMotor.setIdleMode(IdleMode.kBrake);
 
@@ -150,8 +151,8 @@ public class Arm extends SubsystemBase {
     }
 
     private double calcFF(double theta, double vel) {
-        double ff = m_armFeedForward.calculate(theta, vel);
-        // double ff = WristConstants.kG * Math.cos(theta);
+        // double ff = m_armFeedForward.calculate(theta, vel);
+        double ff = WristConstants.kG * Math.cos(theta);
         SmartDashboard.putNumber("Intake FF", ff);
         return ff;
     }

@@ -3,7 +3,6 @@ package frc.robot.subsystems.drivetrain.auto;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -38,7 +37,9 @@ public class AutoRoutines {
     public final Auto ONE_PIECE_CHARGE_STATION = new Auto(
             SCORE_CONE(ElevatorStates.TOP),
             loadTrajectory(new DriveTrajectory("TopNodeToTopPiece", true)),
-            INTAKE_CONE(),
+            Commands.parallel(
+                    loadTrajectory(new DriveTrajectory("ThruTopPiece", false)),
+                    INTAKE_CONE()),
             loadTrajectory(new DriveTrajectory("TopPieceToTopNode", false)),
             SCORE_CONE(ElevatorStates.MID_CONE),
             loadTrajectory(new DriveTrajectory("TopNodeToChargeStation", false)));
@@ -71,7 +72,8 @@ public class AutoRoutines {
     private final Command INTAKE_CONE() {
         return Commands.sequence(
                 Commands.runOnce(() -> m_intake.coneIn()),
-                Commands.waitSeconds(0.5));
+                Commands.waitSeconds(3d),
+                Commands.runOnce(() -> m_intake.handOff()));
     }
 
 }

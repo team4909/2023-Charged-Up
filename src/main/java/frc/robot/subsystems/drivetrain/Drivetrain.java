@@ -280,7 +280,7 @@ public class Drivetrain extends SubsystemBase {
                         getKinematics(),
                         new PIDController(5, 0, 0),
                         new PIDController(5, 0, 0),
-                        new PIDController(1, 0, 1),
+                        new PIDController(2, 0, 0.2),
                         m_swerveModuleConsumer,
                         false,
                         this)
