@@ -123,6 +123,10 @@ public class Arm extends SubsystemBase {
         m_state = state;
     }
 
+    public Command setState2(ArmStates state) {
+        return new InstantCommand(() -> m_state = state);
+    }
+
     private void configureHardware() {
 
         m_wristMotor.restoreFactoryDefaults();

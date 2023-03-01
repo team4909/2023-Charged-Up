@@ -133,7 +133,9 @@ public final class Constants {
 
         public static final double BOTTOM_SETPOINT = 0d;
         public static final double MID_CONE_SETPOINT = 13_982d * METERS_PER_TICK;
-        public static final double MID_CUBE_SETPOINT = 13_908d * METERS_PER_TICK;;
-        public static final double TOP_SETPOINT = 28_500d * METERS_PER_TICK;;
+        public static final double MID_CUBE_SETPOINT = 13_908d * METERS_PER_TICK;
+        public static final double TOP_SETPOINT = 28_500d * METERS_PER_TICK;
+        public static final double SUBSTATION_SETPOINT = 28_500d * METERS_PER_TICK;
+
     }
 }

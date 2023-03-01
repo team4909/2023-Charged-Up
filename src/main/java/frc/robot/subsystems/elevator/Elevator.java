@@ -67,6 +67,7 @@ public class Elevator extends SubsystemBase {
     SmartDashboard.putNumber("elevatorError", m_leftExtensionMotor.getClosedLoopError());
     SmartDashboard.putNumber("elevatorEncoder",
         m_leftExtensionMotor.getSelectedSensorPosition() * ElevatorConstants.METERS_PER_TICK);
+    SmartDashboard.putString("Get Elevator States", m_state.toString());
   }
 
   private void stateMachine() {
@@ -87,8 +88,13 @@ public class Elevator extends SubsystemBase {
           break;
         case RETRACT:
           currentElevatorCommand = SetSetpoint(ElevatorConstants.BOTTOM_SETPOINT);
+          break;
+        case SUBSTATION:
+          currentElevatorCommand = SetSetpoint(ElevatorConstants.SUBSTATION_SETPOINT);
+          break;
         default:
           m_state = ElevatorStates.IDLE;
+          break;
       }
     }
 
@@ -165,7 +171,12 @@ public class Elevator extends SubsystemBase {
   public void setState(ElevatorStates state) {
     m_state = state;
   }
-  public ElevatorStates getState(){
+
+  public Command setState2(ElevatorStates state) {
+    return new InstantCommand(() -> m_state = state);
+  }
+
+  public ElevatorStates getState() {
     return m_state;
   }
 

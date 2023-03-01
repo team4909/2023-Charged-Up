@@ -111,6 +111,10 @@ public class Claw extends SubsystemBase {
         m_state = state;
     }
 
+    public Command setState2(ClawStates state) {
+        return new InstantCommand(() -> m_state = state);
+    }
+
     public static Claw getInstance() {
         if (m_instance == null) {
             m_instance = new Claw();

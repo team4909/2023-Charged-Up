@@ -6,6 +6,7 @@ import java.util.Map;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -24,162 +25,170 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 
 public class RobotContainer {
 
-    private final IntakeSubsystem m_intakeSubsytem = IntakeSubsystem.getInstance();
+	private final IntakeSubsystem m_intakeSubsytem = IntakeSubsystem.getInstance();
 
-    private final CommandXboxController m_driverController = new CommandXboxController(0);
-    private final CommandXboxController m_operatorController = new CommandXboxController(1);
-    private final SendableChooser<Command> m_chooser = new SendableChooser<>();
-    private final AutoRoutines m_routines = new AutoRoutines();
-    private final Elevator m_elevator = Elevator.getInstance();
+	private final CommandXboxController m_driverController = new CommandXboxController(0);
+	private final CommandXboxController m_operatorController = new CommandXboxController(1);
+	private final SendableChooser<Command> m_chooser = new SendableChooser<>();
+	private final AutoRoutines m_routines = new AutoRoutines();
+	private final Elevator m_elevator = Elevator.getInstance();
 
-    private final Arm m_arm = Arm.getInstance();
-    private final Claw m_claw = Claw.getInstance();
-    private final Drivetrain m_drivetrain = Drivetrain.getInstance();
+	private final Arm m_arm = Arm.getInstance();
+	private final Claw m_claw = Claw.getInstance();
+	private final Drivetrain m_drivetrain = Drivetrain.getInstance();
 
-    public RobotContainer() {
-        configureBindings();
-        configureSendableChooser();
-    }
+	public RobotContainer() {
+		configureBindings();
+		configureSendableChooser();
+	}
 
-    private void configureBindings() {
-        // #region Driver Controls
+	private void configureBindings() {
+		// #region Driver Controls
 
-        m_drivetrain.setJoystickSuppliers(
-                () -> m_driverController.getLeftY(),
-                () -> m_driverController.getLeftX(),
-                () -> m_driverController.getRightX());
+		m_drivetrain.setJoystickSuppliers(
+				() -> m_driverController.getLeftY(),
+				() -> m_driverController.getLeftX(),
+				() -> m_driverController.getRightX());
 
-        m_driverController.back().onTrue(m_drivetrain.zeroGyro());
-        m_driverController.rightBumper()
-                .onTrue(m_drivetrain.setState(DrivetrainStates.PRECISE))
-                .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+		m_driverController.back().onTrue(m_drivetrain.zeroGyro());
+		m_driverController.rightBumper()
+				.onTrue(m_drivetrain.setState(DrivetrainStates.PRECISE))
+				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
 
-        m_driverController.y()
-                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
-                        new HashMap<>(Map.of("Angle", 0d))))
-                .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
-        m_driverController.b()
-                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
-                        new HashMap<>(Map.of("Angle", 270d))))
-                .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
-        m_driverController.a()
-                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
-                        new HashMap<>(Map.of("Angle", 180d))))
-                .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
-        m_driverController.x()
-                .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
-                        new HashMap<>(Map.of("Angle", 90d))))
-                .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
-        // m_driverController.leftTrigger() Intake Cube
-        m_driverController.leftBumper().onTrue(new InstantCommand(() -> m_intakeSubsytem.coneSpit()));
-        m_driverController.rightTrigger().onTrue(new InstantCommand(() -> m_intakeSubsytem.coneIn()))
-                // m_driverController.leftTrigger()
-                .onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
+		m_driverController.y()
+				.onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+						new HashMap<>(Map.of("Angle", 0d))))
+				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+		m_driverController.b()
+				.onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+						new HashMap<>(Map.of("Angle", 270d))))
+				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+		m_driverController.a()
+				.onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+						new HashMap<>(Map.of("Angle", 180d))))
+				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+		m_driverController.x()
+				.onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+						new HashMap<>(Map.of("Angle", 90d))))
+				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+		// m_driverController.leftTrigger() Intake Cube
+		m_driverController.leftBumper().onTrue(new InstantCommand(() -> m_intakeSubsytem.coneSpit()));
+		m_driverController.rightTrigger().onTrue(new InstantCommand(() -> m_intakeSubsytem.coneIn()))
+				// m_driverController.leftTrigger()
+				.onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
 
-        m_driverController.leftTrigger().onTrue(new InstantCommand(() -> m_intakeSubsytem.cubeIn()))
-                // m_driverController.leftTrigger()
-                .onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
+		m_driverController.leftTrigger().onTrue(new InstantCommand(() -> m_intakeSubsytem.cubeIn()))
+				// m_driverController.leftTrigger()
+				.onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
 
-        m_driverController.povDown().onTrue(new InstantCommand(() -> m_intakeSubsytem.intakeIn()));
+		m_driverController.povDown().onTrue(new InstantCommand(() -> m_intakeSubsytem.intakeIn()));
 
-        m_driverController.povRight().onTrue(new InstantCommand(() -> m_intakeSubsytem.cubeIn()))
-                .onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
+		m_driverController.povRight().onTrue(new InstantCommand(() -> m_intakeSubsytem.cubeIn()))
+				.onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
 
-        m_driverController.povLeft().onTrue(new InstantCommand(() -> m_intakeSubsytem.coneInn()))
-                .onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
+		m_driverController.povLeft().onTrue(new InstantCommand(() -> m_intakeSubsytem.coneInn()))
+				.onFalse(new InstantCommand(() -> m_intakeSubsytem.handOff()));
 
-        m_driverController.start().onTrue(new InstantCommand(() -> m_intakeSubsytem.intakeZero()));
+		m_driverController.start().onTrue(new InstantCommand(() -> m_intakeSubsytem.intakeZero()));
 
-        m_operatorController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)));
-        m_operatorController.back().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)));
-        // m_operatorController.b().onTrue(new InstantCommand(() ->
-        // m_arm.setState(ArmStates.HANDOFF_CUBE)));
-        m_operatorController.x().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)));
-        m_operatorController.y().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
+		m_operatorController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)));
+		m_operatorController.back().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)));
+		// m_operatorController.b().onTrue(new InstantCommand(() ->
+		// m_arm.setState(ArmStates.HANDOFF_CUBE)));
+		m_operatorController.x().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)));
+		m_operatorController.y().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
 
-        // Mid Cone Sequence
-        m_operatorController.a().onTrue(
-                new SequentialCommandGroup(
-                        new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)),
-                        new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)),
-                        new WaitCommand(1),
-                        new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)),
-                        new WaitCommand(1),
-                        new InstantCommand(() -> m_intakeSubsytem.coneSpit()),
-                        new WaitCommand(1),
-                        new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)))
+		// Mid Cone Sequence
+		m_operatorController.a().onTrue(
+				new SequentialCommandGroup(
+						new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)),
+						new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)),
+						new WaitCommand(1),
+						new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)),
+						new WaitCommand(1),
+						new InstantCommand(() -> m_intakeSubsytem.coneSpit()),
+						new WaitCommand(1),
+						new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)))
 
-        );
+		);
 
-        m_operatorController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING))
-                .andThen(new WaitCommand(0.5))
-                .andThen(() -> m_claw.setState(ClawStates.OPEN))
-                .andThen(new WaitCommand(0.2))
-                .andThen(() -> m_elevator.setState(ElevatorStates.RETRACT))
-                .andThen(() -> m_arm.setState(ArmStates.RETRACTED)));
+		m_operatorController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING))
+				.andThen(new WaitCommand(0.5))
+				.andThen(() -> m_claw.setState(ClawStates.OPEN))
+				.andThen(new WaitCommand(0.2))
+				.andThen(() -> m_elevator.setState(ElevatorStates.RETRACT))
+				.andThen(() -> m_arm.setState(ArmStates.RETRACTED)));
 
-        m_operatorController.rightTrigger()
-                .onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
-        m_operatorController.rightBumper()
-                .onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
-        m_operatorController.povDown().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
-        m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)));
-        m_operatorController.leftTrigger().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING)));
+		m_operatorController.rightTrigger()
+				.onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
+		m_operatorController.rightBumper()
+				.onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
+		m_operatorController.povDown().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
+		m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)));
+		m_operatorController.leftTrigger().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING)));
 
-        m_operatorController.start().onTrue(substationToggle());
+		m_operatorController.start().onTrue(substationToggle());
 
-      }
+	}
 
+	// m_driverController.leftBumper()
+	// .onTrue(new RunCommand(() -> m_intakeSubsytem.cubeSpit(), m_intakeSubsytem))
+	// .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
 
+	// m_driverController.rightTrigger()
+	// .onTrue(new RunCommand(() -> m_intakeSubsytem.coneIn(), m_intakeSubsytem))
+	// .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
 
-        // m_driverController.leftBumper()
-        // .onTrue(new RunCommand(() -> m_intakeSubsytem.cubeSpit(), m_intakeSubsytem))
-        // .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
+	// m_driverController.rightBumper()
+	// .onTrue(new RunCommand(() -> m_intakeSubsytem.coneSpit(), m_intakeSubsytem))
+	// .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
+	// m_driverController.x()
+	// .onTrue(new RunCommand(() -> m_intakeSubsytem.intakeIn(), m_intakeSubsytem));
 
-        // m_driverController.rightTrigger()
-        // .onTrue(new RunCommand(() -> m_intakeSubsytem.coneIn(), m_intakeSubsytem))
-        // .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
+	// m_operatorController.rightTrigger().onTrue(new InstantCommand(() ->
+	// m_elevator.setState(ElevatorStates.TOP)));
+	// m_operatorController.rightBumper().onTrue(new InstantCommand(() ->
+	// m_elevator.setState(ElevatorStates.MID_CUBE)));
+	// m_operatorController.leftBumper().onTrue(new InstantCommand(() ->
+	// m_elevator.setState(ElevatorStates.MID_CONE)));
+	// m_operatorController.leftTrigger().onTrue(new InstantCommand(() ->
+	// m_elevator.setState(ElevatorStates.RETRACT)));
 
-        // m_driverController.rightBumper()
-        // .onTrue(new RunCommand(() -> m_intakeSubsytem.coneSpit(), m_intakeSubsytem))
-        // .onFalse(new RunCommand(() -> m_intakeSubsytem.handOff(), m_intakeSubsytem));
-        // m_driverController.x()
-        // .onTrue(new RunCommand(() -> m_intakeSubsytem.intakeIn(), m_intakeSubsytem));
+	private void configureSendableChooser() {
+		m_chooser.setDefaultOption("Test Auto", m_routines.CHARGE_STATION);
+		m_chooser.addOption("Score Cone & Balance Charge Station",
+				m_routines.SCORE_CONE_CHARGE_STATION_COMMUNITY);
+		m_chooser.addOption("One Meter Test", m_routines.ONE_METER_TEST);
+		m_chooser.addOption("One Piece + Charge Station", m_routines.ONE_PIECE_CHARGE_STATION);
+		SmartDashboard.putData(m_chooser);
+	}
 
-        // m_operatorController.rightTrigger().onTrue(new InstantCommand(() ->
-        // m_elevator.setState(ElevatorStates.TOP)));
-        // m_operatorController.rightBumper().onTrue(new InstantCommand(() ->
-        // m_elevator.setState(ElevatorStates.MID_CUBE)));
-        // m_operatorController.leftBumper().onTrue(new InstantCommand(() ->
-        // m_elevator.setState(ElevatorStates.MID_CONE)));
-        // m_operatorController.leftTrigger().onTrue(new InstantCommand(() ->
-        // m_elevator.setState(ElevatorStates.RETRACT)));
+	public Command getAutonomousCommand() {
+		return m_chooser.getSelected();
+	}
 
-    private void configureSendableChooser() {
-        m_chooser.setDefaultOption("Test Auto", m_routines.CHARGE_STATION);
-        m_chooser.addOption("Score Cone & Balance Charge Station", m_routines.SCORE_CONE_CHARGE_STATION_COMMUNITY);
-        m_chooser.addOption("One Meter Test", m_routines.ONE_METER_TEST);
-        m_chooser.addOption("One Piece + Charge Station", m_routines.ONE_PIECE_CHARGE_STATION);
-        SmartDashboard.putData(m_chooser);
-    }
+	private Command substationToggle() {
 
-    public Command getAutonomousCommand() {
-        return m_chooser.getSelected();
-    }
+		return new ConditionalCommand(
+				(Command) new SequentialCommandGroup(m_elevator.setState2(ElevatorStates.SUBSTATION),
+						m_claw.setState2(ClawStates.OPEN), m_arm.setState2(ArmStates.DROPPING)),
+				(Command) new SequentialCommandGroup(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)),
+						new WaitCommand(1), new InstantCommand(() -> {
+							m_arm.setState(ArmStates.RETRACTED);
+							m_elevator.setState(ElevatorStates.RETRACT);
+						})),
+				() -> m_elevator.getState() != ElevatorStates.SUBSTATION);
 
-    private Command substationToggle() {
+		// return new InstantCommand(() -> {
+		// if (m_elevator.getState() != ElevatorStates.SUBSTATION) {
+		// m_elevator.setState(ElevatorStates.SUBSTATION);
+		// m_claw.setState(ClawStates.OPEN);
+		// m_arm.setState(ArmStates.DROPPING);
+		// } else {
+		// m_claw.setState(ClawStates.CLOSED);
 
-      if(m_elevator.getState() != ElevatorStates.SUBSTATION){
-        return new InstantCommand(() -> m_elevator.setState(ElevatorStates.SUBSTATION))
-        .alongWith(new InstantCommand(() -> m_claw.setState(ClawStates.OPEN))
-                    .andThen(() -> m_arm.setState(ArmStates.DROPPING))
-        );
-      }
-      else{
-        return new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED))
-        .andThen(() -> m_arm.setState(ArmStates.RETRACTED))
-        .andThen(() -> m_elevator.setState(ElevatorStates.RETRACT));
-      }
+		// }
+		// });
 
-    }
+	}
 }
