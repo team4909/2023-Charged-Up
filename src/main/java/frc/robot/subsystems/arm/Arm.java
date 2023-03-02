@@ -72,7 +72,7 @@ public class Arm extends SubsystemBase {
                     currentWristCommand = SetWristPosition(110);
                     break;
                 case HANDOFF_CONE:
-                    currentWristCommand = SetWristPosition(-40.361);
+                    currentWristCommand = SetWristPosition(-47.361);
                     break;
                 case HANDOFF_CUBE:
                     currentWristCommand = SetWristPosition(-7.966);
