@@ -271,7 +271,7 @@ public class Drivetrain extends SubsystemBase {
             setFieldTrajectory(trajectory);
             if (isFirstPath) {
                 resetPose(trajectory.getInitialHolonomicPose());
-                resetGyro(trajectory.getInitialHolonomicPose().getRotation());
+                // resetGyro(trajectory.getInitialHolonomicPose().getRotation());
             }
         }).andThen(
                 new PPSwerveControllerCommand(
@@ -282,7 +282,7 @@ public class Drivetrain extends SubsystemBase {
                         new PIDController(5, 0, 0),
                         new PIDController(2, 0, 0.2),
                         m_swerveModuleConsumer,
-                        false,
+                        true,
                         this)
                         .withTimeout(trajectory.getTotalTimeSeconds() + 1));
     }
@@ -311,6 +311,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public void resetGyro(Rotation2d rot) {
+        m_simChassisAngle = rot;
         m_pigeon.setYaw(rot.getDegrees());
     }
 

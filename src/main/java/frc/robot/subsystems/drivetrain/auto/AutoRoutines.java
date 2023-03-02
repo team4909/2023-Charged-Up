@@ -45,7 +45,7 @@ public class AutoRoutines {
             loadTrajectory(new DriveTrajectory("TopNodeToChargeStation", false)));
 
     private Command loadTrajectory(DriveTrajectory traj) {
-        return new InstantCommand().repeatedly().until(m_drivetrain.isTrajectoryFinished)
+        return Commands.none().repeatedly().until(m_drivetrain.isTrajectoryFinished)
                 .deadlineWith(m_drivetrain.setState(DrivetrainStates.TRAJECTORY_DRIVE,
                         new HashMap<>(
                                 Map.of("Trajectory", traj.getTrajectory(), "IsFirstPath", traj.getIsFirstPath()))));

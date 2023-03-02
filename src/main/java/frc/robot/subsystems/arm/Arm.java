@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -158,7 +159,7 @@ public class Arm extends SubsystemBase {
         // double ff = m_armFeedForward.calculate(theta, vel);
         double ff = WristConstants.kG * Math.cos(theta);
         SmartDashboard.putNumber("Intake FF", ff);
-        return ff;
+        return MathUtil.clamp(ff, -1d, 1d);
     }
 
 }
