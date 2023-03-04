@@ -101,7 +101,7 @@ public final class Constants {
         public static final int FRONT_ROLLER_MOTOR = 1;
         public static final int BACK_ROLLER_MOTOR = 4;
 
-        public static final double kP = 0.02;
+        public static final double kP = 0.005;
         public static final double kG = 0.66;
 
         public static final double OUTPUT_LIMIT = 0.5;

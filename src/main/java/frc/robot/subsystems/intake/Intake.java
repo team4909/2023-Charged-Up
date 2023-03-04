@@ -22,12 +22,12 @@ public class Intake extends SubsystemBase {
   public enum IntakeStates {
     IDLE("Idle"),
     RETRACTED("Retracted"),
-    CALIBRATE("CALIBRATE"),
+    CALIBRATE("Calibrate"),
     INTAKE_CUBE("Intake Cube"),
     INTAKE_CONE("Intake Cone"),
     SPIT_CONE("Spit Cone"),
     SPIT_CUBE("Spit Cube"),
-    HANDOFF("HANDOFF");
+    HANDOFF("Handoff");
 
     String stateName;
 
@@ -103,10 +103,13 @@ public class Intake extends SubsystemBase {
           currentIntakeCommand = Calibrate();
           break;
         case HANDOFF:
-          if (m_lastState.was(IntakeStates.INTAKE_CUBE))
+          if (m_lastState.was(IntakeStates.INTAKE_CUBE)) {
+            IntakeStates.HANDOFF.stateName.concat(" Cube");
             currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.HANDOFF_SETPOINT, 0.2d, -0.05d);
-          else if (m_lastState.was(IntakeStates.INTAKE_CONE))
+          } else if (m_lastState.was(IntakeStates.INTAKE_CONE)) {
+            IntakeStates.HANDOFF.stateName.concat(" Cone");
             currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.HANDOFF_SETPOINT, 0.2d, 0.25d);
+          }
           break;
         default:
           m_state = IntakeStates.IDLE;
@@ -159,7 +162,7 @@ public class Intake extends SubsystemBase {
   // #endregion
 
   private double calcFF(double theta) {
-    double ff = IntakeConstants.kG * Math.cos(theta);
+    double ff = IntakeConstants.kG * Math.cos(Math.toRadians(theta));
     SmartDashboard.putNumber("Intake FF", ff);
     return ff;
   }
