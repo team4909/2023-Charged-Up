@@ -100,18 +100,8 @@ public class Claw extends SubsystemBase {
             m_clawMotor.getPIDController().setReference(setpoint, ControlType.kPosition);
         }, this);
     }
-
-    private Command SetClawSpeed(double speed) {
-        return new InstantCommand(() -> {
-            m_clawMotor.set(speed);
-        }, this);
-    }
-
-    public void setState(ClawStates state) {
-        m_state = state;
-    }
-
-    public Command setState2(ClawStates state) {
+    
+    public Command setState(ClawStates state) {
         return new InstantCommand(() -> m_state = state);
     }
 

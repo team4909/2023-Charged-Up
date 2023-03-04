@@ -40,7 +40,9 @@ public class AutoRoutines {
       Commands.parallel(
           loadTrajectory(new DriveTrajectory("ThruTopPiece", false)),
           INTAKE_CONE()),
-      loadTrajectory(new DriveTrajectory("TopPieceToTopNode", false)),
+      Commands.parallel(
+          loadTrajectory(new DriveTrajectory("TopPieceToTopNode", false)),
+          HANDOFF()),
       SCORE_CONE(ElevatorStates.MID_CONE),
       loadTrajectory(new DriveTrajectory("TopNodeToChargeStation", false)));
 
@@ -63,7 +65,7 @@ public class AutoRoutines {
         Commands.waitSeconds(2),
         Commands.runOnce(() -> m_arm.setState(ArmStates.DROPPING)),
         Commands.waitSeconds(0.5),
-        Commands.runOnce(() -> m_claw.setState(ClawStates.OPEN)),
+        m_claw.setState(ClawStates.OPEN),
         Commands.waitSeconds(0.2),
         Commands.runOnce(() -> m_arm.setState(ArmStates.RETRACTED)),
         Commands.runOnce(() -> m_elevator.setState(ElevatorStates.RETRACT)));
@@ -74,6 +76,19 @@ public class AutoRoutines {
         m_intake.setState(IntakeStates.INTAKE_CONE),
         Commands.waitSeconds(3d),
         m_intake.setState(IntakeStates.HANDOFF));
+  }
+
+  public final Command HANDOFF() {
+    return Commands.sequence(
+        m_claw.setState(ClawStates.OPEN),
+        Commands.runOnce(() -> m_arm.setState(ArmStates.HANDOFF_CONE)),
+        Commands.waitSeconds(1),
+        m_claw.setState(ClawStates.CLOSED),
+        Commands.waitSeconds(1),
+        m_intake.setState(IntakeStates.SPIT_CONE),
+        Commands.waitSeconds(1),
+        Commands.runOnce(() -> m_arm.setState(ArmStates.RETRACTED)),
+        m_intake.setState(IntakeStates.RETRACTED));
   }
 
 }

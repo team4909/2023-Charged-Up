@@ -86,8 +86,8 @@ public class RobotContainer {
 		m_operatorController.povDown().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING)));
 		m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.SUBSTATION)));
 
-		m_operatorController.x().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)));
-		m_operatorController.y().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
+		m_operatorController.x().onTrue(m_claw.setState(ClawStates.OPEN));
+		m_operatorController.y().onTrue(m_claw.setState(ClawStates.CLOSED));
 
 		m_operatorController.rightTrigger()
 				.onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
@@ -97,22 +97,12 @@ public class RobotContainer {
 		m_operatorController.start().onTrue(substationToggle());
 
 		// Handoff Cone Sequence
-		m_operatorController.a().onTrue(
-				new SequentialCommandGroup(
-						new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)),
-						new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)),
-						new WaitCommand(1),
-						new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)),
-						new WaitCommand(1),
-						m_intake.setState(IntakeStates.SPIT_CONE),
-						new WaitCommand(1),
-						new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)),
-						m_intake.setState(IntakeStates.RETRACTED)));
+		m_operatorController.a().onTrue(m_routines.HANDOFF());
 
 		// Drop Game Piece
 		m_operatorController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING))
 				.andThen(new WaitCommand(0.5))
-				.andThen(() -> m_claw.setState(ClawStates.OPEN))
+				.andThen(m_claw.setState(ClawStates.OPEN))
 				.andThen(new WaitCommand(0.2))
 				.andThen(() -> m_elevator.setState(ElevatorStates.RETRACT))
 				.andThen(() -> m_arm.setState(ArmStates.RETRACTED)));
@@ -135,8 +125,8 @@ public class RobotContainer {
 	private Command substationToggle() {
 		return new ConditionalCommand(
 				(Command) new SequentialCommandGroup(m_elevator.setState2(ElevatorStates.DOUBLE_SUBSTATION),
-						m_claw.setState2(ClawStates.OPEN), m_arm.setState2(ArmStates.DROPPING)),
-				(Command) new SequentialCommandGroup(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)),
+						m_claw.setState(ClawStates.OPEN), m_arm.setState2(ArmStates.DROPPING)),
+				(Command) new SequentialCommandGroup(m_claw.setState(ClawStates.CLOSED),
 						new WaitCommand(1), new InstantCommand(() -> {
 							m_arm.setState(ArmStates.RETRACTED);
 							m_elevator.setState(ElevatorStates.RETRACT);
