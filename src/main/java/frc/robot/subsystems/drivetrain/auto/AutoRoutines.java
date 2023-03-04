@@ -60,16 +60,25 @@ public class AutoRoutines {
     }
   }
 
+  private final Command INIT() {
+    return Commands.sequence(
+        Commands.runOnce(() -> m_claw.setState(ClawStates.CLOSED)),
+        m_intake.setState(IntakeStates.CALIBRATE),
+        Commands.waitSeconds(1),
+        m_intake.setState(IntakeStates.RETRACTED));
+  }
+
   private final Command SCORE_CONE(ElevatorStates extensionLevel) {
     return Commands.sequence(
         Commands.runOnce(() -> m_elevator.setState(extensionLevel)),
-        Commands.waitSeconds(2),
+        Commands.waitSeconds(1.5),
         Commands.runOnce(() -> m_arm.setState(ArmStates.DROPPING)),
-        Commands.waitSeconds(0.5),
+        Commands.waitSeconds(0.25),
         m_claw.setState(ClawStates.OPEN),
         Commands.waitSeconds(0.2),
         Commands.runOnce(() -> m_arm.setState(ArmStates.RETRACTED)),
-        Commands.runOnce(() -> m_elevator.setState(ElevatorStates.RETRACT)));
+        Commands.runOnce(() -> m_elevator.setState(ElevatorStates.RETRACT)))
+        .alongWith(INIT());
   }
 
   private final Command INTAKE_CONE() {

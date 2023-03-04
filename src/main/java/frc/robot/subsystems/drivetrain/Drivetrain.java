@@ -278,7 +278,8 @@ public class Drivetrain extends SubsystemBase {
     private Command TrajectoryDrive(PathPlannerTrajectory trajectory, boolean isFirstPath) {
         return new InstantCommand(() -> {
             if (isFirstPath) {
-                resetPose(PathPlannerTrajectory.transformTrajectoryForAlliance(trajectory, DriverStation.getAlliance()).getInitialHolonomicPose());
+                resetPose(PathPlannerTrajectory.transformTrajectoryForAlliance(trajectory, DriverStation.getAlliance())
+                        .getInitialHolonomicPose());
                 // resetGyro(trajectory.getInitialHolonomicPose().getRotation());
             }
             setFieldTrajectory(trajectory);
@@ -293,7 +294,7 @@ public class Drivetrain extends SubsystemBase {
                         m_swerveModuleConsumer,
                         true,
                         this)
-                        .withTimeout(trajectory.getTotalTimeSeconds() + 1));
+                        .withTimeout(trajectory.getTotalTimeSeconds()));
     }
 
     private Command SnapToAngle(double angle) {
@@ -322,7 +323,10 @@ public class Drivetrain extends SubsystemBase {
                 balanceController,
                 () -> m_pigeon.getRoll(),
                 () -> 0,
-                (output) -> {drive(ChassisSpeeds.fromFieldRelativeSpeeds(output, 0d, 0d, getGyroYaw())); SmartDashboard.putNumber("Pitch PID Output", output);},
+                (output) -> {
+                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(output, 0d, 0d, getGyroYaw()));
+                    SmartDashboard.putNumber("Pitch PID Output", output);
+                },
                 this)
                 .alongWith(Commands.run(() -> {
                     SmartDashboard.putNumber("Pitch", m_pigeon.getRoll());

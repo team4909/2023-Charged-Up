@@ -152,7 +152,7 @@ public class Intake extends SubsystemBase {
     return Commands.run(() -> {
       m_pivotLeft.setSmartCurrentLimit(5, 40);
       m_pivotLeft.set(0.1);
-    }, this).withTimeout(0.75)
+    }, this).withTimeout(0.5)
         .andThen(() -> {
           m_pivotLeft.getEncoder().setPosition(110d);
           m_state = IntakeStates.RETRACTED;
