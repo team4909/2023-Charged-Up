@@ -11,6 +11,7 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Constants;
 import frc.robot.Constants.DrivetrainConstants;
 
 public final class PhysicalModule extends ModuleBase {
@@ -27,27 +28,27 @@ public final class PhysicalModule extends ModuleBase {
     public PhysicalModule(int index) {
         switch (index) {
             case 0:
-                m_driveMotor = new TalonFX(DrivetrainConstants.FRONT_LEFT_DRIVE_MOTOR, DrivetrainConstants.CANBUS);
-                m_turnMotor = new TalonFX(DrivetrainConstants.FRONT_LEFT_TURN_MOTOR, DrivetrainConstants.CANBUS);
-                m_encoder = new CANCoder(DrivetrainConstants.FRONT_LEFT_STEER_ENCODER, DrivetrainConstants.CANBUS);
+                m_driveMotor = new TalonFX(DrivetrainConstants.FRONT_LEFT_DRIVE_MOTOR, Constants.CANFD_BUS);
+                m_turnMotor = new TalonFX(DrivetrainConstants.FRONT_LEFT_TURN_MOTOR, Constants.CANFD_BUS);
+                m_encoder = new CANCoder(DrivetrainConstants.FRONT_LEFT_STEER_ENCODER, Constants.CANFD_BUS);
                 m_encoderOffset = DrivetrainConstants.FRONT_LEFT_MODULE_STEER_OFFSET;
                 break;
             case 1:
-                m_driveMotor = new TalonFX(DrivetrainConstants.FRONT_RIGHT_DRIVE_MOTOR, DrivetrainConstants.CANBUS);
-                m_turnMotor = new TalonFX(DrivetrainConstants.FRONT_RIGHT_TURN_MOTOR, DrivetrainConstants.CANBUS);
-                m_encoder = new CANCoder(DrivetrainConstants.FRONT_RIGHT_STEER_ENCODER, DrivetrainConstants.CANBUS);
+                m_driveMotor = new TalonFX(DrivetrainConstants.FRONT_RIGHT_DRIVE_MOTOR, Constants.CANFD_BUS);
+                m_turnMotor = new TalonFX(DrivetrainConstants.FRONT_RIGHT_TURN_MOTOR, Constants.CANFD_BUS);
+                m_encoder = new CANCoder(DrivetrainConstants.FRONT_RIGHT_STEER_ENCODER, Constants.CANFD_BUS);
                 m_encoderOffset = DrivetrainConstants.FRONT_RIGHT_MODULE_STEER_OFFSET;
                 break;
             case 2:
-                m_driveMotor = new TalonFX(DrivetrainConstants.BACK_LEFT_DRIVE_MOTOR, DrivetrainConstants.CANBUS);
-                m_turnMotor = new TalonFX(DrivetrainConstants.BACK_LEFT_TURN_MOTOR, DrivetrainConstants.CANBUS);
-                m_encoder = new CANCoder(DrivetrainConstants.BACK_LEFT_STEER_ENCODER, DrivetrainConstants.CANBUS);
+                m_driveMotor = new TalonFX(DrivetrainConstants.BACK_LEFT_DRIVE_MOTOR, Constants.CANFD_BUS);
+                m_turnMotor = new TalonFX(DrivetrainConstants.BACK_LEFT_TURN_MOTOR, Constants.CANFD_BUS);
+                m_encoder = new CANCoder(DrivetrainConstants.BACK_LEFT_STEER_ENCODER, Constants.CANFD_BUS);
                 m_encoderOffset = DrivetrainConstants.BACK_LEFT_MODULE_STEER_OFFSET;
                 break;
             case 3:
-                m_driveMotor = new TalonFX(DrivetrainConstants.BACK_RIGHT_DRIVE_MOTOR, DrivetrainConstants.CANBUS);
-                m_turnMotor = new TalonFX(DrivetrainConstants.BACK_RIGHT_TURN_MOTOR, DrivetrainConstants.CANBUS);
-                m_encoder = new CANCoder(DrivetrainConstants.BACK_RIGHT_STEER_ENCODER, DrivetrainConstants.CANBUS);
+                m_driveMotor = new TalonFX(DrivetrainConstants.BACK_RIGHT_DRIVE_MOTOR, Constants.CANFD_BUS);
+                m_turnMotor = new TalonFX(DrivetrainConstants.BACK_RIGHT_TURN_MOTOR, Constants.CANFD_BUS);
+                m_encoder = new CANCoder(DrivetrainConstants.BACK_RIGHT_STEER_ENCODER, Constants.CANFD_BUS);
                 m_encoderOffset = DrivetrainConstants.BACK_RIGHT_MODULE_STEER_OFFSET;
                 break;
             default:

@@ -331,6 +331,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     private double cubeAxis(double value) {
+        // Copy sign in case we want to switch code to squared axis later
         return Math.copySign(Math.pow(value, 3), value);
     }
 

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 
 public class Elevator extends SubsystemBase {
@@ -53,9 +54,8 @@ public class Elevator extends SubsystemBase {
   }
 
   private Elevator() {
-    // TODO change this to CAN FD BUS constant
-    m_leftExtensionMotor = new TalonFX(ElevatorConstants.LEFT_MOTOR, "CANivore1");
-    m_rightExtensionMotor = new TalonFX(ElevatorConstants.RIGHT_MOTOR, "CANivore1");
+    m_leftExtensionMotor = new TalonFX(ElevatorConstants.LEFT_MOTOR, Constants.CANFD_BUS);
+    m_rightExtensionMotor = new TalonFX(ElevatorConstants.RIGHT_MOTOR, Constants.CANFD_BUS);
     configHardware();
     m_rightExtensionMotor.setInverted(true);
     m_state = ElevatorStates.IDLE;
@@ -64,10 +64,10 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     stateMachine();
-    SmartDashboard.putNumber("elevatorError", m_leftExtensionMotor.getClosedLoopError());
-    SmartDashboard.putNumber("elevatorEncoder",
+    SmartDashboard.putNumber("Elevator Closed Loop Error", m_leftExtensionMotor.getClosedLoopError());
+    SmartDashboard.putNumber("Elevator Position Meters",
         m_leftExtensionMotor.getSelectedSensorPosition() * ElevatorConstants.METERS_PER_TICK);
-    SmartDashboard.putString("Get Elevator States", m_state.toString());
+    SmartDashboard.putString("Elevator State", m_state.toString());
   }
 
   private void stateMachine() {
@@ -158,9 +158,9 @@ public class Elevator extends SubsystemBase {
   private void configHardware() {
     m_leftExtensionMotor.configFactoryDefault();
     m_leftExtensionMotor.setSelectedSensorPosition(0);
-    m_leftExtensionMotor.config_kP(0, ElevatorConstants.ELEVATOR_KP);
-    m_leftExtensionMotor.config_kD(0, ElevatorConstants.ELEVATOR_KD);
-    m_leftExtensionMotor.configClosedLoopPeakOutput(0, ElevatorConstants.PEAK_OUTPUT);
+    m_leftExtensionMotor.config_kP(0, ElevatorConstants.kP);
+    m_leftExtensionMotor.config_kD(0, ElevatorConstants.kD);
+    m_leftExtensionMotor.configClosedLoopPeakOutput(0, ElevatorConstants.OUTPUT_LIMIT);
     m_leftExtensionMotor.setInverted(false);
 
     m_rightExtensionMotor.configFactoryDefault();

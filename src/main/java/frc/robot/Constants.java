@@ -10,6 +10,7 @@ public final class Constants {
 
     public static final boolean SIM = RobotBase.isSimulation();
     public static final double PERIODIC_LOOP_DURATION = 0.02;
+    public static final String CANFD_BUS = "CANivore1";
 
     public static final class VisionConstants {
 
@@ -50,7 +51,6 @@ public final class Constants {
         // from center to center.
         public static final double DRIVETRAIN_WHEELBASE_METERS = Units.inchesToMeters(32);
 
-        public static final String CANBUS = "CANivore1";
         public static final double FALCON_500_FREE_SPEED = 6380d;
         public static final double TICKS_PER_ROTATION = 2048d;
         public static final double WHEEL_DIAMETER = 0.10033;
@@ -95,11 +95,24 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
+
+        public static final int LEFT_PIVOT_MOTOR = 2;
+        public static final int RIGHT_PIVOT_MOTOR = 3;
+        public static final int FRONT_ROLLER_MOTOR = 1;
+        public static final int BACK_ROLLER_MOTOR = 4;
+
+        public static final double kP = 0.02;
         public static final double kG = 0.66;
 
+        public static final double OUTPUT_LIMIT = 0.5;
         public static final double DEGREE_RANGE = 110d; // from cad
         public static final double TICK_RANGE = 11.428633; // emperically measured
         public static final double DEGREES_PER_TICK = DEGREE_RANGE / TICK_RANGE;
+
+        public static final double RETRACTED_SETPOINT = 100d;
+        public static final double CUBE_SETPOINT = 16d;
+        public static final double CONE_SETPOINT = 11d;
+        public static final double HANDOFF_SETPOINT = 66d;
     }
 
     public static final class WristConstants {
@@ -123,9 +136,9 @@ public final class Constants {
         public static final int LEFT_MOTOR = 9;
         public static final int RIGHT_MOTOR = 10;
 
-        public static final double ELEVATOR_KP = 0.15;
-        public static final double ELEVATOR_KD = 0.1;
-        public static final double PEAK_OUTPUT = 0.25;
+        public static final double kP = 0.15;
+        public static final double kD = 0.1;
+        public static final double OUTPUT_LIMIT = 0.25;
 
         public static final double METER_RANGE = Units.inchesToMeters(42); // from cad
         public static final double TICK_RANGE = 28500d; // emperically measured
