@@ -81,6 +81,7 @@ public class RobotContainer {
 		m_driverController.start().onTrue(m_intake.setState(IntakeStates.CALIBRATE));
 		// #endregion
 
+		// #region Operator Controlls
 		m_operatorController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)));
 		m_operatorController.povDown().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING)));
 		m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.SUBSTATION)));
@@ -88,13 +89,11 @@ public class RobotContainer {
 		m_operatorController.x().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)));
 		m_operatorController.y().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
 
-		// Elevator States
 		m_operatorController.rightTrigger()
 				.onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
 		m_operatorController.rightBumper()
 				.onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
 
-		// Double Substation Sequence
 		m_operatorController.start().onTrue(substationToggle());
 
 		// Handoff Cone Sequence
@@ -117,16 +116,6 @@ public class RobotContainer {
 				.andThen(new WaitCommand(0.2))
 				.andThen(() -> m_elevator.setState(ElevatorStates.RETRACT))
 				.andThen(() -> m_arm.setState(ArmStates.RETRACTED)));
-
-		m_operatorController.rightTrigger()
-				.onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
-		m_operatorController.rightBumper()
-				.onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
-		m_operatorController.povDown().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
-		m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)));
-		m_operatorController.leftTrigger().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING)));
-
-		// m_operatorController.start().onTrue(substationToggle());
 		// #endregion
 
 	}
@@ -144,23 +133,6 @@ public class RobotContainer {
 	}
 
 	private Command substationToggle() {
-		// return null;
-		// return new ConditionalCommand(
-		// (Command) new
-		// SequentialCommandGroup(m_elevator.setState2(ElevatorStates.SUBSTATION),
-		// m_claw.setState2(ClawStates.OPEN), m_arm.setState2(ArmStates.DROPPING)),
-
-		// (Command) new SequentialCommandGroup(new InstantCommand(() ->
-		// m_claw.setState(ClawStates.CLOSED)),
-		// new WaitCommand(1), new InstantCommand(() -> {
-		// m_arm.setState(ArmStates.RETRACTED);
-		// m_elevator.setState(ElevatorStates.RETRACT);
-		// })),
-
-		// () -> m_elevator.getState() != ElevatorStates.SUBSTATION);
-
-		// Working Double substation
-
 		return new ConditionalCommand(
 				(Command) new SequentialCommandGroup(m_elevator.setState2(ElevatorStates.DOUBLE_SUBSTATION),
 						m_claw.setState2(ClawStates.OPEN), m_arm.setState2(ArmStates.DROPPING)),
@@ -170,18 +142,5 @@ public class RobotContainer {
 							m_elevator.setState(ElevatorStates.RETRACT);
 						})),
 				() -> m_elevator.getState() != ElevatorStates.DOUBLE_SUBSTATION);
-
-		// ----------------------------------------------------------------------------------
-		// return new InstantCommand(() -> {
-		// if (m_elevator.getState() != ElevatorStates.SUBSTATION) {
-		// m_elevator.setState(ElevatorStates.SUBSTATION);
-		// m_claw.setState(ClawStates.OPEN);
-		// m_arm.setState(ArmStates.DROPPING);
-		// } else {
-		// m_claw.setState(ClawStates.CLOSED);
-
-		// }
-		// });
-
 	}
 }
