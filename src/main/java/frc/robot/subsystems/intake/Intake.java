@@ -91,7 +91,7 @@ public class Intake extends SubsystemBase {
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CUBE_SETPOINT, 0.5, -0.5);
           break;
         case INTAKE_CONE:
-          currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CONE_SETPOINT, 0.375, -0.75);
+          currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CONE_SETPOINT, 0.375, 0.75);
           break;
         case SPIT_CUBE:
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CUBE_SETPOINT, -0.75, 0.75);
@@ -153,11 +153,11 @@ public class Intake extends SubsystemBase {
       m_pivotLeft.setSmartCurrentLimit(5, 40);
       m_pivotLeft.set(0.1);
     }, this).withTimeout(0.75)
-        .andThen(Commands.run(() -> {
+        .andThen(() -> {
           m_pivotLeft.getEncoder().setPosition(110d);
           m_state = IntakeStates.RETRACTED;
           m_pivotLeft.setSmartCurrentLimit(40, 40);
-        }, this));
+        }, this);
   }
   // #endregion
 
