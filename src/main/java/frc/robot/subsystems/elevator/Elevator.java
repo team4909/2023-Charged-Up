@@ -40,8 +40,8 @@ public class Elevator extends SubsystemBase {
     MID_CUBE("Mid Cube"),
     MID_CONE("Mid Cone"),
     RETRACT("Retracted"),
-    SUBSTATION("Substation");
-
+    SUBSTATION("Substation"),
+    DOUBLE_SUBSTATION("Double Substation");
     String stateName;
 
     private ElevatorStates(String name) {
@@ -92,6 +92,8 @@ public class Elevator extends SubsystemBase {
         case SUBSTATION:
           currentElevatorCommand = SetSetpoint(ElevatorConstants.SUBSTATION_SETPOINT);
           break;
+        case DOUBLE_SUBSTATION:
+        currentElevatorCommand = SetSetpoint(ElevatorConstants.SUBSTATION_SETPOINT);
         default:
           m_state = ElevatorStates.IDLE;
           break;

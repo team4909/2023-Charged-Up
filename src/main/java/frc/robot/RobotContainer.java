@@ -7,6 +7,7 @@ import java.util.function.BooleanSupplier;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -80,14 +81,23 @@ public class RobotContainer {
 		m_driverController.start().onTrue(m_intake.setState(IntakeStates.CALIBRATE));
 		// #endregion
 
-		// #region Operator Controls
 		m_operatorController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)));
-		m_operatorController.back().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.HANDOFF_CONE)));
+		m_operatorController.povDown().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING)));
+		m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.SUBSTATION)));
 
 		m_operatorController.x().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)));
 		m_operatorController.y().onTrue(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)));
 
-		// Mid Cone Sequence
+		// Elevator States
+		m_operatorController.rightTrigger()
+				.onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
+		m_operatorController.rightBumper()
+				.onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
+
+		// Double Substation Sequence
+		m_operatorController.start().onTrue(substationToggle());
+
+		// Handoff Cone Sequence
 		m_operatorController.a().onTrue(
 				new SequentialCommandGroup(
 						new InstantCommand(() -> m_claw.setState(ClawStates.OPEN)),
@@ -100,6 +110,7 @@ public class RobotContainer {
 						new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)),
 						m_intake.setState(IntakeStates.RETRACTED)));
 
+		// Drop Game Piece
 		m_operatorController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING))
 				.andThen(new WaitCommand(0.5))
 				.andThen(() -> m_claw.setState(ClawStates.OPEN))
@@ -133,19 +144,34 @@ public class RobotContainer {
 	}
 
 	private Command substationToggle() {
-		return null;
+		// return null;
 		// return new ConditionalCommand(
 		// (Command) new
 		// SequentialCommandGroup(m_elevator.setState2(ElevatorStates.SUBSTATION),
 		// m_claw.setState2(ClawStates.OPEN), m_arm.setState2(ArmStates.DROPPING)),
+
 		// (Command) new SequentialCommandGroup(new InstantCommand(() ->
 		// m_claw.setState(ClawStates.CLOSED)),
 		// new WaitCommand(1), new InstantCommand(() -> {
 		// m_arm.setState(ArmStates.RETRACTED);
 		// m_elevator.setState(ElevatorStates.RETRACT);
 		// })),
+
 		// () -> m_elevator.getState() != ElevatorStates.SUBSTATION);
 
+		// Working Double substation
+
+		return new ConditionalCommand(
+				(Command) new SequentialCommandGroup(m_elevator.setState2(ElevatorStates.DOUBLE_SUBSTATION),
+						m_claw.setState2(ClawStates.OPEN), m_arm.setState2(ArmStates.DROPPING)),
+				(Command) new SequentialCommandGroup(new InstantCommand(() -> m_claw.setState(ClawStates.CLOSED)),
+						new WaitCommand(1), new InstantCommand(() -> {
+							m_arm.setState(ArmStates.RETRACTED);
+							m_elevator.setState(ElevatorStates.RETRACT);
+						})),
+				() -> m_elevator.getState() != ElevatorStates.DOUBLE_SUBSTATION);
+
+		// ----------------------------------------------------------------------------------
 		// return new InstantCommand(() -> {
 		// if (m_elevator.getState() != ElevatorStates.SUBSTATION) {
 		// m_elevator.setState(ElevatorStates.SUBSTATION);

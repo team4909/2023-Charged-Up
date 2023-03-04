@@ -28,7 +28,8 @@ public class Arm extends SubsystemBase {
         RETRACTED("Top"),
         HANDOFF_CONE("Handoff Cone"),
         HANDOFF_CUBE("Handoff Cube"),
-        DROPPING("Dropping");
+        DROPPING("Dropping"),
+        SUBSTATION("Substation");
 
         String stateName;
 
@@ -81,6 +82,8 @@ public class Arm extends SubsystemBase {
                 case DROPPING:
                     currentWristCommand = SetWristPosition(0);
                     break;
+                case SUBSTATION:
+                    currentWristCommand = SetWristPosition(30);
                 default:
                     m_state = ArmStates.IDLE;
             }
