@@ -94,11 +94,12 @@ public class RobotContainer {
 		m_operatorController.rightBumper()
 				.onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
 
-		m_operatorController.start().onTrue(substationToggle());
+		// m_operatorController.start().onTrue(substationToggle());
 		m_operatorController.back().onTrue(m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
 
 		// Handoff Cone Sequence
 		m_operatorController.a().onTrue(m_routines.HANDOFF());
+		
 
 		// Drop Game Piece
 		m_operatorController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING))
