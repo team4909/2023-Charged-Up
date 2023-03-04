@@ -33,7 +33,9 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -82,7 +84,8 @@ public class Drivetrain extends SubsystemBase {
         JOYSTICK_DRIVE("Joystick Drive"),
         TRAJECTORY_DRIVE("Trajectory Drive"),
         PRECISE("Precise"),
-        SNAP_TO_ANGLE("Snapping To Angle");
+        SNAP_TO_ANGLE("Snapping To Angle"),
+        AUTO_BALANCE("Auto Balance");
 
         String stateName;
 
@@ -206,6 +209,9 @@ public class Drivetrain extends SubsystemBase {
                 case SNAP_TO_ANGLE:
                     currentDrivetrainCommand = SnapToAngle((double) m_stateArgs.get("Angle"));
                     break;
+                case AUTO_BALANCE:
+                    currentDrivetrainCommand = AutoBalance();
+                    break;
                 default:
                     m_state = DrivetrainStates.IDLE;
             }
@@ -280,7 +286,7 @@ public class Drivetrain extends SubsystemBase {
                         getKinematics(),
                         new PIDController(5, 0, 0),
                         new PIDController(5, 0, 0),
-                        new PIDController(2, 0, 0.2),
+                        new PIDController(4, 0, 0.2),
                         m_swerveModuleConsumer,
                         true,
                         this)
@@ -303,6 +309,23 @@ public class Drivetrain extends SubsystemBase {
                             (m_joystickRotationOmega.getAsDouble() + omega) * MAX_ANGULAR_SPEED, getGyroYaw()));
                 },
                 this).andThen(() -> snapPID.close());
+    }
+
+    private Command AutoBalance() {
+        PIDController balanceController = new PIDController(0.03, 0.02, 0.01);
+        balanceController.setTolerance(6d);
+        balanceController.setIntegratorRange(0.01, 0.1);
+        return new PIDCommand(
+                balanceController,
+                () -> m_pigeon.getRoll(),
+                () -> 0,
+                (output) -> {drive(ChassisSpeeds.fromFieldRelativeSpeeds(-output, 0d, 0d, getGyroYaw())); SmartDashboard.putNumber("Pitch PID Output", output);},
+                this)
+                .alongWith(Commands.run(() -> {
+                    SmartDashboard.putNumber("Pitch", m_pigeon.getRoll());
+                    SmartDashboard.putNumber("Pitch PID Error", balanceController.getPositionError());
+                    SmartDashboard.putBoolean("Is Balanced", balanceController.atSetpoint());
+                }));
     }
     // #endregion
 
