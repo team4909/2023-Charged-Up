@@ -19,6 +19,7 @@ import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -36,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
+import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -312,14 +314,14 @@ public class Drivetrain extends SubsystemBase {
     }
 
     private Command AutoBalance() {
-        PIDController balanceController = new PIDController(0.03, 0.02, 0.01);
+        PIDController balanceController = new PIDController(0.03, 0.02, 0.002);
         balanceController.setTolerance(6d);
-        balanceController.setIntegratorRange(0.01, 0.1);
+        balanceController.setIntegratorRange(0.01, 0.05);
         return new PIDCommand(
                 balanceController,
                 () -> m_pigeon.getRoll(),
                 () -> 0,
-                (output) -> {drive(ChassisSpeeds.fromFieldRelativeSpeeds(-output, 0d, 0d, getGyroYaw())); SmartDashboard.putNumber("Pitch PID Output", output);},
+                (output) -> {drive(ChassisSpeeds.fromFieldRelativeSpeeds(output, 0d, 0d, getGyroYaw())); SmartDashboard.putNumber("Pitch PID Output", output);},
                 this)
                 .alongWith(Commands.run(() -> {
                     SmartDashboard.putNumber("Pitch", m_pigeon.getRoll());
