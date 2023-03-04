@@ -70,7 +70,7 @@ public class Claw extends SubsystemBase {
                     currentClawCommand = SetClawPos(0);
                     break;
                 case OPEN:
-                    currentClawCommand = SetClawPos(0.109);
+                    currentClawCommand = SetClawPos(0.129);
                     break;
                 case CUBE:
                     currentClawCommand = SetClawPos(0);
