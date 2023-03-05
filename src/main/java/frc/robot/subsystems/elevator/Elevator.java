@@ -1,13 +1,10 @@
 package frc.robot.subsystems.elevator;
 
-import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -23,11 +20,6 @@ public class Elevator extends SubsystemBase {
   private final TalonFX m_leftExtensionMotor;
   private final TalonFX m_rightExtensionMotor;
 
-  private Timer m_motionProfileTimer;
-
-  public static final TrapezoidProfile.Constraints m_elevatorTrapezoidalConstraints = new TrapezoidProfile.Constraints(
-      3000.0 / 60.0, 6000.0 / 60.0);
-
   private static final ElevatorFeedforward m_elevatorFF = new ElevatorFeedforward(
       0.40921, 0.12654, 1.3374, 0.031771);
 
@@ -42,6 +34,7 @@ public class Elevator extends SubsystemBase {
     RETRACT("Retracted"),
     SUBSTATION("Substation"),
     DOUBLE_SUBSTATION("Double Substation");
+
     String stateName;
 
     private ElevatorStates(String name) {
@@ -93,7 +86,7 @@ public class Elevator extends SubsystemBase {
           currentElevatorCommand = SetSetpoint(ElevatorConstants.SUBSTATION_SETPOINT);
           break;
         case DOUBLE_SUBSTATION:
-        currentElevatorCommand = SetSetpoint(ElevatorConstants.SUBSTATION_SETPOINT);
+          currentElevatorCommand = SetSetpoint(ElevatorConstants.SUBSTATION_SETPOINT);
         default:
           m_state = ElevatorStates.IDLE;
           break;
@@ -111,35 +104,6 @@ public class Elevator extends SubsystemBase {
     return new InstantCommand(() -> m_leftExtensionMotor.set(TalonFXControlMode.PercentOutput, 0), this);
   }
 
-  private Command SetProfiledSetpoint() {
-    TrapezoidProfile.State targetState, beginLState, beginRState;
-    TrapezoidProfile profileL, profileR;
-    targetState = new TrapezoidProfile.State(ElevatorConstants.BOTTOM_SETPOINT, 0.0);
-
-    beginLState = new TrapezoidProfile.State(m_leftExtensionMotor.getSelectedSensorPosition(), 0.0);
-    beginRState = new TrapezoidProfile.State(m_rightExtensionMotor.getSelectedSensorPosition(), 0.0);
-
-    profileL = new TrapezoidProfile(m_elevatorTrapezoidalConstraints, targetState, beginLState);
-    profileR = new TrapezoidProfile(m_elevatorTrapezoidalConstraints, targetState, beginRState);
-    m_motionProfileTimer = new Timer();
-
-    m_motionProfileTimer.reset();
-    m_motionProfileTimer.start();
-    return new RunCommand(() -> {
-      double dt = m_motionProfileTimer.get();
-
-      TrapezoidProfile.State currentLState = profileL.calculate(dt);
-      double leftFF = m_elevatorFF.calculate(currentLState.velocity);
-      TrapezoidProfile.State currentRState = profileR.calculate(dt);
-      double rightFF = m_elevatorFF.calculate(currentRState.velocity);
-
-      m_leftExtensionMotor.set(
-          TalonFXControlMode.Position, currentLState.position, DemandType.ArbitraryFeedForward, leftFF);
-      m_rightExtensionMotor.set(
-          TalonFXControlMode.Position, currentRState.position, DemandType.ArbitraryFeedForward, rightFF);
-    }, this);
-  }
-
   private Command SetSetpoint(double setpointMeters) {
     double ff = m_elevatorFF
         .calculate(m_leftExtensionMotor.getSelectedSensorVelocity() * 10 * ElevatorConstants.METERS_PER_TICK);
@@ -147,13 +111,6 @@ public class Elevator extends SubsystemBase {
     return new RunCommand(() -> {
       SmartDashboard.putNumber("Elevator FF", ff);
       m_leftExtensionMotor.set(TalonFXControlMode.Position, setpointMeters / ElevatorConstants.METERS_PER_TICK);
-    }, this);
-  }
-
-  private Command SetProfiledSetpoint(double setpoint) {
-    return new RunCommand(() -> {
-      m_leftExtensionMotor.set(TalonFXControlMode.MotionMagic, setpoint);
-      m_rightExtensionMotor.set(TalonFXControlMode.MotionMagic, setpoint);
     }, this);
   }
 

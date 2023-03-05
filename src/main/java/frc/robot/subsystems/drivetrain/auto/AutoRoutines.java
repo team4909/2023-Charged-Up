@@ -48,10 +48,10 @@ public class AutoRoutines {
       loadTrajectory(new DriveTrajectory("TopNodeToChargeStation", false)));
 
   private Command loadTrajectory(DriveTrajectory traj) {
-    return Commands.none().repeatedly().until(m_drivetrain.isTrajectoryFinished)
+    return Commands.waitUntil(m_drivetrain.isTrajectoryFinished)
         .deadlineWith(m_drivetrain.setState(DrivetrainStates.TRAJECTORY_DRIVE,
             new HashMap<>(
-                Map.of("Trajectory", traj.getTrajectory(), "IsFirstPath", traj.getIsFirstPath()))));
+                Map.of("Trajectory", traj.trajectory(), "IsFirstPath", traj.isFirstPath()))));
   }
 
   private class Auto extends SequentialCommandGroup {
@@ -100,5 +100,4 @@ public class AutoRoutines {
         Commands.runOnce(() -> m_arm.setState(ArmStates.RETRACTED)),
         m_intake.setState(IntakeStates.RETRACTED));
   }
-
 }

@@ -113,6 +113,14 @@ public final class Constants {
         public static final double CUBE_SETPOINT = 16d;
         public static final double CONE_SETPOINT = 11d;
         public static final double HANDOFF_SETPOINT = 66d;
+
+        public static final class Sim {
+            public static final double GEARING = 7d;
+            public static final double ARM_LENGTH = Units.inchesToMeters(12);
+            private static final double ARM_WEIGHT = Units.lbsToKilograms(7.5);
+            // Approx, using 1/3 * mr^2 (moi for a rod about end)
+            public static final double MOI = (1d / 3d) * ARM_WEIGHT * Math.pow(ARM_LENGTH, 2);
+        }
     }
 
     public static final class WristConstants {
@@ -121,7 +129,7 @@ public final class Constants {
         public static final double kP = 0.035;
 
         // https://www.reca.lc/arm?armMass=%7B%22s%22%3A4%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A7.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A105%2C%22u%22%3A%22A%22%7D&efficiency=100&endAngle=%7B%22s%22%3A93%2C%22u%22%3A%22deg%22%7D&iterationLimit=20000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22NEO%22%7D&ratio=%7B%22magnitude%22%3A14.2857%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
-        public static final double kG = 0.95;
+        public static final double kG = 0.85;
         public static final double kV = 0.28;
         public static final double kA = 0.02;
 
@@ -136,6 +144,7 @@ public final class Constants {
         public static final int LEFT_MOTOR = 9;
         public static final int RIGHT_MOTOR = 10;
 
+        // https://www.reca.lc/arm?armMass=%7B%22s%22%3A7.5%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A6.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=100&endAngle=%7B%22s%22%3A110%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22NEO%22%7D&ratio=%7B%22magnitude%22%3A7%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
         public static final double kP = 0.15;
         public static final double kD = 0.1;
         public static final double OUTPUT_LIMIT = 0.25;
