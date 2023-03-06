@@ -110,14 +110,6 @@ public class Arm extends SubsystemBase {
     }
 
     private void setWristSetpoint(double setpoint) {
-        // m_arbFF = m_armFeedForward.calculate(getWristEncoderPos(),
-        // Units.rotationsPerMinuteToRadiansPerSecond(m_wristMotor.getEncoder().getVelocity())
-        // * (180d / Math.PI));
-        // m_wristMotor.getPIDController().setReference(setpoint,
-        // ControlType.kSmartMotion, 0, m_arbFF);
-        // m_wristMotor.getPIDController().setReference(setpoint,
-        // ControlType.kPosition);
-        // double ff = -calcFF(m_wristMotor.getEncoder().getPosition());
         m_wristMotor.getPIDController().setReference(setpoint, ControlType.kPosition, 0,
                 calcFF(Units.degreesToRadians(m_wristMotor.getEncoder().getPosition()),
                         Units.rotationsPerMinuteToRadiansPerSecond(m_wristMotor.getEncoder().getVelocity())));

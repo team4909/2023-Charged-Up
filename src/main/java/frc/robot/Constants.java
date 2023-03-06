@@ -137,6 +137,10 @@ public final class Constants {
         public static final double DEGREE_RANGE = 191d; // from cad
         public static final double TICK_RANGE = 7.976211547851562; // emperically measured
         public static final double DEGREES_PER_TICK = DEGREE_RANGE / TICK_RANGE;
+
+        public static final class SIM {
+            public static final double ARM_LENGTH = Units.inchesToMeters(7.5);
+        }
     }
 
     public static final class ElevatorConstants {
@@ -159,5 +163,12 @@ public final class Constants {
         public static final double TOP_SETPOINT = 28_500d * METERS_PER_TICK;
         public static final double DOUBLE_SUBSTATION_SETPOINT = 28_500d * METERS_PER_TICK;
         public static final double SUBSTATION_SETPOINT = 1234 * METERS_PER_TICK;
+
+        public static final class SIM {
+            public static final double GEARING = 4d; // Wild Guess
+            public static final double DRUM_RADIUS = Units.inchesToMeters(1d); // Wild Guess
+            public static final double CARRIAGE_MASS = Units.lbsToKilograms(12.5); // Estimate
+            public static final double RETRACTED_LENGTH = Units.inchesToMeters(30d);
+        }
     }
 }

@@ -1,10 +1,24 @@
 {
   "HALProvider": {
     "Other Devices": {
-      "SPARK MAX [2]": {
+      "Talon FX[9]": {
         "header": {
           "open": true
         }
+      }
+    },
+    "RoboRIO": {
+      "3.3V Rail": {
+        "open": true
+      },
+      "5V Rail": {
+        "open": true
+      },
+      "6V Rail": {
+        "open": true
+      },
+      "RoboRIO Input": {
+        "open": true
       }
     }
   },
@@ -17,6 +31,8 @@
       "/LiveWindow/Ungrouped/PIDController[4]": "PIDController",
       "/LiveWindow/Ungrouped/PIDController[5]": "PIDController",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/LiveWindow/Ungrouped/Talon FX [10]": "Motor Controller",
+      "/LiveWindow/Ungrouped/Talon FX [9]": "Motor Controller",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Mech2d": "Mechanism2d",
       "/SmartDashboard/Robot Mechanism Simulation": "Mechanism2d",
@@ -25,6 +41,39 @@
     },
     "windows": {
       "/SmartDashboard/Field": {
+        "Robot": {
+          "arrowColor": [
+            0.0,
+            0.6078431606292725,
+            0.0,
+            255.0
+          ],
+          "color": [
+            0.0,
+            0.5882353186607361,
+            0.0,
+            255.0
+          ]
+        },
+        "image": "D:\\VisualCodeProjects\\2023-Charged-Up\\res\\2023-field_1.png",
+        "traj": {
+          "arrowColor": [
+            1.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "arrowSize": 11,
+          "arrowWeight": 0.10000000149011612,
+          "color": [
+            0.0,
+            0.0,
+            0.0,
+            255.0
+          ],
+          "style": "Line",
+          "weight": 10.0
+        },
         "window": {
           "visible": true
         }
@@ -44,6 +93,9 @@
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
+        "Elevator": {
+          "open": true
+        },
         "Intake": {
           "open": true
         },
@@ -60,7 +112,7 @@
               "autoFit": true
             }
           ],
-          "height": 221,
+          "height": 218,
           "series": [
             {
               "color": [
@@ -100,11 +152,57 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "name": "Intake"
+      }
     },
     "Plot <1>": {
+      "plots": [
+        {
+          "height": 218,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Elevator/Sim Meters"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Elevator/Sim v"
+            },
+            {
+              "color": [
+                0.3333333432674408,
+                0.658823549747467,
+                0.4078431725502014,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Elevator/Sim I"
+            },
+            {
+              "color": [
+                0.7686275243759155,
+                0.30588236451148987,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Elevator/Position Setpoint"
+            }
+          ]
+        }
+      ],
       "window": {
-        "visible": false
+        "name": "Elevator"
       }
     }
   }

@@ -3,7 +3,6 @@ package frc.robot.subsystems.intake;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -12,16 +11,13 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.SimVisualizer;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.SimVisualizer;
 
 public class Intake extends SubsystemBase {
 
@@ -32,8 +28,6 @@ public class Intake extends SubsystemBase {
   private double m_pivotSetpoint;
   private final SingleJointedArmSim m_pivotSim;
   private final PIDController m_simPivotPID;
-
-  private MechanismLigament2d m_intakeLig;
 
   public enum IntakeStates {
     IDLE("Idle"),
@@ -111,8 +105,9 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    var input = m_pivotLeft.getAppliedOutput() * RobotController.getBatteryVoltage();
-    m_pivotSim.setInput(input + calcFF(m_pivotLeft.getEncoder().getPosition()));
+    double input = m_pivotLeft.getAppliedOutput() * RobotController.getBatteryVoltage()
+        + calcFF(m_pivotLeft.getEncoder().getPosition());
+    m_pivotSim.setInput(input);
     m_pivotSim.update(Constants.PERIODIC_LOOP_DURATION);
     double simAngleDegrees = Math.toDegrees(m_pivotSim.getAngleRads());
     m_pivotLeft.getEncoder().setPosition(simAngleDegrees);
