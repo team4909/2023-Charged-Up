@@ -52,7 +52,7 @@ public class SimVisualizer {
         .append(new MechanismLigament2d("elevator_outer_stage",
             ElevatorConstants.SIM.RETRACTED_LENGTH * kLengthScaleFactor, -45d, 12d, new Color8Bit(Color.kForestGreen)));
     m_elevatorLigament = elevatorOuterStage
-        .append(new MechanismLigament2d("elevator_outer_stage", 0d, 0d));
+        .append(new MechanismLigament2d("elevator_inner_stage", 0d, 0d));
     m_elevatorLigament.setColor(new Color8Bit(Color.kBlack));
 
     m_wristLigament = m_elevatorLigament
