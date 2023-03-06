@@ -89,11 +89,11 @@ public class Elevator extends SubsystemBase {
     double input = m_extensionMotorSim.getMotorOutputLeadVoltage();
     m_elevatorSim.setInput(input);
     m_elevatorSim.update(Constants.PERIODIC_LOOP_DURATION);
-    var sensorPos = (int) (m_elevatorSim.getPositionMeters() / ElevatorConstants.METERS_PER_TICK);
-    m_extensionMotorSim
-        .setIntegratedSensorRawPosition(sensorPos);
-    var sensorVelocity = (int) (m_elevatorSim.getVelocityMetersPerSecond() / 10 / ElevatorConstants.METERS_PER_TICK);
+    int sensorPosition = (int) (m_elevatorSim.getPositionMeters() / ElevatorConstants.METERS_PER_TICK);
+    m_extensionMotorSim.setIntegratedSensorRawPosition(sensorPosition);
+    int sensorVelocity = (int) (m_elevatorSim.getVelocityMetersPerSecond() / 10 / ElevatorConstants.METERS_PER_TICK);
     m_extensionMotorSim.setIntegratedSensorVelocity(sensorVelocity);
+
     SmartDashboard.putNumber("Elevator/Sim Meters", m_elevatorSim.getPositionMeters());
     SmartDashboard.putNumber("Elevator/Sim Input", input);
     SmartDashboard.putNumber("Elevator/Sim I", m_elevatorSim.getCurrentDrawAmps());
@@ -157,8 +157,7 @@ public class Elevator extends SubsystemBase {
     m_leftExtensionMotor.setSelectedSensorPosition(0);
     m_leftExtensionMotor.config_kP(0, ElevatorConstants.kP);
     m_leftExtensionMotor.config_kD(0, ElevatorConstants.kD);
-    m_leftExtensionMotor.configClosedLoopPeakOutput(0,
-        ElevatorConstants.OUTPUT_LIMIT);
+    m_leftExtensionMotor.configClosedLoopPeakOutput(0, ElevatorConstants.OUTPUT_LIMIT);
     m_leftExtensionMotor.setInverted(false);
 
     m_rightExtensionMotor.configFactoryDefault();
