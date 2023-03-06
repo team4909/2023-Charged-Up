@@ -6,13 +6,20 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.SimVisualizer;
 import frc.robot.Constants.WristConstants;
 
 public class Arm extends SubsystemBase {
@@ -21,11 +28,12 @@ public class Arm extends SubsystemBase {
 
     private final CANSparkMax m_wristMotor;
     private final ArmFeedforward m_armFeedForward;
-    private double m_arbFF;
+    private final SingleJointedArmSim m_wristSim;
+    private final PIDController m_simWristPID;
 
     public enum ArmStates {
         IDLE("Idle"),
-        RETRACTED("Top"),
+        RETRACTED("Retracted"),
         HANDOFF_CONE("Handoff Cone"),
         HANDOFF_CUBE("Handoff Cube"),
         DROPPING("Dropping"),
@@ -48,19 +56,44 @@ public class Arm extends SubsystemBase {
         m_armFeedForward = new ArmFeedforward(WristConstants.kS, WristConstants.kG, WristConstants.kV,
                 WristConstants.kA);
         configureHardware();
+
+        if (Constants.SIM) {
+            m_wristSim = new SingleJointedArmSim(
+                    DCMotor.getNEO(1),
+                    WristConstants.SIM.GEARING,
+                    WristConstants.SIM.MOI,
+                    WristConstants.SIM.ARM_LENGTH,
+                    Math.toRadians(-66d), // These angles are not exact, but add up to the degree range
+                    Math.toRadians(125d),
+                    true,
+                    VecBuilder.fill(Units.degreesToRadians(0.04)));
+            m_simWristPID = new PIDController(0.003, 0.005d, 0d);
+        } else {
+            m_wristSim = null;
+            m_simWristPID = null;
+        }
     }
 
     public void periodic() {
         stateMachine();
-        SmartDashboard.putString("state", m_state.toString());
-        SmartDashboard.putNumber("wrist encoder pos deg", getWristEncoderPos());
-        SmartDashboard.putNumber("UNdo conversion",
-                getWristEncoderPos() / WristConstants.DEGREES_PER_TICK);
-        SmartDashboard.putNumber("Velocity (ticks)", m_wristMotor.getEncoder().getVelocity());
-        SmartDashboard.putNumber("smart motion allowed close loop error",
-                m_wristMotor.getPIDController().getSmartMotionAllowedClosedLoopError(0));
-        SmartDashboard.putNumber("Wrist Output", m_wristMotor.getAppliedOutput());
-        SmartDashboard.putNumber("Arb FF", m_arbFF);
+        SmartDashboard.putString("Wrist/State", m_state.toString());
+        SmartDashboard.putNumber("Wrist/Encoder Position (Degrees)", getWristEncoderPos());
+        SmartDashboard.putNumber("Wrist/Motor Output", m_wristMotor.getAppliedOutput());
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        double input = m_wristMotor.getAppliedOutput() * RobotController.getBatteryVoltage()
+                + calcFF(m_wristMotor.getEncoder().getPosition());
+        m_wristSim.setInput(input);
+        m_wristSim.update(Constants.PERIODIC_LOOP_DURATION);
+        double simAngleDegrees = Math.toDegrees(m_wristSim.getAngleRads());
+        m_wristMotor.getEncoder().setPosition(simAngleDegrees);
+        SmartDashboard.putNumber("Wrist/Sim Degrees", simAngleDegrees);
+        SmartDashboard.putNumber("Wrist/Sim Input", input);
+        SmartDashboard.putNumber("Wrist/Sim I", m_wristSim.getCurrentDrawAmps());
+        SmartDashboard.putNumber("Wrist/Sim v", m_wristSim.getVelocityRadPerSec());
+        SimVisualizer.getInstance().wristAngle.accept(simAngleDegrees);
     }
 
     private void stateMachine() {
@@ -103,16 +136,20 @@ public class Arm extends SubsystemBase {
     }
 
     private Command SetWristPosition(double setpoint) {
+        SmartDashboard.putNumber("Wrist/Setpoint", setpoint);
         return new RunCommand(() -> {
-            setWristSetpoint(setpoint);
-            SmartDashboard.putNumber("Wrist Setpoint", setpoint);
+            if (Constants.SIM) {
+                double voltage = m_simWristPID.calculate(m_wristMotor.getEncoder().getPosition(), setpoint);
+                m_wristMotor.getPIDController().setReference(voltage, ControlType.kVoltage);
+            } else {
+                setWristSetpoint(setpoint);
+            }
         }, this);
     }
 
     private void setWristSetpoint(double setpoint) {
         m_wristMotor.getPIDController().setReference(setpoint, ControlType.kPosition, 0,
-                calcFF(Units.degreesToRadians(m_wristMotor.getEncoder().getPosition()),
-                        Units.rotationsPerMinuteToRadiansPerSecond(m_wristMotor.getEncoder().getVelocity())));
+                calcFF(Units.degreesToRadians(m_wristMotor.getEncoder().getPosition())));
     }
 
     public void setState(ArmStates state) {
@@ -142,19 +179,18 @@ public class Arm extends SubsystemBase {
         return m_wristMotor.getEncoder().getPosition();
     }
 
+    private double calcFF(double thetaDegrees) {
+        double ff = WristConstants.kG * Math.cos(Math.toRadians(thetaDegrees));
+        SmartDashboard.putNumber("Wrist/Feed Forward", ff);
+        return MathUtil.clamp(ff, -1d, 1d);
+    }
+
     public static Arm getInstance() {
         if (m_instance == null) {
             m_instance = new Arm();
         }
         return m_instance;
 
-    }
-
-    private double calcFF(double theta, double vel) {
-        // double ff = m_armFeedForward.calculate(theta, vel);
-        double ff = WristConstants.kG * Math.cos(theta);
-        SmartDashboard.putNumber("Intake FF", ff);
-        return MathUtil.clamp(ff, -1d, 1d);
     }
 
 }

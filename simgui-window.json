@@ -3,11 +3,11 @@
     "Data": [
       "DockNode    ID=0x00000001 Pos=230,34 Size=1320,280 Split=X",
       "DockNode  ID=0x00000002 Parent=0x00000001 SizeRef=486,283 Selected=0x2D9B9756",
-      "DockNode  ID=0x00000003 Parent=0x00000001 SizeRef=426,283 Selected=0xF5CC1934",
+      "DockNode  ID=0x00000003 Parent=0x00000001 SizeRef=426,283 Selected=0x73586B9A",
       "DockNode    ID=0x00000004 Pos=554,777 Size=862,197 Split=X",
       "DockNode  ID=0x00000005 Parent=0x00000004 SizeRef=191,73 Selected=0x6AE6D891",
       "DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=603,73 Selected=0x138219D4",
-      "DockNode    ID=0x0000000A Pos=337,329 Size=1133,431 Split=X",
+      "DockNode    ID=0x0000000A Pos=357,328 Size=1133,431 Split=X",
       "DockNode  ID=0x00000007 Parent=0x0000000A SizeRef=522,431 Selected=0x63F8E93F",
       "DockNode  ID=0x0000000B Parent=0x0000000A SizeRef=609,431 Selected=0xB5CBE9F0"
     ]
@@ -24,11 +24,18 @@
       "ypos": "23"
     }
   },
+  "Table": {
+    "0x542B5671,2": {
+      "Column 0  Width": "245",
+      "Column 1  Width": "134",
+      "RefScale": "13"
+    }
+  },
   "Window": {
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
       "DockId": "0x0000000B,0",
-      "Pos": "861,329",
+      "Pos": "881,328",
       "Size": "609,431"
     },
     "###/SmartDashboard/Mech2d": {
@@ -39,17 +46,17 @@
     "###/SmartDashboard/Robot Mechanism Simulation": {
       "Collapsed": "0",
       "DockId": "0x00000007,0",
-      "Pos": "337,329",
+      "Pos": "357,328",
       "Size": "522,431"
     },
     "###/SmartDashboard/SendableChooser[0]": {
       "Collapsed": "0",
-      "Pos": "1537,80",
+      "Pos": "1583,76",
       "Size": "254,54"
     },
     "###FMS": {
       "Collapsed": "0",
-      "Pos": "33,319",
+      "Pos": "24,320",
       "Size": "283,146"
     },
     "###Joysticks": {
@@ -83,8 +90,9 @@
     },
     "###Plot <2>": {
       "Collapsed": "0",
-      "Pos": "23,486",
-      "Size": "275,431"
+      "DockId": "0x00000003,2",
+      "Pos": "934,34",
+      "Size": "616,280"
     },
     "###RoboRIO": {
       "Collapsed": "0",
@@ -109,7 +117,7 @@
     },
     "Robot State": {
       "Collapsed": "0",
-      "Pos": "5,20",
+      "Pos": "11,22",
       "Size": "92,99"
     }
   }

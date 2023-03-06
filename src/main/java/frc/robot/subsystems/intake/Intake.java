@@ -78,9 +78,9 @@ public class Intake extends SubsystemBase {
     if (Constants.SIM) {
       m_pivotSim = new SingleJointedArmSim(
           DCMotor.getNEO(2),
-          IntakeConstants.Sim.GEARING,
-          IntakeConstants.Sim.MOI / 5,
-          IntakeConstants.Sim.ARM_LENGTH,
+          IntakeConstants.SIM.GEARING,
+          IntakeConstants.SIM.MOI / 5,
+          IntakeConstants.SIM.ARM_LENGTH,
           Math.toRadians(0),
           Math.toRadians(IntakeConstants.DEGREE_RANGE),
           true,
@@ -145,10 +145,10 @@ public class Intake extends SubsystemBase {
           break;
         case HANDOFF:
           if (m_lastState.was(IntakeStates.INTAKE_CUBE)) {
-            IntakeStates.HANDOFF.stateName.concat(" Cube");
+            IntakeStates.HANDOFF.stateName = "Handoff Cube";
             currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.HANDOFF_SETPOINT, 0.2d, -0.05d);
           } else if (m_lastState.was(IntakeStates.INTAKE_CONE)) {
-            IntakeStates.HANDOFF.stateName.concat(" Cone");
+            IntakeStates.HANDOFF.stateName = "Handoff Cone";
             currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.HANDOFF_SETPOINT, 0.2d, 0.25d);
           }
           break;
@@ -207,8 +207,8 @@ public class Intake extends SubsystemBase {
   }
   // #endregion
 
-  private double calcFF(double theta) {
-    double ff = IntakeConstants.kG * Math.cos(Math.toRadians(theta));
+  private double calcFF(double thetaDegrees) {
+    double ff = IntakeConstants.kG * Math.cos(Math.toRadians(thetaDegrees));
     SmartDashboard.putNumber("Intake/Feed Forward", ff);
     return ff;
   }

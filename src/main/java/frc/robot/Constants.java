@@ -114,7 +114,7 @@ public final class Constants {
         public static final double CONE_SETPOINT = 11d;
         public static final double HANDOFF_SETPOINT = 66d;
 
-        public static final class Sim {
+        public static final class SIM {
             public static final double GEARING = 7d;
             public static final double ARM_LENGTH = Units.inchesToMeters(12);
             private static final double ARM_WEIGHT = Units.lbsToKilograms(7.5);
@@ -139,7 +139,12 @@ public final class Constants {
         public static final double DEGREES_PER_TICK = DEGREE_RANGE / TICK_RANGE;
 
         public static final class SIM {
-            public static final double ARM_LENGTH = Units.inchesToMeters(7.5);
+            public static final double GEARING = 14.2857;
+            public static final double ARM_LENGTH = Units.inchesToMeters(15);
+            private static final double ARM_WEIGHT = Units.lbsToKilograms(4);
+            // Approx, using 1/3 * mr^2 (moi for a rod about end)
+            public static final double MOI = (1d / 3d) * ARM_WEIGHT * Math.pow(ARM_LENGTH, 2);
+
         }
     }
 

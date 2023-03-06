@@ -15,7 +15,6 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-  private SimVisualizer m_simVisualizer;
 
   @Override
   public void robotInit() {
@@ -88,7 +87,7 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationInit() {
     DriverStation.silenceJoystickConnectionWarning(true);
-    m_simVisualizer = SimVisualizer.getInstance();
+    SimVisualizer.getInstance();
 
   }
 

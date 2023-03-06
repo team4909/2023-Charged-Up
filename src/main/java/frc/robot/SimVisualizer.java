@@ -2,6 +2,7 @@ package frc.robot;
 
 import java.util.function.Consumer;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -38,7 +39,7 @@ public class SimVisualizer {
     m_baseLigament.setColor(new Color8Bit(Color.kForestGreen));
 
     m_intakeLigament = m_baseLigament
-        .append(new MechanismLigament2d("intake", IntakeConstants.Sim.ARM_LENGTH * kLengthScaleFactor, 90d, 15d,
+        .append(new MechanismLigament2d("intake", IntakeConstants.SIM.ARM_LENGTH * kLengthScaleFactor, 90d, 15d,
             new Color8Bit(Color.kBlack)));
 
     // #region Elevator & End Effector
@@ -46,7 +47,7 @@ public class SimVisualizer {
     MechanismLigament2d elevatorBase = m_elevatorRoot
         .append(new MechanismLigament2d("elevator_base",
             Units.inchesToMeters(kElevatorHeightOffsetInches) * kLengthScaleFactor, 90d));
-    elevatorBase.setColor(new Color8Bit(Color.kGainsboro));
+    elevatorBase.setColor(new Color8Bit(Color.kGhostWhite));
     MechanismLigament2d elevatorOuterStage = elevatorBase
         .append(new MechanismLigament2d("elevator_outer_stage",
             ElevatorConstants.SIM.RETRACTED_LENGTH * kLengthScaleFactor, -45d, 12d, new Color8Bit(Color.kForestGreen)));
@@ -55,10 +56,11 @@ public class SimVisualizer {
     m_elevatorLigament.setColor(new Color8Bit(Color.kBlack));
 
     m_wristLigament = m_elevatorLigament
-        .append(new MechanismLigament2d("wrist", WristConstants.SIM.ARM_LENGTH * kLengthScaleFactor, 120d));
+        .append(new MechanismLigament2d("wrist", WristConstants.SIM.ARM_LENGTH * kLengthScaleFactor, -45d));
+    m_wristLigament.setColor(new Color8Bit(Color.kBlack));
     // #endregion
     intakeAngle = inputDeg -> m_intakeLigament.setAngle(inputDeg);
-    wristAngle = inputDeg -> m_wristLigament.setAngle(inputDeg);
+    wristAngle = inputDeg -> m_wristLigament.setAngle(inputDeg - 45d);
     elevatorExtension = inputMeters -> m_elevatorLigament
         .setLength(inputMeters * kLengthScaleFactor);
 
