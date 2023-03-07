@@ -50,7 +50,8 @@ public class SimVisualizer {
     elevatorBase.setColor(new Color8Bit(Color.kGhostWhite));
     MechanismLigament2d elevatorOuterStage = elevatorBase
         .append(new MechanismLigament2d("elevator_outer_stage",
-            ElevatorConstants.SIM.RETRACTED_LENGTH * kLengthScaleFactor, -45d, 12d, new Color8Bit(Color.kForestGreen)));
+            ElevatorConstants.SIM.RETRACTED_LENGTH * kLengthScaleFactor, -45d, 15d,
+            new Color8Bit(Color.kForestGreen)));
     m_elevatorLigament = elevatorOuterStage
         .append(new MechanismLigament2d("elevator_inner_stage", 0d, 0d));
     m_elevatorLigament.setColor(new Color8Bit(Color.kBlack));

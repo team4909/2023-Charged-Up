@@ -66,14 +66,15 @@ public class Intake extends SubsystemBase {
     m_frontRoller.restoreFactoryDefaults();
     m_backRoller.restoreFactoryDefaults();
 
-    m_pivotRight.follow(m_pivotLeft);
-
     m_pivotLeft.getPIDController().setP(IntakeConstants.kP);
     m_pivotLeft.getPIDController().setOutputRange(-IntakeConstants.OUTPUT_LIMIT, IntakeConstants.OUTPUT_LIMIT);
 
     m_pivotLeft.setSmartCurrentLimit(40, 40);
     m_pivotLeft.getEncoder().setPositionConversionFactor(IntakeConstants.DEGREES_PER_TICK);
     m_pivotLeft.setInverted(true);
+
+    m_pivotRight.follow(m_pivotLeft, true);
+    m_pivotRight.set(0.01);
 
     if (Constants.SIM) {
       m_pivotSim = new SingleJointedArmSim(
@@ -132,7 +133,7 @@ public class Intake extends SubsystemBase {
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CUBE_SETPOINT, 0.5, -0.5);
           break;
         case INTAKE_CONE:
-          currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CONE_SETPOINT, 0.375, 0.75);
+          currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CONE_SETPOINT, 0., 1);
           break;
         case SPIT_CUBE:
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CUBE_SETPOINT, -0.75, 0.75);
@@ -149,7 +150,7 @@ public class Intake extends SubsystemBase {
             currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.HANDOFF_SETPOINT, 0.2d, -0.05d);
           } else if (m_lastState.was(IntakeStates.INTAKE_CONE)) {
             IntakeStates.HANDOFF.stateName = "Handoff Cone";
-            currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.HANDOFF_SETPOINT, 0.2d, 0.25d);
+            currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.HANDOFF_SETPOINT, 0.2d, 0.15d);
           }
           break;
         default:

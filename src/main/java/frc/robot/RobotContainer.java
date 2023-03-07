@@ -6,6 +6,7 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -23,6 +24,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.Elevator.ElevatorStates;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.Intake.IntakeStates;
+import frc.robot.subsystems.leds.LEDs;
 
 public class RobotContainer {
 
@@ -31,6 +33,7 @@ public class RobotContainer {
 	private final SendableChooser<Command> m_chooser = new SendableChooser<>();
 	private final AutoRoutines m_routines = new AutoRoutines();
 	private final Elevator m_elevator = Elevator.getInstance();
+	private final LEDs m_leds = LEDs.getInstance();
 
 	private final Arm m_arm = Arm.getInstance();
 	private final Claw m_claw = Claw.getInstance();
@@ -41,6 +44,7 @@ public class RobotContainer {
 	public RobotContainer() {
 		configureBindings();
 		configureSendableChooser();
+		m_leds.setDefaultCommand(m_leds.strobe());
 	}
 
 	private void configureBindings() {
@@ -82,6 +86,9 @@ public class RobotContainer {
 		// #endregion
 
 		// #region Operator Controlls
+		m_operatorController.povRight().onTrue(m_leds.setLedColor(Color.kYellow));
+		m_operatorController.povLeft().onTrue(m_leds.setLedColor(Color.kPurple));
+
 		m_operatorController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)));
 		m_operatorController.povDown().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING)));
 		m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.SUBSTATION)));
@@ -99,7 +106,6 @@ public class RobotContainer {
 
 		// Handoff Cone Sequence
 		m_operatorController.a().onTrue(m_routines.HANDOFF());
-		
 
 		// Drop Game Piece
 		m_operatorController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING))
@@ -124,15 +130,16 @@ public class RobotContainer {
 		return m_chooser.getSelected();
 	}
 
-	private Command substationToggle() {
-		return new ConditionalCommand(
-				(Command) new SequentialCommandGroup(m_elevator.setState2(ElevatorStates.DOUBLE_SUBSTATION),
-						m_claw.setState(ClawStates.OPEN), m_arm.setState2(ArmStates.DROPPING)),
-				(Command) new SequentialCommandGroup(m_claw.setState(ClawStates.CLOSED),
-						new WaitCommand(1), new InstantCommand(() -> {
-							m_arm.setState(ArmStates.RETRACTED);
-							m_elevator.setState(ElevatorStates.RETRACT);
-						})),
-				() -> m_elevator.getState() != ElevatorStates.DOUBLE_SUBSTATION);
-	}
+	// private Command substationToggle() {
+	// return new ConditionalCommand(
+	// (Command) new
+	// SequentialCommandGroup(m_elevator.setState2(ElevatorStates.DOUBLE_SUBSTATION),
+	// m_claw.setState(ClawStates.OPEN), m_arm.setState2(ArmStates.DROPPING)),
+	// (Command) new SequentialCommandGroup(m_claw.setState(ClawStates.CLOSED),
+	// new WaitCommand(1), new InstantCommand(() -> {
+	// m_arm.setState(ArmStates.RETRACTED);
+	// m_elevator.setState(ElevatorStates.RETRACT);
+	// })),
+	// () -> m_elevator.getState() != ElevatorStates.DOUBLE_SUBSTATION);
+	// }
 }

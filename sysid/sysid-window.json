@@ -1,0 +1,66 @@
+{
+  "MainWindow": {
+    "GLOBAL": {
+      "fps": "120",
+      "height": "1017",
+      "maximized": "1",
+      "style": "0",
+      "userScale": "2",
+      "width": "1920",
+      "xpos": "-1920",
+      "ypos": "23"
+    }
+  },
+  "Window": {
+    "###Analyzer": {
+      "Collapsed": "0",
+      "Pos": "360,25",
+      "Size": "530,530"
+    },
+    "###Generator": {
+      "Collapsed": "0",
+      "Pos": "6,34",
+      "Size": "350,444"
+    },
+    "###Logger": {
+      "Collapsed": "0",
+      "Pos": "4,488",
+      "Size": "345,471"
+    },
+    "###Program Log": {
+      "Collapsed": "0",
+      "Pos": "357,569",
+      "Size": "526,523"
+    },
+    "About": {
+      "Collapsed": "0",
+      "Pos": "799,512",
+      "Size": "324,113"
+    },
+    "Debug##Default": {
+      "Collapsed": "0",
+      "Pos": "60,60",
+      "Size": "400,400"
+    },
+    "Deploy Status": {
+      "Collapsed": "0",
+      "Pos": "496,114",
+      "Size": "960,909"
+    },
+    "Diagnostic Plots": {
+      "Collapsed": "0",
+      "Pos": "895,25",
+      "Size": "1021,1081"
+    },
+    "Exception Caught!": {
+      "Collapsed": "0",
+      "Pos": "721,526",
+      "Size": "480,84"
+    },
+    "Warning": {
+      "Collapsed": "0",
+      "Pos": "927,3",
+      "Size": "89,1131"
+    }
+  }
+}

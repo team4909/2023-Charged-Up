@@ -134,7 +134,7 @@ public class Drivetrain extends SubsystemBase {
         }
 
         m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
-        if (m_vision.robotPose.get() != null || m_vision.latency.get() != null)
+        if (m_vision.robotPose.get() != null && m_vision.latency.get() != null)
             m_poseEstimator.addVisionMeasurement(m_vision.robotPose.get(), m_vision.latency.get());
 
         SmartDashboard.putString("DrivetrainState", m_state.toString());

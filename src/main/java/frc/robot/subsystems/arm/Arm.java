@@ -180,7 +180,8 @@ public class Arm extends SubsystemBase {
     }
 
     private double calcFF(double thetaDegrees) {
-        double ff = WristConstants.kG * Math.cos(Math.toRadians(thetaDegrees));
+        double ff = WristConstants.kG
+                * Math.cos(Math.toRadians(m_wristMotor.getEncoder().getPosition() >= 90 ? thetaDegrees : 90));
         SmartDashboard.putNumber("Wrist/Feed Forward", ff);
         return MathUtil.clamp(ff, -1d, 1d);
     }

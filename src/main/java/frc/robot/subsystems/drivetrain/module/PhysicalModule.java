@@ -65,16 +65,16 @@ public final class PhysicalModule extends ModuleBase {
         super.driveVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(
                 m_driveMotor.getSelectedSensorVelocity() * (600 / TICKS_PER_ROTATION))
                 * DrivetrainConstants.DRIVE_REDUCTION;
-        super.driveCurrentAmps = m_driveMotor.getSupplyCurrent();
-        super.driveAppliedVolts = m_driveMotor.getMotorOutputVoltage();
+        // super.driveCurrentAmps = m_driveMotor.getSupplyCurrent();
+        // super.driveAppliedVolts = m_driveMotor.getMotorOutputVoltage();
 
         super.turnPositionRad = Units.rotationsToRadians(m_turnMotor.getSelectedSensorPosition() / TICKS_PER_ROTATION)
                 * DrivetrainConstants.STEER_REDUCTION;
         super.turnVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(
                 m_turnMotor.getSelectedSensorVelocity() * (600 / TICKS_PER_ROTATION))
                 * DrivetrainConstants.STEER_REDUCTION;
-        super.turnCurrentAmps = m_turnMotor.getSupplyCurrent();
-        super.turnAppliedVolts = m_turnMotor.getMotorOutputVoltage();
+        // super.turnCurrentAmps = m_turnMotor.getSupplyCurrent();
+        // super.turnAppliedVolts = m_turnMotor.getMotorOutputVoltage();
         super.turnAbsolutePosition = getWheelHeading();
     }
 
