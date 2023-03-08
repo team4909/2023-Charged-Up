@@ -23,18 +23,27 @@ public class LEDs extends SubsystemBase {
     m_leds.start();
   }
 
+  int count;
+
   public Command setLedColor(Color color) {
+
     return Commands.runOnce(() -> {
-      for (int i = 0; i < kledLength; i++) {
-        m_ledBuffer.setLED(i, color);
+      if (count == 300) {
+        for (int i = 0; i < kledLength; i++) {
+          m_ledBuffer.setLED(i, color);
+        }
+        m_leds.setData(m_ledBuffer);
+        count = 0;
+      } else {
+        count++;
       }
-      m_leds.setData(m_ledBuffer);
+
     }, this).ignoringDisable(true);
   }
 
   int m_position = 0;
 
-  Color currentColor = Color.kAqua;
+  Color currentColor = Color.kBeige;
 
   public Command strobe() {
 
@@ -42,7 +51,7 @@ public class LEDs extends SubsystemBase {
       for (int i = 0; i < kTopStripColumns; i++) {
 
         if (m_position / kTopStripColumns >= (kledLength / kTopStripColumns) / 2) {
-          currentColor = currentColor.equals(Color.kAqua) ? Color.kRed : Color.kAqua;
+          currentColor = currentColor.equals(Color.kBeige) ? new Color(21, 71, 51) : Color.kBeige;
           m_position = 0;
         }
         m_ledBuffer.setLED(m_position + i, currentColor);
