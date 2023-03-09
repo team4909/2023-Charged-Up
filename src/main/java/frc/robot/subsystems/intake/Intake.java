@@ -133,7 +133,7 @@ public class Intake extends SubsystemBase {
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CUBE_SETPOINT, 0.5, -0.5);
           break;
         case INTAKE_CONE:
-          currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CONE_SETPOINT, 0.3, 0.3);
+          currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CONE_SETPOINT, 0.3, 0.5);
           break;
         case SPIT_CUBE:
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CUBE_SETPOINT, -0.75, 0.75);

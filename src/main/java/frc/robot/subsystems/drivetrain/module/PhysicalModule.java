@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import edu.wpi.first.math.MathUtil;
@@ -54,7 +55,7 @@ public final class PhysicalModule extends ModuleBase {
             default:
                 throw new RuntimeException("Invalid Module index");
         }
-        m_driveFeedforward = new SimpleMotorFeedforward(DrivetrainConstants.kS, DrivetrainConstants.kV);
+        m_driveFeedforward = new SimpleMotorFeedforward(0d, 0d);
         configHardware();
     }
 
@@ -99,7 +100,6 @@ public final class PhysicalModule extends ModuleBase {
         m_driveMotor.setInverted(false);
         m_driveMotor.setNeutralMode(NeutralMode.Brake);
         m_driveMotor.setSelectedSensorPosition(0);
-        m_driveMotor.config_kP(0, DrivetrainConstants.kP);
 
         m_turnMotor.configFactoryDefault();
         m_turnMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 1));
@@ -109,12 +109,13 @@ public final class PhysicalModule extends ModuleBase {
         m_turnMotor.setNeutralMode(NeutralMode.Brake);
         m_turnMotor.setSelectedSensorPosition(-1 * Module.convertDegreesToTicks(getWheelHeading()));
         m_turnMotor.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Unsigned_0_to_360);
-        m_turnMotor.config_kP(0, 0.2);
-        m_turnMotor.config_kD(0, 0.1);
+        m_turnMotor.config_kP(0, 0.3);
 
         m_encoder.configFactoryDefault();
         m_encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
         m_encoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+        m_encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
+        m_encoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
     }
 
     private double getWheelHeading() {

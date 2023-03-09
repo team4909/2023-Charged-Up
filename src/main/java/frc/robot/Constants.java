@@ -66,9 +66,7 @@ public final class Constants {
         public static final double BACK_LEFT_MODULE_STEER_OFFSET = 251.2;
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 91.2;
 
-        public static final double kS = 0.0d;
-        public static final double kV = 0.0;
-        public static final double kP = 0.0;
+        public static final double TURN_kP = 0.3;
 
         // CAN IDS
         public static final int PIGEON_ID = 20;
@@ -89,7 +87,7 @@ public final class Constants {
 
     public static final class ClawConstants {
 
-        public static final double kP = 6;
+        public static final double kP = 6.5;
 
         public static final double OUTPUT_LIMIT = 0.5;
     }

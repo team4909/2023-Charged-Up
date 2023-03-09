@@ -28,39 +28,14 @@ public class LEDs extends SubsystemBase {
   public Command setLedColor(Color color) {
 
     return Commands.runOnce(() -> {
-      if (count == 300) {
-        for (int i = 0; i < kledLength; i++) {
-          m_ledBuffer.setLED(i, color);
-        }
-        m_leds.setData(m_ledBuffer);
-        count = 0;
-      } else {
-        count++;
+      for (int i = 0; i < kledLength; i++) {
+        m_ledBuffer.setLED(i, color);
       }
-
-    }, this).ignoringDisable(true);
-  }
-
-  int m_position = 0;
-
-  Color currentColor = Color.kBeige;
-
-  public Command strobe() {
-
-    return Commands.run(() -> {
-      for (int i = 0; i < kTopStripColumns; i++) {
-
-        if (m_position / kTopStripColumns >= (kledLength / kTopStripColumns) / 2) {
-          currentColor = currentColor.equals(Color.kBeige) ? new Color(21, 71, 51) : Color.kBeige;
-          m_position = 0;
-        }
-        m_ledBuffer.setLED(m_position + i, currentColor);
-      }
-
-      m_position += kTopStripColumns;
-      m_position %= (kledLength - kTopStripColumns);
       m_leds.setData(m_ledBuffer);
-    }, this).ignoringDisable(true);
+      count = 0;
+    }, this)
+        .ignoringDisable(true);
+
   }
 
   public static LEDs getInstance() {

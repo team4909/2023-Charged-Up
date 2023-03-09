@@ -8,9 +8,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.arm.Arm;
@@ -44,7 +43,7 @@ public class RobotContainer {
 	public RobotContainer() {
 		configureBindings();
 		configureSendableChooser();
-		m_leds.setDefaultCommand(m_leds.strobe());
+		m_leds.setLedColor(Color.kWheat);
 	}
 
 	private void configureBindings() {
@@ -91,7 +90,10 @@ public class RobotContainer {
 
 		m_operatorController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)));
 		m_operatorController.povDown().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING)));
-		m_operatorController.leftBumper().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.SUBSTATION)));
+		m_operatorController.leftBumper().onTrue(
+				Commands.sequence(
+						m_claw.setState(ClawStates.OPEN),
+						Commands.runOnce(() -> m_arm.setState(ArmStates.SUBSTATION))));
 
 		m_operatorController.x().onTrue(m_claw.setState(ClawStates.OPEN));
 		m_operatorController.y().onTrue(m_claw.setState(ClawStates.CLOSED));

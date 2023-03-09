@@ -259,8 +259,10 @@ public class Drivetrain extends SubsystemBase {
                             .getTranslation();
 
                     drive(ChassisSpeeds.fromFieldRelativeSpeeds(
-                            linearVelocity.getX() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
-                            linearVelocity.getY() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
+                            (isJoystickInputPresent() ? linearVelocity.getX() : 0)
+                                    * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
+                            (isJoystickInputPresent() ? linearVelocity.getY() : 0)
+                                    * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
                             omega * MAX_ANGULAR_SPEED,
                             getGyroYaw()));
                 },
