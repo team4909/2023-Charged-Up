@@ -19,38 +19,42 @@ public final class Module {
     private final double MAX_VELOCITY_METERS_PER_SECOND = DrivetrainConstants.FALCON_500_FREE_SPEED / 60.0 *
             DrivetrainConstants.DRIVE_REDUCTION *
             DrivetrainConstants.WHEEL_DIAMETER * Math.PI;
-
     private final PIDController m_simTurnPID = new PIDController(23.0, 0.0, 0.1); // Tuned for SIM!
+    private double m_lastAngle;
 
     public Module(int index) {
         m_module = Constants.SIM ? new SimulatedModule() : new PhysicalModule(index);
         m_index = index;
+        m_lastAngle = getModuleState().angle.getDegrees();
     }
 
     public void update() {
         m_module.updateModuleInputs();
-
         SmartDashboard.putNumber("Encoder " + m_index, m_module.turnAbsolutePosition);
         SmartDashboard.putString("State " + m_index, getModuleState().toString());
         SmartDashboard.putString("Pos " + m_index, getModulePosition().toString());
     }
 
-    public void set(SwerveModuleState state) {
-        SwerveModuleState desiredState;
+    public void set(SwerveModuleState desiredstate) {
+        SwerveModuleState optimizedDesiredState;
         if (Constants.SIM) {
-            desiredState = SwerveModuleState.optimize(state, getModuleAngle());
-            m_module.setTurn(m_simTurnPID.calculate(getModuleAngle().getRadians(), desiredState.angle.getRadians()));
+            optimizedDesiredState = SwerveModuleState.optimize(desiredstate, getModuleAngle());
+            m_module.setTurn(
+                    m_simTurnPID.calculate(getModuleAngle().getRadians(), optimizedDesiredState.angle.getRadians()));
         } else {
-            desiredState = SwerveModuleState.optimize(state, getModuleAngle());
-            // desiredState = CTREModuleState.optimize(state, getModuleAngle());
-            m_module.setTurn(convertDegreesToTicks(desiredState.angle.getDegrees()));
+            // optimizedDesiredState = SwerveModuleState.optimize(desiredstate,
+            // getModuleAngle());
+            optimizedDesiredState = CTREModuleState.optimize(desiredstate, getModuleState().angle);
+            m_module.setTurn(convertDegreesToTicks(optimizedDesiredState.angle.getDegrees()));
         }
-        m_module.setDriveVolts(desiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE);
+        m_module.setDriveVolts(
+                optimizedDesiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE);
+        m_lastAngle = optimizedDesiredState.angle.getDegrees();
     }
 
     private Rotation2d getModuleAngle() {
         return Constants.SIM ? new Rotation2d(MathUtil.angleModulus(m_module.turnAbsolutePosition))
-                : Rotation2d.fromDegrees(m_module.turnAbsolutePosition);
+                : Rotation2d.fromDegrees(m_module.turnPositionRad);
     }
 
     private double getPositionMeters() {
@@ -58,7 +62,8 @@ public final class Module {
     }
 
     private double getVelocityMetersPerSec() {
-        return m_module.driveVelocityRadPerSec * m_wheelRadius;
+        // return m_module.driveVelocityRadPerSec * m_wheelRadius;
+        return m_module.driveVelocityRadPerSec;
     }
 
     public SwerveModulePosition getModulePosition() {
@@ -76,8 +81,29 @@ public final class Module {
     }
 
     public static double convertDegreesToTicks(double degrees) {
-
         double ticks = degrees * 1 / ((1.0 / 2048.0) * (1.0 / (150 / 7)) * (360.0 / 1.0));
         return ticks;
+    }
+
+    public static double convertMPStoTicks(double mps) {
+        double wheelRPM = ((mps * 60) / DrivetrainConstants.WHEEL_CIRCUMFERENCE);
+        return convertRPMToTicks(wheelRPM);
+    }
+
+    public static double convertTicksToMPS(double ticks) {
+        double wheelRPM = convertTicksToRPM(ticks);
+        double wheelMPS = (wheelRPM * DrivetrainConstants.WHEEL_CIRCUMFERENCE) / 60;
+        return wheelMPS;
+    }
+
+    public static double convertRPMToTicks(double RPM) {
+        double motorRPM = RPM * 6.75; // TODO extract into a const
+        return motorRPM * (2048.0 / 600.0);
+    }
+
+    public static double convertTicksToRPM(double ticks) {
+        double motorRPM = ticks * (600.0 / 2048.0);
+        double mechRPM = motorRPM / 6.75;
+        return mechRPM;
     }
 }

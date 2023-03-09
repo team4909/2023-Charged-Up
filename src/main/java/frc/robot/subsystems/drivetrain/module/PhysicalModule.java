@@ -63,14 +63,18 @@ public final class PhysicalModule extends ModuleBase {
     void updateModuleInputs() {
         super.drivePositionRad = Units.rotationsToRadians(m_driveMotor.getSelectedSensorPosition() / TICKS_PER_ROTATION)
                 * DrivetrainConstants.DRIVE_REDUCTION;
-        super.driveVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(
-                m_driveMotor.getSelectedSensorVelocity() * (600 / TICKS_PER_ROTATION))
-                * DrivetrainConstants.DRIVE_REDUCTION;
+        // super.driveVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(
+        // m_driveMotor.getSelectedSensorVelocity() * (600 / TICKS_PER_ROTATION))
+        // * DrivetrainConstants.DRIVE_REDUCTION;
+        super.driveVelocityRadPerSec = Module.convertTicksToMPS(m_driveMotor.getSelectedSensorVelocity());
         // super.driveCurrentAmps = m_driveMotor.getSupplyCurrent();
         // super.driveAppliedVolts = m_driveMotor.getMotorOutputVoltage();
 
-        super.turnPositionRad = Units.rotationsToRadians(m_turnMotor.getSelectedSensorPosition() / TICKS_PER_ROTATION)
-                * DrivetrainConstants.STEER_REDUCTION;
+        // super.turnPositionRad =
+        // Units.rotationsToRadians(m_turnMotor.getSelectedSensorPosition() /
+        // TICKS_PER_ROTATION)
+        // * DrivetrainConstants.STEER_REDUCTION;
+        super.turnPositionRad = Module.convertTicksToDegrees(m_turnMotor.getSelectedSensorPosition());
         super.turnVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(
                 m_turnMotor.getSelectedSensorVelocity() * (600 / TICKS_PER_ROTATION))
                 * DrivetrainConstants.STEER_REDUCTION;
@@ -107,7 +111,7 @@ public final class PhysicalModule extends ModuleBase {
         m_turnMotor.enableVoltageCompensation(true);
         m_turnMotor.setInverted(true);
         m_turnMotor.setNeutralMode(NeutralMode.Brake);
-        m_turnMotor.setSelectedSensorPosition(-1 * Module.convertDegreesToTicks(getWheelHeading()));
+        m_turnMotor.setSelectedSensorPosition(Module.convertDegreesToTicks(getWheelHeading()));
         m_turnMotor.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Unsigned_0_to_360);
         m_turnMotor.config_kP(0, 0.3);
 
@@ -119,7 +123,7 @@ public final class PhysicalModule extends ModuleBase {
     }
 
     private double getWheelHeading() {
-        return Math.floorMod((int) m_encoder.getPosition(), 360) - m_encoderOffset;
+        return m_encoder.getAbsolutePosition() - m_encoderOffset;
     }
 
 }
