@@ -11,4 +11,16 @@ public record DriveTrajectory(PathPlannerTrajectory trajectory, boolean isFirstP
         PathPlanner.loadPath(trajectoryName, DrivetrainConstants.MAX_DRIVETRAIN_SPEED, 3),
         isFirstPath);
   }
+
+  public DriveTrajectory(String trajectoryName, boolean isFirstPath, double maxVel, double maxAccel) {
+    this(
+        PathPlanner.loadPath(trajectoryName, maxVel, maxAccel),
+        isFirstPath);
+  }
+
+  public DriveTrajectory(String trajectoryName, boolean isFirstPath, double maxAccel) {
+    this(
+        PathPlanner.loadPath(trajectoryName, DrivetrainConstants.MAX_DRIVETRAIN_SPEED, maxAccel),
+        isFirstPath);
+  }
 }

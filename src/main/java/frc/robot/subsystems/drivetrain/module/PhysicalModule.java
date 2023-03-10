@@ -118,8 +118,8 @@ public final class PhysicalModule extends ModuleBase {
         m_encoder.configFactoryDefault();
         m_encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
         m_encoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
-        m_encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
-        m_encoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
+        m_encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 10);
+        m_encoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 10);
     }
 
     private double getWheelHeading() {

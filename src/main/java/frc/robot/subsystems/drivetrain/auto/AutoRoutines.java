@@ -31,9 +31,9 @@ public class AutoRoutines {
       loadTrajectory(new DriveTrajectory("ChargeStationStraight", true)));
   public final Auto SCORE_CONE_CHARGE_STATION_COMMUNITY = new Auto(
       SCORE_CONE(ElevatorStates.TOP),
-      loadTrajectory(new DriveTrajectory("ChargeStationStraight", true)),
-      loadTrajectory(new DriveTrajectory("PastChargeStation", false)),
-      loadTrajectory(new DriveTrajectory("BackChargeStation", false)),
+      loadTrajectory(new DriveTrajectory("ChargeStationStraight", true, 1.5)),
+      // loadTrajectory(new DriveTrajectory("PastChargeStation", false)),
+      loadTrajectory(new DriveTrajectory("BackChargeStation", false, 1.5)),
       m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
   public final Auto ONE_PIECE_CHARGE_STATION = new Auto(
       SCORE_CONE(ElevatorStates.TOP),
