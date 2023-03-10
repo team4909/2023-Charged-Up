@@ -1,5 +1,7 @@
 package frc.robot.subsystems.leds;
 
+import java.util.function.Function;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
@@ -15,6 +17,11 @@ public class LEDs extends SubsystemBase {
   private final int kledLength = 123;
   private final int kTopStripColumns = 6;
   private final int kFrontStripColumns = 3;
+  private final double kDarkenFactor = 5;
+
+  private Function<Color, Color> darken = (Color color) -> {
+    return new Color(color.red / kDarkenFactor, color.green / kDarkenFactor, color.blue / kDarkenFactor);
+  };
 
   private LEDs() {
     m_leds = new AddressableLED(0);
@@ -23,7 +30,15 @@ public class LEDs extends SubsystemBase {
     m_leds.start();
   }
 
-  int count;
+  public Command setBreatheColor(Color color) {
+
+    return Commands.run(() -> {
+      for (int i = 0; i < kledLength; i++) {
+        m_ledBuffer.setLED(i, color);
+      }
+    }, this);
+
+  }
 
   public Command setLedColor(Color color) {
 
@@ -32,7 +47,6 @@ public class LEDs extends SubsystemBase {
         m_ledBuffer.setLED(i, color);
       }
       m_leds.setData(m_ledBuffer);
-      count = 0;
     }, this)
         .ignoringDisable(true);
 

@@ -124,7 +124,7 @@
               "autoFit": true
             }
           ],
-          "height": 218,
+          "height": 182,
           "series": [
             {
               "color": [
@@ -172,7 +172,7 @@
     "Plot <1>": {
       "plots": [
         {
-          "height": 218,
+          "height": 182,
           "series": [
             {
               "color": [
@@ -220,7 +220,7 @@
     "Plot <2>": {
       "plots": [
         {
-          "height": 218,
+          "height": 182,
           "series": [
             {
               "color": [
