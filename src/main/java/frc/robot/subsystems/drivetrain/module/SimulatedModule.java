@@ -58,4 +58,8 @@ public final class SimulatedModule extends ModuleBase {
         m_turnAppliedVolts = MathUtil.clamp(volts, -12d, 12d);
         turnMotor.setInputVoltage(m_turnAppliedVolts);
     }
+
+    @Override
+    void resetTurn() {
+    }
 }

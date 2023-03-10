@@ -123,7 +123,11 @@ public final class PhysicalModule extends ModuleBase {
     }
 
     private double getWheelHeading() {
-        return m_encoder.getAbsolutePosition() - m_encoderOffset;
+        return m_encoder.getPosition() - m_encoderOffset;
+    }
+
+    void resetTurn() {
+        m_turnMotor.setSelectedSensorPosition(Module.convertDegreesToTicks(getWheelHeading()));
     }
 
 }

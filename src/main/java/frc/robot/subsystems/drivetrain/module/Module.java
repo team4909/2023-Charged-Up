@@ -106,4 +106,10 @@ public final class Module {
         double mechRPM = motorRPM / 6.75;
         return mechRPM;
     }
+
+    public void resetTurn() {
+        if (m_module instanceof PhysicalModule) {
+            m_module.resetTurn();
+        }
+    }
 }

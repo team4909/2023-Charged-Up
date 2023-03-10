@@ -307,9 +307,12 @@ public class Drivetrain extends SubsystemBase {
                             (MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180)),
                             snapPID.getSetpoint());
                     drive(ChassisSpeeds.fromFieldRelativeSpeeds(
-                            // TODO This needs to deal with deadband
-                            -m_joystickTranslationX.getAsDouble() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
-                            -m_joystickTranslationY.getAsDouble() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
+                            isJoystickInputPresent()
+                                    ? -m_joystickTranslationX.getAsDouble() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED
+                                    : 0,
+                            isJoystickInputPresent()
+                                    ? -m_joystickTranslationY.getAsDouble() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED
+                                    : 0,
                             (m_joystickRotationOmega.getAsDouble() + omega) * MAX_ANGULAR_SPEED, getGyroYaw()));
                 },
                 this).andThen(() -> snapPID.close());
@@ -366,7 +369,13 @@ public class Drivetrain extends SubsystemBase {
         return Math.copySign(Math.pow(value, 3), value);
     }
 
-    public final static Drivetrain getInstance() {
+    public void resetModules() {
+        for (Module module : m_modules) {
+            module.resetTurn();
+        }
+    }
+
+    public static Drivetrain getInstance() {
         if (m_instance == null) {
             m_instance = new Drivetrain();
         }
