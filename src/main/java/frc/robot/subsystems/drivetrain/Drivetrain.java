@@ -101,6 +101,7 @@ public class Drivetrain extends SubsystemBase {
 
     private Drivetrain() {
         m_pigeon.clearStickyFaults();
+        m_pigeon.setYaw(180);
         for (int i = 0; i < m_modules.length; i++)
             m_modules[i] = new Module(i);
         m_pose = new Pose2d();
