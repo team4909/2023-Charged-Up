@@ -112,6 +112,7 @@ public final class Constants {
         public static final double CUBE_SETPOINT = 16d;
         public static final double CONE_SETPOINT = 11d;
         public static final double HANDOFF_SETPOINT = 66d;
+        public static final double SPIT_CONE_SETPOINT = 60d;
 
         public static final class SIM {
             public static final double GEARING = 7d;

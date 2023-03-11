@@ -104,7 +104,7 @@ public class RobotContainer {
 				.onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
 
 		// m_operatorController.start().onTrue(substationToggle());
-		m_operatorController.back().onTrue(m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
+		m_operatorController.back().onTrue(m_routines.SCORE_CONE_CHARGE_STATION_COMMUNITY);
 
 		// Handoff Cone Sequence
 		m_operatorController.a().onTrue(m_routines.HANDOFF());
@@ -121,7 +121,7 @@ public class RobotContainer {
 	}
 
 	private void configureSendableChooser() {
-		m_chooser.setDefaultOption("Test Auto", m_routines.CHARGE_STATION);
+		m_chooser.setDefaultOption("Blank Auto", m_routines.BLANK_AUTO);
 		m_chooser.addOption("Score Cone & Balance Charge Station", m_routines.SCORE_CONE_CHARGE_STATION_COMMUNITY);
 		m_chooser.addOption("One Meter Test", m_routines.ONE_METER_TEST);
 		m_chooser.addOption("One Piece + Charge Station", m_routines.ONE_PIECE_CHARGE_STATION);

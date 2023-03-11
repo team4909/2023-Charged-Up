@@ -27,8 +27,7 @@ public class AutoRoutines {
 
   public final Auto ONE_METER_TEST = new Auto(
       loadTrajectory(new DriveTrajectory("Test", true)));
-  public final Auto CHARGE_STATION = new Auto(
-      loadTrajectory(new DriveTrajectory("ChargeStationStraight", true)));
+  public final Auto BLANK_AUTO = new Auto();
   public final Auto SCORE_CONE_CHARGE_STATION_COMMUNITY = new Auto(
       SCORE_CONE(ElevatorStates.TOP),
       loadTrajectory(new DriveTrajectory("ChargeStationStraight", true, 1.5)),
@@ -94,9 +93,9 @@ public class AutoRoutines {
         Commands.runOnce(() -> m_arm.setState(ArmStates.HANDOFF_CONE)),
         Commands.waitSeconds(1),
         m_claw.setState(ClawStates.CLOSED),
-        Commands.waitSeconds(1),
+        Commands.waitSeconds(0.5),
         m_intake.setState(IntakeStates.SPIT_CONE),
-        Commands.waitSeconds(1),
+        Commands.waitSeconds(0.1),
         Commands.runOnce(() -> m_arm.setState(ArmStates.RETRACTED)),
         m_intake.setState(IntakeStates.RETRACTED));
   }

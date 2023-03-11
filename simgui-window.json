@@ -6,20 +6,17 @@
       "DockNode  ID=0x00000003 Parent=0x00000001 SizeRef=426,283 Selected=0x73586B9A",
       "DockNode    ID=0x00000004 Pos=554,777 Size=862,197 Split=X",
       "DockNode  ID=0x00000005 Parent=0x00000004 SizeRef=191,73 Selected=0x6AE6D891",
-      "DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=603,73 Selected=0x138219D4",
-      "DockNode    ID=0x0000000A Pos=1596,1049 Size=1133,431 Split=X",
-      "DockNode  ID=0x00000007 Parent=0x0000000A SizeRef=522,431 Selected=0x63F8E93F",
-      "DockNode  ID=0x0000000B Parent=0x0000000A SizeRef=609,431 Selected=0xB5CBE9F0"
+      "DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=603,73 Selected=0x138219D4"
     ]
   },
   "MainWindow": {
     "GLOBAL": {
       "fps": "120",
-      "height": "2004",
+      "height": "1106",
       "maximized": "1",
       "style": "1",
       "userScale": "2",
-      "width": "3840",
+      "width": "1920",
       "xpos": "-1920",
       "ypos": "23"
     }
@@ -34,9 +31,8 @@
   "Window": {
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
-      "DockId": "0x0000000B,0",
-      "Pos": "2120,1049",
-      "Size": "609,431"
+      "Pos": "1101,308",
+      "Size": "1133,431"
     },
     "###/SmartDashboard/Mech2d": {
       "Collapsed": "0",
@@ -45,24 +41,23 @@
     },
     "###/SmartDashboard/Robot Mechanism Simulation": {
       "Collapsed": "0",
-      "DockId": "0x00000007,0",
-      "Pos": "1596,1049",
+      "Pos": "548,342",
       "Size": "522,431"
     },
     "###/SmartDashboard/SendableChooser[0]": {
       "Collapsed": "0",
       "Pos": "1583,76",
-      "Size": "576,90"
+      "Size": "361,66"
     },
     "###Addressable LEDs": {
       "Collapsed": "0",
       "Pos": "94,491",
-      "Size": "311,841"
+      "Size": "199,547"
     },
     "###FMS": {
       "Collapsed": "0",
       "Pos": "24,320",
-      "Size": "600,254"
+      "Size": "388,182"
     },
     "###Joysticks": {
       "Collapsed": "0",
@@ -118,7 +113,7 @@
     "###Timing": {
       "Collapsed": "0",
       "Pos": "5,150",
-      "Size": "294,258"
+      "Size": "188,186"
     },
     "Debug##Default": {
       "Collapsed": "0",
@@ -128,7 +123,7 @@
     "Robot State": {
       "Collapsed": "0",
       "Pos": "11,22",
-      "Size": "196,189"
+      "Size": "126,129"
     }
   }
 }
