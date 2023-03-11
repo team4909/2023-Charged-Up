@@ -43,7 +43,7 @@ public class RobotContainer {
 	public RobotContainer() {
 		configureBindings();
 		configureSendableChooser();
-		m_leds.setLedColor(Color.kWheat);
+		m_leds.setDefaultCommand(m_leds.setLedColor(Constants.TEAM_COLOR));
 	}
 
 	private void configureBindings() {
@@ -85,8 +85,8 @@ public class RobotContainer {
 		// #endregion
 
 		// #region Operator Controlls
-		m_operatorController.povRight().onTrue(m_leds.setLedColor(Color.kYellow));
-		m_operatorController.povLeft().onTrue(m_leds.setLedColor(Color.kPurple));
+		m_operatorController.povRight().whileTrue(m_leds.setLedColor(Color.kYellow));
+		m_operatorController.povLeft().whileTrue(m_leds.setLedColor(Color.kPurple));
 
 		m_operatorController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)));
 		m_operatorController.povDown().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING)));
@@ -104,8 +104,6 @@ public class RobotContainer {
 				.onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
 
 		// m_operatorController.start().onTrue(substationToggle());
-		m_operatorController.back().onTrue(m_routines.SCORE_CONE_CHARGE_STATION_COMMUNITY);
-
 		// Handoff Cone Sequence
 		m_operatorController.a().onTrue(m_routines.HANDOFF());
 

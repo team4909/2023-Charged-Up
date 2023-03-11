@@ -1,6 +1,9 @@
 package frc.robot.subsystems.leds;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -17,10 +20,16 @@ public class LEDs extends SubsystemBase {
   private final int kledLength = 123;
   private final int kTopStripColumns = 6;
   private final int kFrontStripColumns = 3;
-  private final double kDarkenFactor = 5;
+  private final double kBrightnessCoeff = 1.03;
+  private final int kBrightnessLowerLimit = 30;
+  private final int kBrightnessUpperLimit = 40;
 
   private Function<Color, Color> darken = (Color color) -> {
-    return new Color(color.red / kDarkenFactor, color.green / kDarkenFactor, color.blue / kDarkenFactor);
+    return new Color(color.red / kBrightnessCoeff, color.green / kBrightnessCoeff, color.blue / kBrightnessCoeff);
+  };
+
+  private Function<Color, Color> lighten = (Color color) -> {
+    return new Color(color.red * kBrightnessCoeff, color.green * kBrightnessCoeff, color.blue * kBrightnessCoeff);
   };
 
   private LEDs() {
@@ -30,14 +39,58 @@ public class LEDs extends SubsystemBase {
     m_leds.start();
   }
 
-  public Command setBreatheColor(Color color) {
-
+  public Command setBreatheColor(Color initialColor) {
+    var currentColor = new Object() {
+      Color color = initialColor;
+      boolean shouldDarken = true;
+    };
     return Commands.run(() -> {
-      for (int i = 0; i < kledLength; i++) {
-        m_ledBuffer.setLED(i, color);
-      }
-    }, this);
+      for (int i = 0; i < kledLength; i++)
+        m_ledBuffer.setLED(i, currentColor.color);
+      Stream<Double> rgb = Stream.of(currentColor.color.red, currentColor.color.green, currentColor.color.blue);
+      if (currentColor.shouldDarken) {
+        if (rgb.filter(c -> (c * 255) <= (kBrightnessCoeff) + kBrightnessLowerLimit).count() > 1L)
+          currentColor.shouldDarken = false;
+        else
+          currentColor.color = darken.apply(currentColor.color);
+      } else {
+        if (rgb.filter(c -> (c * 255) <= (kBrightnessCoeff) + kBrightnessUpperLimit).count() > 1L)
+          currentColor.color = lighten.apply(currentColor.color);
+        else
+          currentColor.shouldDarken = true;
 
+      }
+
+      m_leds.setData(m_ledBuffer);
+    }, this)
+        .beforeStarting(() -> {
+          currentColor.color = initialColor;
+          currentColor.shouldDarken = true;
+        })
+        .ignoringDisable(true);
+
+  }
+
+  public Command setFlashColor(Color initialColor) {
+    var currentColor = new Object() {
+      Color color = initialColor;
+      boolean off = false;
+    };
+    return Commands.run(() -> {
+      for (int i = 0; i < kledLength; i++)
+        m_ledBuffer.setLED(i, currentColor.color);
+
+      if (currentColor.off) {
+        currentColor.color = Color.kBlack;
+        currentColor.off = false;
+      } else {
+        currentColor.color = initialColor;
+        currentColor.off = true;
+      }
+      m_leds.setData(m_ledBuffer);
+    }, this)
+        .beforeStarting(() -> currentColor.color = initialColor)
+        .ignoringDisable(true);
   }
 
   public Command setLedColor(Color color) {
@@ -48,6 +101,7 @@ public class LEDs extends SubsystemBase {
       }
       m_leds.setData(m_ledBuffer);
     }, this)
+        .andThen(Commands.none().repeatedly())
         .ignoringDisable(true);
 
   }
