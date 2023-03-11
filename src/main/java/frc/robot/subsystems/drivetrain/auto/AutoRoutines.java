@@ -45,6 +45,7 @@ public class AutoRoutines {
           HANDOFF()),
       SCORE_CONE(ElevatorStates.MID_CONE),
       loadTrajectory(new DriveTrajectory("TopNodeToChargeStation", false)));
+    // public final Auto TWO_PIECE_GRAB
 
   private Command loadTrajectory(DriveTrajectory traj) {
     return Commands.waitUntil(m_drivetrain.isTrajectoryFinished)
@@ -72,7 +73,7 @@ public class AutoRoutines {
         Commands.runOnce(() -> m_elevator.setState(extensionLevel)),
         Commands.waitSeconds(1.5),
         Commands.runOnce(() -> m_arm.setState(ArmStates.DROPPING)),
-        Commands.waitSeconds(0.25),
+        Commands.waitSeconds(0.75),
         m_claw.setState(ClawStates.OPEN),
         Commands.waitSeconds(0.2),
         Commands.runOnce(() -> m_arm.setState(ArmStates.RETRACTED)),
