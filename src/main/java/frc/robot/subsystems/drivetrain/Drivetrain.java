@@ -86,7 +86,8 @@ public class Drivetrain extends SubsystemBase {
         TRAJECTORY_DRIVE("Trajectory Drive"),
         PRECISE("Precise"),
         SNAP_TO_ANGLE("Snapping To Angle"),
-        AUTO_BALANCE("Auto Balance");
+        AUTO_BALANCE("Auto Balance"),
+        VISION_ALIGN("Vision Align");
 
         String stateName;
 
@@ -214,6 +215,9 @@ public class Drivetrain extends SubsystemBase {
                 case AUTO_BALANCE:
                     currentDrivetrainCommand = AutoBalance();
                     break;
+                case VISION_ALIGN:
+                    currentDrivetrainCommand = VisionAlign();
+                    break;
                 default:
                     m_state = DrivetrainStates.IDLE;
             }
@@ -326,9 +330,9 @@ public class Drivetrain extends SubsystemBase {
         balanceController.setIntegratorRange(0.01, 0.05);
         return new PIDCommand(
                 balanceController,
-                () -> m_pigeon.getRoll(), // "Roll" is actually our pitch for the default pigeon
+                () -> m_pigeon.getRoll(), // "Roll" is actually our pitch for the default pigeon configuration
                 () -> 0,
-                (output) -> {
+                output -> {
                     drive(ChassisSpeeds.fromFieldRelativeSpeeds(output, 0d, 0d, getGyroYaw()));
                     SmartDashboard.putNumber("Pitch PID Output", output);
                 },
@@ -339,6 +343,16 @@ public class Drivetrain extends SubsystemBase {
                     SmartDashboard.putBoolean("Is Balanced", balanceController.atSetpoint());
                 }));
     }
+
+    private Command VisionAlign() {
+        PIDController alignController = new PIDController(0.1, 0.0, 0.0);
+        return new PIDCommand(
+                alignController,
+                m_vision.xOffset,
+                () -> 0,
+                output -> drive(ChassisSpeeds.fromFieldRelativeSpeeds(0d, output, 0d, getGyroYaw())),
+                this);
+    }
     // #endregion
 
     public void resetPose(Pose2d pose) {
@@ -348,6 +362,10 @@ public class Drivetrain extends SubsystemBase {
     public void resetGyro(Rotation2d rot) {
         m_simChassisAngle = rot;
         m_pigeon.setYaw(rot.getDegrees());
+    }
+
+    public void setVisionPipeline(int pipeline) {
+        m_vision.changePipeline.accept(pipeline);
     }
 
     public Command zeroGyro() {

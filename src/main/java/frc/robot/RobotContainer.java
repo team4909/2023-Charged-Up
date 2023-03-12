@@ -76,11 +76,14 @@ public class RobotContainer {
 
 		m_driverController.rightTrigger().onTrue(m_intake.setState(IntakeStates.INTAKE_CONE))
 				.onFalse(m_intake.setState(IntakeStates.HANDOFF));
-		m_driverController.leftTrigger().onTrue(m_intake.setState(IntakeStates.INTAKE_CUBE))
-				.onFalse(m_intake.setState(IntakeStates.HANDOFF));
 		m_driverController.leftBumper().onTrue(m_intake.setState(IntakeStates.SPIT_CONE));
 		m_driverController.povDown().onTrue(m_intake.setState(IntakeStates.RETRACTED));
 		m_driverController.start().onTrue(m_intake.setState(IntakeStates.CALIBRATE));
+
+		m_driverController.povLeft().onTrue(Commands.runOnce(() -> m_drivetrain.setVisionPipeline(0)));
+		m_driverController.povRight().onTrue(Commands.runOnce(() -> m_drivetrain.setVisionPipeline(1)));
+		m_driverController.leftTrigger().onTrue(m_drivetrain.setState(DrivetrainStates.VISION_ALIGN))
+				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
 		// #endregion
 
 		// #region Operator Controlls
