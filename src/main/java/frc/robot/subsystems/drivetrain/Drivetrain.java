@@ -30,6 +30,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -346,16 +347,16 @@ public class Drivetrain extends SubsystemBase {
     }
 
     private Command VisionAlign() {
-        PIDController alignController = new PIDController(0.1, 0.0, 0.0);
+        PIDController alignController = new PIDController(0.03, 0.02, 0.0);
         return new PIDCommand(
                 alignController,
                 m_vision.xOffset,
-                () -> 0,
+                () -> 8,
                 output -> {
-                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(0d, -output, 0d, getGyroYaw()));
+                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(0d, output, 0d, getGyroYaw()));
                     SmartDashboard.putNumber("Drivetrain/vision align pid output", output);
                 },
-                this);
+                this).until(() -> (m_vision.xOffset.getAsDouble() == 0d));
     }
     // #endregion
 

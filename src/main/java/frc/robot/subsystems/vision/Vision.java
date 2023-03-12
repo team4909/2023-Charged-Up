@@ -48,7 +48,6 @@ public class Vision {
         if (visionResults().isPresent()) {
             SmartDashboard.putNumber("Vision/April Tag distance", LimelightHelpers.getTX("limelight"));
             return LimelightHelpers.getTX("limelight");
-
         }
         return 0d;
     }
