@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.limelight.LimelightHelpers;
 import frc.lib.limelight.LimelightHelpers.LimelightResults;
 import frc.robot.Constants;
@@ -45,7 +46,9 @@ public class Vision {
 
     private double getOffsetDistance() {
         if (visionResults().isPresent()) {
-            return LimelightHelpers.getTX("Limelight");
+            SmartDashboard.putNumber("Vision/April Tag distance", LimelightHelpers.getTX("limelight"));
+            return LimelightHelpers.getTX("limelight");
+
         }
         return 0d;
     }

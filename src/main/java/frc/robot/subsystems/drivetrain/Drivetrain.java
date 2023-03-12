@@ -136,8 +136,9 @@ public class Drivetrain extends SubsystemBase {
         }
 
         m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
-        if (m_vision.robotPose.get() != null && m_vision.latency.get() != null)
-            m_poseEstimator.addVisionMeasurement(m_vision.robotPose.get(), m_vision.latency.get());
+        // if (m_vision.robotPose.get() != null && m_vision.latency.get() != null)
+        // m_poseEstimator.addVisionMeasurement(m_vision.robotPose.get(),
+        // m_vision.latency.get());
 
         SmartDashboard.putString("DrivetrainState", m_state.toString());
         SmartDashboard.putBoolean("Joystick", isJoystickInputPresent());
@@ -350,7 +351,10 @@ public class Drivetrain extends SubsystemBase {
                 alignController,
                 m_vision.xOffset,
                 () -> 0,
-                output -> drive(ChassisSpeeds.fromFieldRelativeSpeeds(0d, output, 0d, getGyroYaw())),
+                output -> {
+                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(0d, -output, 0d, getGyroYaw()));
+                    SmartDashboard.putNumber("Drivetrain/vision align pid output", output);
+                },
                 this);
     }
     // #endregion
