@@ -48,7 +48,7 @@ public class Claw extends SubsystemBase {
         m_clawMotor.setIdleMode(IdleMode.kCoast);
         m_clawMotor.setInverted(false);
         m_clawMotor.setSmartCurrentLimit(10);
-        m_clawEncoder.setZeroOffset(0.78);
+        m_clawEncoder.setZeroOffset(0.93);
     }
 
     @Override

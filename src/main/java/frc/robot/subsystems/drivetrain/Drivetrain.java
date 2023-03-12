@@ -351,9 +351,9 @@ public class Drivetrain extends SubsystemBase {
         return new PIDCommand(
                 alignController,
                 m_vision.xOffset,
-                () -> 8,
+                () -> Units.inchesToMeters(23.5),
                 output -> {
-                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(0d, output, 0d, getGyroYaw()));
+                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(0d, 0d, 0d, getGyroYaw()));
                     SmartDashboard.putNumber("Drivetrain/vision align pid output", output);
                 },
                 this).until(() -> (m_vision.xOffset.getAsDouble() == 0d));

@@ -5,7 +5,10 @@ import java.util.function.DoubleSupplier;
 import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
+import org.photonvision.PhotonUtils;
+
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -46,10 +49,21 @@ public class Vision {
 
     private double getOffsetDistance() {
         if (visionResults().isPresent()) {
-            SmartDashboard.putNumber("Vision/April Tag distance", LimelightHelpers.getTX("limelight"));
-            return LimelightHelpers.getTX("limelight");
+            var tx = LimelightHelpers.getTX("limelight");
+            var ty = LimelightHelpers.getTY("limelight");
+            var dist = PhotonUtils.calculateDistanceToTargetMeters(Units.inchesToMeters(24d), Units.inchesToMeters(18d),
+                    0d, ty);
+            var horizontalDist = dist * Math.tan(Math.toRadians(tx));
+            SmartDashboard.putNumber("Vision/April Tag distance inches", Units.metersToInches(horizontalDist));
+            return horizontalDist;
         }
         return 0d;
     }
+
+    // private double getOffsetGoal() {
+    // if (LimelightHelpers.getCurrentPipelineIndex("limelight") == 2) {
+    // return
+    // }
+    // }
 
 }
