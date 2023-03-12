@@ -38,7 +38,6 @@ public class RobotContainer {
 	private final Claw m_claw = Claw.getInstance();
 	private final Drivetrain m_drivetrain = Drivetrain.getInstance();
 	private final Intake m_intake = Intake.getInstance();
-	private BooleanSupplier m_isHandingOff = () -> false;
 
 	public RobotContainer() {
 		configureBindings();

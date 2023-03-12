@@ -23,8 +23,7 @@ public class Claw extends SubsystemBase {
         IDLE("Idle"),
         CLOSED("Closed"),
         OPEN("Open"),
-        CUBE("Cube"),
-        CONE("Cone");
+        CUBE("Cube");
 
         String stateName;
 
@@ -73,9 +72,6 @@ public class Claw extends SubsystemBase {
                     currentClawCommand = SetClawPos(0.15);
                     break;
                 case CUBE:
-                    currentClawCommand = SetClawPos(0);
-                    break;
-                case CONE:
                     currentClawCommand = SetClawPos(0);
                     break;
                 default:
