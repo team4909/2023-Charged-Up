@@ -14,7 +14,6 @@ import frc.robot.subsystems.intake.Intake.IntakeStates;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-
   private RobotContainer m_robotContainer;
 
   @Override

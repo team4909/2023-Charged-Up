@@ -42,7 +42,7 @@ public class RobotContainer {
 	public RobotContainer() {
 		configureBindings();
 		configureSendableChooser();
-		m_leds.setDefaultCommand(m_leds.setLedColor(Constants.TEAM_COLOR));
+		m_leds.setDefaultCommand(m_leds.setBreatheColor(Constants.TEAM_COLOR));
 	}
 
 	private void configureBindings() {
