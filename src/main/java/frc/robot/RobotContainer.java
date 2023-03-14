@@ -2,7 +2,6 @@ package frc.robot;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -42,7 +41,7 @@ public class RobotContainer {
 	public RobotContainer() {
 		configureBindings();
 		configureSendableChooser();
-		m_leds.setDefaultCommand(m_leds.setBreatheColor(Constants.TEAM_COLOR));
+		m_leds.setDefaultCommand(m_leds.setBreatheColor(new Color(0, 255, 0)));
 	}
 
 	private void configureBindings() {
@@ -80,7 +79,7 @@ public class RobotContainer {
 				.onFalse(m_intake.setState(IntakeStates.HANDOFF));
 		m_driverController.leftBumper().onTrue(m_intake.setState(IntakeStates.SPIT_CONE));
 		m_driverController.povDown().onTrue(m_intake.setState(IntakeStates.RETRACTED));
-		m_driverController.start().onTrue(m_intake.setState(IntakeStates.CALIBRATE));
+		m_driverController.start().onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY));
 		// #endregion
 
 		// #region Operator Controlls

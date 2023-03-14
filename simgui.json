@@ -65,6 +65,7 @@
             255.0
           ]
         },
+        "image": "D:\\VisualCodeProjects\\2023-Charged-Up\\res\\2023-field_1.png",
         "traj": {
           "arrowColor": [
             1.0,
@@ -102,13 +103,7 @@
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
-        "Elevator": {
-          "open": true
-        },
-        "Intake": {
-          "open": true
-        },
-        "Wrist": {
+        "Drivetrain": {
           "open": true
         },
         "open": true

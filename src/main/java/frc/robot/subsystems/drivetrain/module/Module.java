@@ -30,9 +30,9 @@ public final class Module {
 
     public void update() {
         m_module.updateModuleInputs();
-        SmartDashboard.putNumber("Encoder " + m_index, m_module.turnAbsolutePosition);
-        SmartDashboard.putString("State " + m_index, getModuleState().toString());
-        SmartDashboard.putString("Pos " + m_index, getModulePosition().toString());
+        SmartDashboard.putNumber("Drivetrain/Module/Encoder " + m_index, m_module.turnAbsolutePosition);
+        SmartDashboard.putString("Drivetrain/Module/State " + m_index, getModuleState().toString());
+        SmartDashboard.putString("Drivetrain/Module/Position " + m_index, getModulePosition().toString());
     }
 
     public void set(SwerveModuleState desiredstate) {
@@ -42,8 +42,6 @@ public final class Module {
             m_module.setTurn(
                     m_simTurnPID.calculate(getModuleAngle().getRadians(), optimizedDesiredState.angle.getRadians()));
         } else {
-            // optimizedDesiredState = SwerveModuleState.optimize(desiredstate,
-            // getModuleAngle());
             optimizedDesiredState = CTREModuleState.optimize(desiredstate, getModuleState().angle);
             m_module.setTurn(convertDegreesToTicks(optimizedDesiredState.angle.getDegrees()));
         }
@@ -62,7 +60,6 @@ public final class Module {
     }
 
     private double getVelocityMetersPerSec() {
-        // return m_module.driveVelocityRadPerSec * m_wheelRadius;
         return m_module.driveVelocityRadPerSec;
     }
 

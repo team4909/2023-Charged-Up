@@ -31,7 +31,6 @@ public class AutoRoutines {
   public final Auto SCORE_CONE_CHARGE_STATION_COMMUNITY = new Auto(
       SCORE_CONE(ElevatorStates.TOP),
       loadTrajectory(new DriveTrajectory("ChargeStationStraight", true, 1.5)),
-      // loadTrajectory(new DriveTrajectory("PastChargeStation", false)),
       loadTrajectory(new DriveTrajectory("BackChargeStation", false, 1.5)),
       m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
   public final Auto ONE_PIECE_CHARGE_STATION = new Auto(
@@ -45,7 +44,7 @@ public class AutoRoutines {
           HANDOFF()),
       SCORE_CONE(ElevatorStates.MID_CONE),
       loadTrajectory(new DriveTrajectory("TopNodeToChargeStation", false)));
-    // public final Auto TWO_PIECE_GRAB
+  // public final Auto TWO_PIECE_GRAB
 
   private Command loadTrajectory(DriveTrajectory traj) {
     return Commands.waitUntil(m_drivetrain.isTrajectoryFinished)

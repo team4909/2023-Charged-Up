@@ -46,341 +46,350 @@ import frc.robot.subsystems.vision.Vision;
 
 public class Drivetrain extends SubsystemBase {
 
-    // #region Fields
-    private static Drivetrain m_instance = null;
+  // #region Fields
+  private static Drivetrain m_instance = null;
 
-    private final Module[] m_modules = new Module[4]; // 0-FL 1-FR 2-BL 3-BR
-    private final Field2d m_field = new Field2d();
+  private final Module[] m_modules = new Module[4]; // 0-FL 1-FR 2-BL 3-BR
+  private final Field2d m_field = new Field2d();
 
-    private DrivetrainStates m_state = DrivetrainStates.IDLE;
-    private DrivetrainStates m_lastState;
-    private HashMap<String, ?> m_stateArgs;
+  private DrivetrainStates m_state = DrivetrainStates.IDLE;
+  private DrivetrainStates m_lastState;
+  private HashMap<String, ?> m_stateArgs;
 
-    private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
-    private Rotation2d m_simChassisAngle = new Rotation2d();
-    private DoubleSupplier m_joystickTranslationX, m_joystickTranslationY, m_joystickRotationOmega;
-    private SwerveDrivePoseEstimator m_poseEstimator;
-    private Pose2d m_pose;
+  private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds();
+  private Rotation2d m_simChassisAngle = new Rotation2d();
+  private DoubleSupplier m_joystickTranslationX, m_joystickTranslationY, m_joystickRotationOmega;
+  private SwerveDrivePoseEstimator m_poseEstimator;
+  private Pose2d m_pose;
 
-    private final Pigeon2 m_pigeon = new Pigeon2(DrivetrainConstants.PIGEON_ID);
-    private final Translation2d[] m_moduleTranslations = new Translation2d[] {
-            new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0), // FL
-            new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0), // FR
-            new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0), // BL
-            new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0) // BR
-    };
-    private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(m_moduleTranslations);
-    private final double MAX_ANGULAR_SPEED = 4;
-    private final Vision m_vision = new Vision();
+  private final Pigeon2 m_pigeon = new Pigeon2(DrivetrainConstants.PIGEON_ID);
+  private final Translation2d[] m_moduleTranslations = new Translation2d[] {
+      new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0), // FL
+      new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0), // FR
+      new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0), // BL
+      new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0) // BR
+  };
+  private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(m_moduleTranslations);
+  private final double MAX_ANGULAR_SPEED = 4;
+  private final Vision m_vision = new Vision();
 
-    private Consumer<SwerveModuleState[]> m_swerveModuleConsumer = (states) -> drive(
-            m_kinematics.toChassisSpeeds(states));
-    private Supplier<Pose2d> m_poseSupplier = () -> m_pose;
-    // #endregion
+  private Consumer<SwerveModuleState[]> m_swerveModuleConsumer = (states) -> drive(
+      m_kinematics.toChassisSpeeds(states));
+  private Supplier<Pose2d> m_poseSupplier = () -> m_pose;
+  // #endregion
 
-    public BooleanSupplier isTrajectoryFinished = () -> !m_state.equals(DrivetrainStates.TRAJECTORY_DRIVE);
+  public BooleanSupplier isTrajectoryFinished = () -> !m_state.equals(DrivetrainStates.TRAJECTORY_DRIVE);
 
-    public enum DrivetrainStates {
-        IDLE("Idle"),
-        JOYSTICK_DRIVE("Joystick Drive"),
-        TRAJECTORY_DRIVE("Trajectory Drive"),
-        PRECISE("Precise"),
-        SNAP_TO_ANGLE("Snapping To Angle"),
-        AUTO_BALANCE("Auto Balance");
+  public enum DrivetrainStates {
+    IDLE("Idle"),
+    JOYSTICK_DRIVE("Joystick Drive"),
+    TRAJECTORY_DRIVE("Trajectory Drive"),
+    ON_THE_FLY_TRAJECTORY("On The Fly Trajectory"),
+    PRECISE("Precise"),
+    SNAP_TO_ANGLE("Snapping To Angle"),
+    AUTO_BALANCE("Auto Balance");
 
-        String stateName;
+    String stateName;
 
-        private DrivetrainStates(String name) {
-            this.stateName = name;
-        }
-
-        public String toString() {
-            return this.stateName;
-        }
+    private DrivetrainStates(String name) {
+      this.stateName = name;
     }
 
-    private Drivetrain() {
-        m_pigeon.clearStickyFaults();
-        m_pigeon.setYaw(180);
-        for (int i = 0; i < m_modules.length; i++)
-            m_modules[i] = new Module(i);
-        m_pose = new Pose2d();
-        // Using default std deviations values
-        m_poseEstimator = new SwerveDrivePoseEstimator(m_kinematics, getGyroYaw(), getSwerveModulePositions(), m_pose,
-                new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1),
-                new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.9, 0.9, 0.9));
-        SmartDashboard.putData(m_field);
+    public String toString() {
+      return this.stateName;
+    }
+  }
+
+  private Drivetrain() {
+    m_pigeon.clearStickyFaults();
+    m_pigeon.setYaw(180);
+    for (int i = 0; i < m_modules.length; i++)
+      m_modules[i] = new Module(i);
+    m_pose = new Pose2d();
+    // Using default std deviations values
+    m_poseEstimator = new SwerveDrivePoseEstimator(m_kinematics, getGyroYaw(), getSwerveModulePositions(), m_pose,
+        new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1),
+        new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.9, 0.9, 0.9));
+    SmartDashboard.putData(m_field);
+  }
+
+  @Override
+  public void periodic() {
+    stateMachine();
+    m_field.setRobotPose(m_pose);
+
+    final double dt = Constants.PERIODIC_LOOP_DURATION;
+
+    Twist2d dModuleState = new Pose2d()
+        .log(new Pose2d(
+            m_chassisSpeeds.vxMetersPerSecond * dt,
+            m_chassisSpeeds.vyMetersPerSecond * dt,
+            new Rotation2d(
+                m_chassisSpeeds.omegaRadiansPerSecond * dt)));
+    m_simChassisAngle = m_simChassisAngle.plus(new Rotation2d(dModuleState.dtheta));
+    SwerveModuleState[] setpointModuleStates = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(setpointModuleStates, DrivetrainConstants.MAX_DRIVETRAIN_SPEED);
+
+    for (int i = 0; i < 4; i++) {
+      m_modules[i].update();
+      m_modules[i].set(setpointModuleStates[i]);
     }
 
-    @Override
-    public void periodic() {
-        stateMachine();
-        m_field.setRobotPose(m_pose);
+    m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
+    if (m_vision.getAllianceRelativePose() != null && m_vision.latency.get() != null)
+      m_poseEstimator.addVisionMeasurement(m_vision.getAllianceRelativePose(), m_vision.latency.get());
 
-        final double dt = Constants.PERIODIC_LOOP_DURATION;
+    SmartDashboard.putString("Drivetrain/State", m_state.toString());
+    SmartDashboard.putBoolean("Drivetrain/Joystick Input", isJoystickInputPresent());
+    SmartDashboard.putNumber("Drivetrain/Gyro Angle", getGyroYaw().getDegrees());
+    SmartDashboard.putNumber("Drivetrain/Pose X", m_pose.getX());
+    SmartDashboard.putNumber("Drivetrain/Pose Y", m_pose.getY());
+    SmartDashboard.putNumber("Drivetrain/Pose Theta", m_pose.getRotation().getDegrees());
+  }
 
-        Twist2d dModuleState = new Pose2d()
-                .log(new Pose2d(
-                        m_chassisSpeeds.vxMetersPerSecond * dt,
-                        m_chassisSpeeds.vyMetersPerSecond * dt,
-                        new Rotation2d(
-                                m_chassisSpeeds.omegaRadiansPerSecond * dt)));
-        m_simChassisAngle = m_simChassisAngle.plus(new Rotation2d(dModuleState.dtheta));
-        SwerveModuleState[] setpointModuleStates = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(setpointModuleStates, DrivetrainConstants.MAX_DRIVETRAIN_SPEED);
+  public void setFieldTrajectory(Trajectory t) {
+    m_field.getObject("traj").setTrajectory(t);
+  }
 
-        for (int i = 0; i < 4; i++) {
-            m_modules[i].update();
-            m_modules[i].set(setpointModuleStates[i]);
-        }
+  public SwerveDriveKinematics getKinematics() {
+    return m_kinematics;
+  }
 
-        m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
-        if (m_vision.robotPose.get() != null && m_vision.latency.get() != null)
-            m_poseEstimator.addVisionMeasurement(m_vision.robotPose.get(), m_vision.latency.get());
+  private Rotation2d getGyroYaw() {
+    return Constants.SIM ? m_simChassisAngle : Rotation2d.fromDegrees(m_pigeon.getYaw());
+  }
 
-        SmartDashboard.putString("DrivetrainState", m_state.toString());
-        SmartDashboard.putBoolean("Joystick", isJoystickInputPresent());
+  private SwerveModulePosition[] getSwerveModulePositions() {
+    SwerveModulePosition[] positions = new SwerveModulePosition[4];
+    for (int i = 0; i < m_modules.length; i++)
+      positions[i] = m_modules[i].getModulePosition();
+    return positions;
+  }
+
+  public void setJoystickSuppliers(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega) {
+    m_joystickTranslationX = x;
+    m_joystickTranslationY = y;
+    m_joystickRotationOmega = omega;
+  }
+
+  private boolean isJoystickInputPresent() {
+    return !Stream
+        .of(m_joystickTranslationX.getAsDouble(), m_joystickTranslationY.getAsDouble(),
+            m_joystickRotationOmega.getAsDouble())
+        .filter((input) -> deadband(input, DrivetrainConstants.DEADBAND) != 0)
+        .collect(Collectors.toList()).isEmpty();
+  }
+
+  private void drive(ChassisSpeeds chassisSpeeds) {
+    m_chassisSpeeds = chassisSpeeds;
+  }
+
+  private void stateMachine() {
+    Command currentDrivetrainCommand = null;
+    if (!m_state.equals(m_lastState)) {
+      switch (m_state) {
+        case IDLE:
+          currentDrivetrainCommand = StopIdle().repeatedly().until(this::isJoystickInputPresent)
+              .finallyDo((interrupted) -> {
+                if (!interrupted)
+                  setState(DrivetrainStates.JOYSTICK_DRIVE).schedule();
+              });
+          break;
+        case JOYSTICK_DRIVE:
+          currentDrivetrainCommand = JoystickDrive(1d, 1d, DrivetrainConstants.DEADBAND)
+              .until(() -> !isJoystickInputPresent())
+              .finallyDo((interrupted) -> {
+                if (!interrupted)
+                  setState(DrivetrainStates.IDLE).schedule();
+              });
+          break;
+        case TRAJECTORY_DRIVE:
+          currentDrivetrainCommand = TrajectoryDrive(
+              (PathPlannerTrajectory) m_stateArgs.get("Trajectory"),
+              (boolean) m_stateArgs.get("IsFirstPath"))
+              .andThen(setState(DrivetrainStates.IDLE));
+          break;
+        case ON_THE_FLY_TRAJECTORY:
+          currentDrivetrainCommand = TrajectoryDrive(m_vision.generateOnTheFlyTrajectory(5), false);
+          break;
+        case PRECISE:
+          currentDrivetrainCommand = JoystickDrive(DrivetrainConstants.PRECISE_SPEED_SCALE,
+              DrivetrainConstants.PRECISE_SPEED_SCALE, DrivetrainConstants.DEADBAND / 2d);
+          break;
+        case SNAP_TO_ANGLE:
+          currentDrivetrainCommand = SnapToAngle((double) m_stateArgs.get("Angle"));
+          break;
+        case AUTO_BALANCE:
+          currentDrivetrainCommand = AutoBalance();
+          break;
+        default:
+          m_state = DrivetrainStates.IDLE;
+      }
     }
 
-    public void setFieldTrajectory(Trajectory t) {
-        m_field.getObject("traj").setTrajectory(t);
+    m_lastState = m_state;
+
+    if (currentDrivetrainCommand != null) {
+      currentDrivetrainCommand.schedule();
     }
+  }
 
-    public SwerveDriveKinematics getKinematics() {
-        return m_kinematics;
+  public Command setState(DrivetrainStates state) {
+    return new InstantCommand(() -> m_state = state);
+  }
+
+  public Command setState(DrivetrainStates state, HashMap<String, ?> stateArgs) {
+    return new InstantCommand(() -> {
+      m_state = state;
+      m_stateArgs = stateArgs;
+    });
+  }
+
+  // #region State Commands
+  private Command JoystickDrive(double linearSpeedScale, double angularSpeedScale, double deadband) {
+    return new RunCommand(
+        () -> {
+          final double x = -m_joystickTranslationX.getAsDouble();
+          final double y = -m_joystickTranslationY.getAsDouble();
+          final Rotation2d theta = new Rotation2d(x, y);
+          double magnitude = Math.hypot(x, y);
+          double omega = -m_joystickRotationOmega.getAsDouble();
+
+          magnitude = deadband(magnitude, deadband);
+          omega = deadband(omega, deadband);
+          magnitude = cubeAxis(magnitude);
+          omega = cubeAxis(omega);
+
+          magnitude *= linearSpeedScale;
+          omega *= angularSpeedScale;
+
+          Translation2d linearVelocity = new Pose2d(new Translation2d(), theta)
+              .transformBy(new Transform2d(new Translation2d(magnitude, 0d), new Rotation2d()))
+              .getTranslation();
+
+          drive(ChassisSpeeds.fromFieldRelativeSpeeds(
+              (isJoystickInputPresent() ? linearVelocity.getX() : 0)
+                  * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
+              (isJoystickInputPresent() ? linearVelocity.getY() : 0)
+                  * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
+              omega * MAX_ANGULAR_SPEED,
+              getGyroYaw()));
+        },
+        this);
+
+  }
+
+  private Command StopIdle() {
+    return new InstantCommand(
+        () -> drive(new ChassisSpeeds()), this);
+  }
+
+  private Command TrajectoryDrive(PathPlannerTrajectory trajectory, boolean isFirstPath) {
+    return new InstantCommand(() -> {
+      final PathPlannerTrajectory transformedTrajectory = PathPlannerTrajectory
+          .transformTrajectoryForAlliance(trajectory, DriverStation.getAlliance());
+      if (isFirstPath) {
+        resetGyro(trajectory.getInitialHolonomicPose().getRotation());
+        resetPose(transformedTrajectory.getInitialHolonomicPose());
+      }
+      setFieldTrajectory(transformedTrajectory);
+    }).andThen(
+        new PPSwerveControllerCommand(
+            trajectory,
+            m_poseSupplier,
+            getKinematics(),
+            new PIDController(5, 0, 0),
+            new PIDController(5, 0, 0),
+            new PIDController(4, 0, 0.2),
+            m_swerveModuleConsumer,
+            true,
+            this)
+            .withTimeout(trajectory.getTotalTimeSeconds()));
+  }
+
+  private Command SnapToAngle(double angle) {
+    PIDController snapPID = new PIDController(0.012, 0.0, 0.0);
+    snapPID.enableContinuousInput(-180, 180);
+    snapPID.setSetpoint(angle);
+    return new RunCommand(
+        () -> {
+          double omega = snapPID.calculate(
+              (MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180)),
+              snapPID.getSetpoint());
+          drive(ChassisSpeeds.fromFieldRelativeSpeeds(
+              isJoystickInputPresent()
+                  ? -m_joystickTranslationX.getAsDouble() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED
+                  : 0,
+              isJoystickInputPresent()
+                  ? -m_joystickTranslationY.getAsDouble() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED
+                  : 0,
+              (m_joystickRotationOmega.getAsDouble() + omega) * MAX_ANGULAR_SPEED, getGyroYaw()));
+        },
+        this).andThen(() -> snapPID.close());
+  }
+
+  private Command AutoBalance() {
+    // All values tuned by hand, works well enough - do not touch
+    PIDController balanceController = new PIDController(0.03, 0.02, 0.002);
+    balanceController.setTolerance(6d);
+    balanceController.setIntegratorRange(0.01, 0.05);
+    return new PIDCommand(
+        balanceController,
+        () -> m_pigeon.getRoll(), // "Roll" is actually our pitch for the default pigeon configuration
+        () -> 0,
+        (output) -> {
+          drive(ChassisSpeeds.fromFieldRelativeSpeeds(output, 0d, 0d, getGyroYaw()));
+          SmartDashboard.putNumber("Pitch PID Output", output);
+        },
+        this)
+        .alongWith(Commands.run(() -> {
+          SmartDashboard.putNumber("Pitch", m_pigeon.getRoll());
+          SmartDashboard.putNumber("Pitch PID Error", balanceController.getPositionError());
+          SmartDashboard.putBoolean("Is Balanced", balanceController.atSetpoint());
+        }));
+  }
+  // #endregion
+
+  public void resetPose(Pose2d pose) {
+    m_poseEstimator.resetPosition(getGyroYaw(), getSwerveModulePositions(), pose);
+  }
+
+  public void resetGyro(Rotation2d rot) {
+    m_simChassisAngle = rot;
+    m_pigeon.setYaw(rot.getDegrees());
+  }
+
+  public Command zeroGyro() {
+    return new InstantCommand(() -> m_pigeon.setYaw(0d));
+  }
+
+  private double deadband(double value, double deadband) {
+    if (Math.abs(value) > deadband) {
+      if (value > 0d)
+        return (value - deadband) / (1d - deadband);
+      else
+        return (value + deadband) / (1d - deadband);
+    } else {
+      return 0d;
     }
+  }
 
-    private Rotation2d getGyroYaw() {
-        return Constants.SIM ? m_simChassisAngle : Rotation2d.fromDegrees(m_pigeon.getYaw());
+  private double cubeAxis(double value) {
+    // Copy sign in case we want to switch code to squared axis later
+    return Math.copySign(Math.pow(value, 3), value);
+  }
+
+  public void resetModules() {
+    for (Module module : m_modules) {
+      module.resetTurn();
     }
+  }
 
-    private SwerveModulePosition[] getSwerveModulePositions() {
-        SwerveModulePosition[] positions = new SwerveModulePosition[4];
-        for (int i = 0; i < m_modules.length; i++)
-            positions[i] = m_modules[i].getModulePosition();
-        return positions;
+  public static Drivetrain getInstance() {
+    if (m_instance == null) {
+      m_instance = new Drivetrain();
     }
-
-    public void setJoystickSuppliers(DoubleSupplier x, DoubleSupplier y, DoubleSupplier omega) {
-        m_joystickTranslationX = x;
-        m_joystickTranslationY = y;
-        m_joystickRotationOmega = omega;
-    }
-
-    private boolean isJoystickInputPresent() {
-        return !Stream
-                .of(m_joystickTranslationX.getAsDouble(), m_joystickTranslationY.getAsDouble(),
-                        m_joystickRotationOmega.getAsDouble())
-                .filter((input) -> deadband(input, DrivetrainConstants.DEADBAND) != 0)
-                .collect(Collectors.toList()).isEmpty();
-    }
-
-    private void drive(ChassisSpeeds chassisSpeeds) {
-        m_chassisSpeeds = chassisSpeeds;
-    }
-
-    private void stateMachine() {
-        Command currentDrivetrainCommand = null;
-        if (!m_state.equals(m_lastState)) {
-            switch (m_state) {
-                case IDLE:
-                    currentDrivetrainCommand = StopIdle().repeatedly().until(this::isJoystickInputPresent)
-                            .finallyDo((interrupted) -> {
-                                if (!interrupted)
-                                    setState(DrivetrainStates.JOYSTICK_DRIVE).schedule();
-                            });
-                    break;
-                case JOYSTICK_DRIVE:
-                    currentDrivetrainCommand = JoystickDrive(1d, 1d, DrivetrainConstants.DEADBAND)
-                            .until(() -> !isJoystickInputPresent())
-                            .finallyDo((interrupted) -> {
-                                if (!interrupted)
-                                    setState(DrivetrainStates.IDLE).schedule();
-                            });
-                    break;
-                case TRAJECTORY_DRIVE:
-                    currentDrivetrainCommand = TrajectoryDrive(
-                            (PathPlannerTrajectory) m_stateArgs.get("Trajectory"),
-                            (boolean) m_stateArgs.get("IsFirstPath"))
-                            .andThen(setState(DrivetrainStates.IDLE));
-                    break;
-                case PRECISE:
-                    currentDrivetrainCommand = JoystickDrive(DrivetrainConstants.PRECISE_SPEED_SCALE,
-                            DrivetrainConstants.PRECISE_SPEED_SCALE, DrivetrainConstants.DEADBAND / 2d);
-                    break;
-                case SNAP_TO_ANGLE:
-                    currentDrivetrainCommand = SnapToAngle((double) m_stateArgs.get("Angle"));
-                    break;
-                case AUTO_BALANCE:
-                    currentDrivetrainCommand = AutoBalance();
-                    break;
-                default:
-                    m_state = DrivetrainStates.IDLE;
-            }
-        }
-
-        m_lastState = m_state;
-
-        if (currentDrivetrainCommand != null) {
-            currentDrivetrainCommand.schedule();
-        }
-    }
-
-    public Command setState(DrivetrainStates state) {
-        return new InstantCommand(() -> m_state = state);
-    }
-
-    public Command setState(DrivetrainStates state, HashMap<String, ?> stateArgs) {
-        return new InstantCommand(() -> {
-            m_state = state;
-            m_stateArgs = stateArgs;
-        });
-    }
-
-    // #region State Commands
-    private Command JoystickDrive(double linearSpeedScale, double angularSpeedScale, double deadband) {
-        return new RunCommand(
-                () -> {
-                    final double x = -m_joystickTranslationX.getAsDouble();
-                    final double y = -m_joystickTranslationY.getAsDouble();
-                    final Rotation2d theta = new Rotation2d(x, y);
-                    double magnitude = Math.hypot(x, y);
-                    double omega = -m_joystickRotationOmega.getAsDouble();
-
-                    magnitude = deadband(magnitude, deadband);
-                    omega = deadband(omega, deadband);
-                    magnitude = cubeAxis(magnitude);
-                    omega = cubeAxis(omega);
-
-                    magnitude *= linearSpeedScale;
-                    omega *= angularSpeedScale;
-
-                    Translation2d linearVelocity = new Pose2d(new Translation2d(), theta)
-                            .transformBy(new Transform2d(new Translation2d(magnitude, 0d), new Rotation2d()))
-                            .getTranslation();
-
-                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(
-                            (isJoystickInputPresent() ? linearVelocity.getX() : 0)
-                                    * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
-                            (isJoystickInputPresent() ? linearVelocity.getY() : 0)
-                                    * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
-                            omega * MAX_ANGULAR_SPEED,
-                            getGyroYaw()));
-                },
-                this);
-
-    }
-
-    private Command StopIdle() {
-        return new InstantCommand(
-                () -> drive(new ChassisSpeeds()), this);
-    }
-
-    private Command TrajectoryDrive(PathPlannerTrajectory trajectory, boolean isFirstPath) {
-        return new InstantCommand(() -> {
-            if (isFirstPath) {
-                resetPose(PathPlannerTrajectory.transformTrajectoryForAlliance(trajectory, DriverStation.getAlliance())
-                        .getInitialHolonomicPose());
-                // resetGyro(trajectory.getInitialHolonomicPose().getRotation());
-            }
-            setFieldTrajectory(trajectory);
-        }).andThen(
-                new PPSwerveControllerCommand(
-                        trajectory,
-                        m_poseSupplier,
-                        getKinematics(),
-                        new PIDController(5, 0, 0),
-                        new PIDController(5, 0, 0),
-                        new PIDController(4, 0, 0.2),
-                        m_swerveModuleConsumer,
-                        true,
-                        this)
-                        .withTimeout(trajectory.getTotalTimeSeconds()));
-    }
-
-    private Command SnapToAngle(double angle) {
-        PIDController snapPID = new PIDController(0.012, 0.0, 0.0);
-        snapPID.enableContinuousInput(-180, 180);
-        snapPID.setSetpoint(angle);
-        return new RunCommand(
-                () -> {
-                    double omega = snapPID.calculate(
-                            (MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180)),
-                            snapPID.getSetpoint());
-                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(
-                            isJoystickInputPresent()
-                                    ? -m_joystickTranslationX.getAsDouble() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED
-                                    : 0,
-                            isJoystickInputPresent()
-                                    ? -m_joystickTranslationY.getAsDouble() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED
-                                    : 0,
-                            (m_joystickRotationOmega.getAsDouble() + omega) * MAX_ANGULAR_SPEED, getGyroYaw()));
-                },
-                this).andThen(() -> snapPID.close());
-    }
-
-    private Command AutoBalance() {
-        // All values tuned by hand, works well enough - do not touch
-        PIDController balanceController = new PIDController(0.03, 0.02, 0.002);
-        balanceController.setTolerance(6d);
-        balanceController.setIntegratorRange(0.01, 0.05);
-        return new PIDCommand(
-                balanceController,
-                () -> m_pigeon.getRoll(), // "Roll" is actually our pitch for the default pigeon
-                () -> 0,
-                (output) -> {
-                    drive(ChassisSpeeds.fromFieldRelativeSpeeds(output, 0d, 0d, getGyroYaw()));
-                    SmartDashboard.putNumber("Pitch PID Output", output);
-                },
-                this)
-                .alongWith(Commands.run(() -> {
-                    SmartDashboard.putNumber("Pitch", m_pigeon.getRoll());
-                    SmartDashboard.putNumber("Pitch PID Error", balanceController.getPositionError());
-                    SmartDashboard.putBoolean("Is Balanced", balanceController.atSetpoint());
-                }));
-    }
-    // #endregion
-
-    public void resetPose(Pose2d pose) {
-        m_poseEstimator.resetPosition(getGyroYaw(), getSwerveModulePositions(), pose);
-    }
-
-    public void resetGyro(Rotation2d rot) {
-        m_simChassisAngle = rot;
-        m_pigeon.setYaw(rot.getDegrees());
-    }
-
-    public Command zeroGyro() {
-        return new InstantCommand(() -> m_pigeon.setYaw(0d));
-    }
-
-    private double deadband(double value, double deadband) {
-        if (Math.abs(value) > deadband) {
-            if (value > 0d)
-                return (value - deadband) / (1d - deadband);
-            else
-                return (value + deadband) / (1d - deadband);
-        } else {
-            return 0d;
-        }
-    }
-
-    private double cubeAxis(double value) {
-        // Copy sign in case we want to switch code to squared axis later
-        return Math.copySign(Math.pow(value, 3), value);
-    }
-
-    public void resetModules() {
-        for (Module module : m_modules) {
-            module.resetTurn();
-        }
-    }
-
-    public static Drivetrain getInstance() {
-        if (m_instance == null) {
-            m_instance = new Drivetrain();
-        }
-        return m_instance;
-    }
+    return m_instance;
+  }
 
 }

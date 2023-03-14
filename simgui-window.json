@@ -1,7 +1,7 @@
 {
   "Docking": {
     "Data": [
-      "DockNode    ID=0x00000001 Pos=230,34 Size=1320,280 Split=X",
+      "DockNode    ID=0x00000001 Pos=236,30 Size=1320,280 Split=X",
       "DockNode  ID=0x00000002 Parent=0x00000001 SizeRef=486,283 Selected=0x2D9B9756",
       "DockNode  ID=0x00000003 Parent=0x00000001 SizeRef=426,283 Selected=0x73586B9A",
       "DockNode    ID=0x00000004 Pos=554,777 Size=862,197 Split=X",
@@ -27,7 +27,7 @@
   "Table": {
     "0x542B5671,2": {
       "Column 0  Width": "245",
-      "Column 1  Width": "134",
+      "Column 1  Width": "191",
       "RefScale": "13"
     }
   },
@@ -56,7 +56,7 @@
     },
     "###Addressable LEDs": {
       "Collapsed": "0",
-      "Pos": "94,491",
+      "Pos": "97,501",
       "Size": "142,400"
     },
     "###FMS": {
@@ -73,7 +73,7 @@
     "###NetworkTables": {
       "Collapsed": "0",
       "DockId": "0x00000002,0",
-      "Pos": "230,34",
+      "Pos": "236,30",
       "Size": "702,280"
     },
     "###Other Devices": {
@@ -89,19 +89,19 @@
     "###Plot <0>": {
       "Collapsed": "0",
       "DockId": "0x00000003,0",
-      "Pos": "934,34",
+      "Pos": "940,30",
       "Size": "616,280"
     },
     "###Plot <1>": {
       "Collapsed": "0",
       "DockId": "0x00000003,1",
-      "Pos": "934,34",
+      "Pos": "940,30",
       "Size": "616,280"
     },
     "###Plot <2>": {
       "Collapsed": "0",
       "DockId": "0x00000003,2",
-      "Pos": "934,34",
+      "Pos": "940,30",
       "Size": "616,280"
     },
     "###RoboRIO": {

@@ -54,8 +54,8 @@ public class Claw extends SubsystemBase {
     @Override
     public void periodic() {
         stateMachine();
-        SmartDashboard.putString("Claw State", m_state.toString());
-        SmartDashboard.putNumber("Claw Position", m_clawEncoder.getPosition());
+        SmartDashboard.putString("Claw/State", m_state.toString());
+        SmartDashboard.putNumber("Claw/Encoder Position", m_clawEncoder.getPosition());
     }
 
     private void stateMachine() {
@@ -92,7 +92,7 @@ public class Claw extends SubsystemBase {
 
     private Command SetClawPos(double setpoint) {
         return new InstantCommand(() -> {
-            SmartDashboard.putNumber("Claw setpoint", setpoint);
+            SmartDashboard.putNumber("Claw/Setpoint", setpoint);
             m_clawMotor.getPIDController().setReference(setpoint, ControlType.kPosition);
         }, this);
     }

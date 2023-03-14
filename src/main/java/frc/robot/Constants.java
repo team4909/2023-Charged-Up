@@ -4,9 +4,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 
 public final class Constants {
@@ -14,7 +12,6 @@ public final class Constants {
     public static final boolean SIM = RobotBase.isSimulation();
     public static final double PERIODIC_LOOP_DURATION = 0.02;
     public static final String CANFD_BUS = "CANivore1";
-    public static final Alliance ALLIANCE = DriverStation.getAlliance();
     public static final Color TEAM_COLOR = new Color(0, 255, 0);
 
     public static final class VisionConstants {
