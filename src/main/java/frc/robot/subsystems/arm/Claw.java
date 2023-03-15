@@ -9,6 +9,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClawConstants;
@@ -98,7 +99,7 @@ public class Claw extends SubsystemBase {
     }
 
     public Command setState(ClawStates state) {
-        return new InstantCommand(() -> m_state = state);
+        return Commands.runOnce(() -> m_state = state);
     }
 
     public static Claw getInstance() {

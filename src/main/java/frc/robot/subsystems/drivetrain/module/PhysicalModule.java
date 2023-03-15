@@ -23,7 +23,6 @@ public final class PhysicalModule extends ModuleBase {
     private final double m_encoderOffset;
 
     private final double TICKS_PER_ROTATION = 2048d;
-    private final double nominalVoltage = 12d;
     private final SimpleMotorFeedforward m_driveFeedforward;
 
     public PhysicalModule(int index) {
@@ -87,7 +86,8 @@ public final class PhysicalModule extends ModuleBase {
     void setDriveVolts(double volts) {
         var ffVolts = m_driveFeedforward
                 .calculate(super.driveVelocityRadPerSec * (DrivetrainConstants.WHEEL_DIAMETER / 2));
-        var voltageAsPercent = MathUtil.clamp((volts + ffVolts) / nominalVoltage, -12d, 12d);
+        var voltageAsPercent = MathUtil.clamp((volts + ffVolts) / Constants.NOMINAL_VOLTAGE, -Constants.NOMINAL_VOLTAGE,
+                Constants.NOMINAL_VOLTAGE);
         m_driveMotor.set(TalonFXControlMode.PercentOutput, voltageAsPercent);
     }
 

@@ -63,9 +63,12 @@
             0.5882353186607361,
             0.0,
             255.0
-          ]
+          ],
+          "length": 0.7900000214576721,
+          "width": 0.7900000214576721
         },
-        "image": "D:\\VisualCodeProjects\\2023-Charged-Up\\res\\2023-field_1.png",
+        "height": 8.013679504394531,
+        "image": "C:\\Users\\ahsok\\Downloads\\field23.png",
         "traj": {
           "arrowColor": [
             1.0,
@@ -84,6 +87,8 @@
           "style": "Line",
           "weight": 10.0
         },
+        "units": "meters",
+        "width": 16.54180145263672,
         "window": {
           "visible": true
         }
@@ -104,6 +109,9 @@
     "transitory": {
       "SmartDashboard": {
         "Drivetrain": {
+          "open": true
+        },
+        "Elevator": {
           "open": true
         },
         "open": true
@@ -204,6 +212,15 @@
                 1.0
               ],
               "id": "NT:/SmartDashboard/Elevator/Position Setpoint"
+            },
+            {
+              "color": [
+                0.5058823823928833,
+                0.44705885648727417,
+                0.7019608020782471,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Elevator/Arbitrary Feed Forward"
             }
           ]
         }
@@ -258,6 +275,16 @@
       ],
       "window": {
         "name": "Wrist"
+      }
+    },
+    "Plot <3>": {
+      "plots": [
+        {
+          "height": 218
+        }
+      ],
+      "window": {
+        "name": "ElevatorProfiling"
       }
     }
   }

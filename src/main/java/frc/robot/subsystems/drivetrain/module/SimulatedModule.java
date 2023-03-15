@@ -49,13 +49,13 @@ public final class SimulatedModule extends ModuleBase {
 
     @Override
     void setDriveVolts(double volts) {
-        m_driveAppliedVolts = MathUtil.clamp(volts, -12d, 12d);
+        m_driveAppliedVolts = MathUtil.clamp(volts, -Constants.NOMINAL_VOLTAGE, Constants.NOMINAL_VOLTAGE);
         driveMotor.setInputVoltage(m_driveAppliedVolts);
     }
 
     @Override
     void setTurn(double volts) {
-        m_turnAppliedVolts = MathUtil.clamp(volts, -12d, 12d);
+        m_turnAppliedVolts = MathUtil.clamp(volts, -Constants.NOMINAL_VOLTAGE, Constants.NOMINAL_VOLTAGE);
         turnMotor.setInputVoltage(m_turnAppliedVolts);
     }
 

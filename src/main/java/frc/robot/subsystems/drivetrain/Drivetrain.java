@@ -206,11 +206,14 @@ public class Drivetrain extends SubsystemBase {
         case TRAJECTORY_DRIVE:
           currentDrivetrainCommand = TrajectoryDrive(
               (PathPlannerTrajectory) m_stateArgs.get("Trajectory"),
-              (boolean) m_stateArgs.get("IsFirstPath"))
+              (boolean) m_stateArgs.get("IsFirstPath"),
+              false)
               .andThen(setState(DrivetrainStates.IDLE));
           break;
         case ON_THE_FLY_TRAJECTORY:
-          currentDrivetrainCommand = TrajectoryDrive(m_vision.generateOnTheFlyTrajectory(5), false);
+          currentDrivetrainCommand = TrajectoryDrive(
+              m_vision.generateOnTheFlyTrajectory(m_pose, m_chassisSpeeds, (int) m_stateArgs.get("Waypoint")),
+              false, true);
           break;
         case PRECISE:
           currentDrivetrainCommand = JoystickDrive(DrivetrainConstants.PRECISE_SPEED_SCALE,
@@ -235,7 +238,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public Command setState(DrivetrainStates state) {
-    return new InstantCommand(() -> m_state = state);
+    return Commands.runOnce(() -> m_state = state);
   }
 
   public Command setState(DrivetrainStates state, HashMap<String, ?> stateArgs) {
@@ -284,7 +287,7 @@ public class Drivetrain extends SubsystemBase {
         () -> drive(new ChassisSpeeds()), this);
   }
 
-  private Command TrajectoryDrive(PathPlannerTrajectory trajectory, boolean isFirstPath) {
+  private Command TrajectoryDrive(PathPlannerTrajectory trajectory, boolean isFirstPath, boolean onTheFly) {
     return new InstantCommand(() -> {
       final PathPlannerTrajectory transformedTrajectory = PathPlannerTrajectory
           .transformTrajectoryForAlliance(trajectory, DriverStation.getAlliance());
@@ -292,8 +295,10 @@ public class Drivetrain extends SubsystemBase {
         resetGyro(trajectory.getInitialHolonomicPose().getRotation());
         resetPose(transformedTrajectory.getInitialHolonomicPose());
       }
-      setFieldTrajectory(transformedTrajectory);
+      setFieldTrajectory(onTheFly ? trajectory : transformedTrajectory);
     }).andThen(
+        // PathPlanner only flips the trajectory when its from the gui, so for on the
+        // fly we return an already flipped one.
         new PPSwerveControllerCommand(
             trajectory,
             m_poseSupplier,
@@ -304,7 +309,8 @@ public class Drivetrain extends SubsystemBase {
             m_swerveModuleConsumer,
             true,
             this)
-            .withTimeout(trajectory.getTotalTimeSeconds()));
+            .withTimeout(trajectory.getTotalTimeSeconds()))
+        .andThen(setState(DrivetrainStates.IDLE));
   }
 
   private Command SnapToAngle(double angle) {

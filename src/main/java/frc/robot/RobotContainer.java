@@ -8,11 +8,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.arm.Arm;
-import frc.robot.subsystems.arm.Arm.ArmStates;
+import frc.robot.subsystems.arm.Wrist;
+import frc.robot.subsystems.arm.Wrist.WristStates;
 import frc.robot.subsystems.arm.Claw;
 import frc.robot.subsystems.arm.Claw.ClawStates;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -28,12 +27,13 @@ public class RobotContainer {
 
 	private final CommandXboxController m_driverController = new CommandXboxController(0);
 	private final CommandXboxController m_operatorController = new CommandXboxController(1);
+	private final CommandXboxController m_testController = new CommandXboxController(2);
 	private final SendableChooser<Command> m_chooser = new SendableChooser<>();
 	private final AutoRoutines m_routines = new AutoRoutines();
 	private final Elevator m_elevator = Elevator.getInstance();
 	private final LEDs m_leds = LEDs.getInstance();
 
-	private final Arm m_arm = Arm.getInstance();
+	private final Wrist m_arm = Wrist.getInstance();
 	private final Claw m_claw = Claw.getInstance();
 	private final Drivetrain m_drivetrain = Drivetrain.getInstance();
 	private final Intake m_intake = Intake.getInstance();
@@ -86,33 +86,52 @@ public class RobotContainer {
 		m_operatorController.povRight().whileTrue(m_leds.setLedColor(Color.kYellow));
 		m_operatorController.povLeft().whileTrue(m_leds.setLedColor(Color.kPurple));
 
-		m_operatorController.povUp().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.RETRACTED)));
-		m_operatorController.povDown().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING)));
+		m_operatorController.povUp().onTrue(m_arm.setState(WristStates.RETRACTED));
+		m_operatorController.povDown().onTrue(m_arm.setState(WristStates.DROPPING));
 		m_operatorController.leftBumper().onTrue(
 				Commands.sequence(
 						m_claw.setState(ClawStates.OPEN),
-						Commands.runOnce(() -> m_arm.setState(ArmStates.SUBSTATION))));
+						m_arm.setState(WristStates.SUBSTATION)));
 
 		m_operatorController.x().onTrue(m_claw.setState(ClawStates.OPEN));
 		m_operatorController.y().onTrue(m_claw.setState(ClawStates.CLOSED));
 
-		m_operatorController.rightTrigger()
-				.onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.MID_CONE)));
-		m_operatorController.rightBumper()
-				.onTrue(new InstantCommand(() -> m_elevator.setState(ElevatorStates.TOP)));
+		m_operatorController.rightTrigger().onTrue(m_elevator.setState(ElevatorStates.MID_CONE));
+		m_operatorController.rightBumper().onTrue(m_elevator.setState(ElevatorStates.TOP));
 
 		// m_operatorController.start().onTrue(substationToggle());
 		// Handoff Cone Sequence
 		m_operatorController.a().onTrue(m_routines.HANDOFF());
 
 		// Drop Game Piece
-		m_operatorController.b().onTrue(new InstantCommand(() -> m_arm.setState(ArmStates.DROPPING))
+		m_operatorController.b().onTrue(m_arm.setState(WristStates.DROPPING)
 				.andThen(new WaitCommand(0.5))
 				.andThen(m_claw.setState(ClawStates.OPEN))
 				.andThen(new WaitCommand(0.2))
-				.andThen(() -> m_elevator.setState(ElevatorStates.RETRACT))
-				.andThen(() -> m_arm.setState(ArmStates.RETRACTED)));
+				.andThen(m_elevator.setState(ElevatorStates.RETRACT))
+				.andThen(m_arm.setState(WristStates.RETRACTED)));
 		// #endregion
+
+		m_testController.leftBumper()
+				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 1))));
+		m_testController.a()
+				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 2))));
+		m_testController.b()
+				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 3))));
+		m_testController.x()
+				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 4))));
+		m_testController.y()
+				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 5))));
+		m_testController.povRight()
+				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 6))));
+		m_testController.povLeft()
+				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 7))));
+		m_testController.povDown()
+				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 8))));
+		m_testController.povUp()
+				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 9))));
+		m_testController.rightBumper()
+				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 10))));
 
 	}
 
@@ -126,6 +145,14 @@ public class RobotContainer {
 
 	public Command getAutonomousCommand() {
 		return m_chooser.getSelected();
+	}
+
+	// Useful for running pid controllers and motion profiles faster than the
+	// default 20 ms loop time.
+	public Runnable getControlLoop() {
+		return () -> {
+
+		};
 	}
 
 	// private Command substationToggle() {

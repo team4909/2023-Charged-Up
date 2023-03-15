@@ -1,5 +1,7 @@
 package frc.robot.subsystems.elevator;
 
+import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
@@ -11,6 +13,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -77,7 +80,10 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     stateMachine();
-    SmartDashboard.putNumber("Elevator/Closed Loop Error", m_leftExtensionMotor.getClosedLoopError());
+    SmartDashboard.putNumber("Elevator/Closed Loop Error",
+        m_leftExtensionMotor.getClosedLoopError() * ElevatorConstants.METERS_PER_TICK);
+    SmartDashboard.putNumber("Elevator/Velocity",
+        m_leftExtensionMotor.getSelectedSensorVelocity() * ElevatorConstants.METERS_PER_TICK);
     SmartDashboard.putNumber("Elevator/Position Meters",
         m_leftExtensionMotor.getSelectedSensorPosition() * ElevatorConstants.METERS_PER_TICK);
     SmartDashboard.putString("Elevator/State", m_state.toString());
@@ -143,12 +149,19 @@ public class Elevator extends SubsystemBase {
   }
 
   private Command SetSetpoint(double setpointMeters) {
-    double ff = m_elevatorFF
-        .calculate(m_leftExtensionMotor.getSelectedSensorVelocity() * 10 * ElevatorConstants.METERS_PER_TICK);
+
     SmartDashboard.putNumber("Elevator/Position Setpoint", setpointMeters);
     return new RunCommand(() -> {
-      SmartDashboard.putNumber("Elevator/Arbitrary Feed Forward", ff);
+      double elevatordesiredVelMPS = m_leftExtensionMotor.getSelectedSensorVelocity() * 10
+          * ElevatorConstants.METERS_PER_TICK;
+      double feedForwardVolts = m_elevatorFF.calculate(elevatordesiredVelMPS); // Converting to percent
+      // m_leftExtensionMotor.set(TalonFXControlMode.MotionMagic, setpointMeters /
+      // ElevatorConstants.METERS_PER_TICK,
+      // DemandType.ArbitraryFeedForward, feedForwardVolts /
+      // Constants.NOMINAL_VOLTAGE);
       m_leftExtensionMotor.set(TalonFXControlMode.Position, setpointMeters / ElevatorConstants.METERS_PER_TICK);
+      SmartDashboard.putNumber("Elevator/Motion Magic Velocity", elevatordesiredVelMPS);
+      SmartDashboard.putNumber("Elevator/Feed Forward V", feedForwardVolts);
     }, this);
   }
 
@@ -159,18 +172,18 @@ public class Elevator extends SubsystemBase {
     m_leftExtensionMotor.config_kD(0, ElevatorConstants.kD);
     m_leftExtensionMotor.configClosedLoopPeakOutput(0, ElevatorConstants.OUTPUT_LIMIT);
     m_leftExtensionMotor.setInverted(false);
+    m_leftExtensionMotor.configMotionCruiseVelocity(1 / ElevatorConstants.METERS_PER_TICK);
+    m_leftExtensionMotor.configMotionAcceleration(1 / ElevatorConstants.METERS_PER_TICK / 2);
+    if (Constants.SIM)
+      m_leftExtensionMotor.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 10); // This stops stale frames in sim
 
     m_rightExtensionMotor.configFactoryDefault();
     m_rightExtensionMotor.setInverted(TalonFXInvertType.OpposeMaster);
     m_rightExtensionMotor.follow(m_leftExtensionMotor);
   }
 
-  public void setState(ElevatorStates state) {
-    m_state = state;
-  }
-
-  public Command setState2(ElevatorStates state) {
-    return new InstantCommand(() -> m_state = state);
+  public Command setState(ElevatorStates state) {
+    return Commands.runOnce(() -> m_state = state);
   }
 
   public ElevatorStates getState() {
