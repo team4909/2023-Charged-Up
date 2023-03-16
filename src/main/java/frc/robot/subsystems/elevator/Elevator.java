@@ -152,14 +152,11 @@ public class Elevator extends SubsystemBase {
 
     SmartDashboard.putNumber("Elevator/Position Setpoint", setpointMeters);
     return new RunCommand(() -> {
-      double elevatordesiredVelMPS = m_leftExtensionMotor.getSelectedSensorVelocity() * 10
+      double elevatordesiredVelMPS = m_leftExtensionMotor.getActiveTrajectoryVelocity() * 10
           * ElevatorConstants.METERS_PER_TICK;
-      double feedForwardVolts = m_elevatorFF.calculate(elevatordesiredVelMPS); // Converting to percent
-      // m_leftExtensionMotor.set(TalonFXControlMode.MotionMagic, setpointMeters /
-      // ElevatorConstants.METERS_PER_TICK,
-      // DemandType.ArbitraryFeedForward, feedForwardVolts /
-      // Constants.NOMINAL_VOLTAGE);
-      m_leftExtensionMotor.set(TalonFXControlMode.Position, setpointMeters / ElevatorConstants.METERS_PER_TICK);
+      double feedForwardVolts = m_elevatorFF.calculate(elevatordesiredVelMPS);
+      m_leftExtensionMotor.set(TalonFXControlMode.MotionMagic, setpointMeters / ElevatorConstants.METERS_PER_TICK,
+          DemandType.ArbitraryFeedForward, feedForwardVolts / Constants.NOMINAL_VOLTAGE); // Converting ff to percent
       SmartDashboard.putNumber("Elevator/Motion Magic Velocity", elevatordesiredVelMPS);
       SmartDashboard.putNumber("Elevator/Feed Forward V", feedForwardVolts);
     }, this);
@@ -172,8 +169,9 @@ public class Elevator extends SubsystemBase {
     m_leftExtensionMotor.config_kD(0, ElevatorConstants.kD);
     m_leftExtensionMotor.configClosedLoopPeakOutput(0, ElevatorConstants.OUTPUT_LIMIT);
     m_leftExtensionMotor.setInverted(false);
-    m_leftExtensionMotor.configMotionCruiseVelocity(1 / ElevatorConstants.METERS_PER_TICK);
-    m_leftExtensionMotor.configMotionAcceleration(1 / ElevatorConstants.METERS_PER_TICK / 2);
+    m_leftExtensionMotor.configMotionCruiseVelocity(12500);
+    m_leftExtensionMotor.configMotionAcceleration(27000);
+    m_leftExtensionMotor.configMotionSCurveStrength(7);
     if (Constants.SIM)
       m_leftExtensionMotor.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 10); // This stops stale frames in sim
 
