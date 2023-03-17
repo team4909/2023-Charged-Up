@@ -2,10 +2,10 @@ package frc.robot.subsystems.drivetrain.module;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.team364.CTREModuleState;
 import frc.robot.Constants;
 import frc.robot.Constants.DrivetrainConstants;
@@ -21,18 +21,21 @@ public final class Module {
             DrivetrainConstants.WHEEL_DIAMETER * Math.PI;
     private final PIDController m_simTurnPID = new PIDController(23.0, 0.0, 0.1); // Tuned for SIM!
     private double m_lastAngle;
+    private final SimpleMotorFeedforward m_driveFeedforward;
 
     public Module(int index) {
         m_module = Constants.SIM ? new SimulatedModule() : new PhysicalModule(index);
         m_index = index;
         m_lastAngle = getModuleState().angle.getDegrees();
+        m_driveFeedforward = new SimpleMotorFeedforward(0.24634, 0.68591, 0.18461);
     }
 
     public void update() {
         m_module.updateModuleInputs();
-        SmartDashboard.putNumber("Drivetrain/Module/Encoder " + m_index, m_module.turnAbsolutePosition);
-        SmartDashboard.putString("Drivetrain/Module/State " + m_index, getModuleState().toString());
-        SmartDashboard.putString("Drivetrain/Module/Position " + m_index, getModulePosition().toString());
+        // SmartDashboard.putString("Drivetrain/Module/State " + m_index,
+        // getModuleState().toString());
+        // SmartDashboard.putString("Drivetrain/Module/Position " + m_index,
+        // getModulePosition().toString());
     }
 
     public void set(SwerveModuleState desiredstate) {
@@ -41,12 +44,15 @@ public final class Module {
             optimizedDesiredState = SwerveModuleState.optimize(desiredstate, getModuleAngle());
             m_module.setTurn(
                     m_simTurnPID.calculate(getModuleAngle().getRadians(), optimizedDesiredState.angle.getRadians()));
+            m_module.setDrive(
+                    optimizedDesiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, 0d);
         } else {
             optimizedDesiredState = CTREModuleState.optimize(desiredstate, getModuleState().angle);
             m_module.setTurn(convertDegreesToTicks(optimizedDesiredState.angle.getDegrees()));
+            double speedTicks = convertMPStoTicks(optimizedDesiredState.speedMetersPerSecond);
+            m_module.setDrive(speedTicks, m_driveFeedforward.calculate(optimizedDesiredState.speedMetersPerSecond));
         }
-        m_module.setDriveVolts(
-                optimizedDesiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE);
+
         m_lastAngle = optimizedDesiredState.angle.getDegrees();
     }
 

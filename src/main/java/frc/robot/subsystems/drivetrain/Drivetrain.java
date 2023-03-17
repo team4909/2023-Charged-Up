@@ -137,14 +137,17 @@ public class Drivetrain extends SubsystemBase {
 
     m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
     if (m_vision.getAllianceRelativePose() != null && m_vision.latency.get() != null)
-      m_poseEstimator.addVisionMeasurement(m_vision.getAllianceRelativePose(), m_vision.latency.get());
+      m_poseEstimator.addVisionMeasurement(m_vision.getAllianceRelativePose(),
+          m_vision.latency.get());
 
     SmartDashboard.putString("Drivetrain/State", m_state.toString());
-    SmartDashboard.putBoolean("Drivetrain/Joystick Input", isJoystickInputPresent());
+    SmartDashboard.putBoolean("Drivetrain/Joystick Input",
+        isJoystickInputPresent());
     SmartDashboard.putNumber("Drivetrain/Gyro Angle", getGyroYaw().getDegrees());
     SmartDashboard.putNumber("Drivetrain/Pose X", m_pose.getX());
     SmartDashboard.putNumber("Drivetrain/Pose Y", m_pose.getY());
-    SmartDashboard.putNumber("Drivetrain/Pose Theta", m_pose.getRotation().getDegrees());
+    SmartDashboard.putNumber("Drivetrain/Pose Theta",
+        m_pose.getRotation().getDegrees());
   }
 
   public void setFieldTrajectory(Trajectory t) {
@@ -212,7 +215,8 @@ public class Drivetrain extends SubsystemBase {
           break;
         case ON_THE_FLY_TRAJECTORY:
           currentDrivetrainCommand = TrajectoryDrive(
-              m_vision.generateOnTheFlyTrajectory(m_pose, m_chassisSpeeds, (int) m_stateArgs.get("Waypoint")),
+              m_vision.generateOnTheFlyTrajectory(m_pose, m_chassisSpeeds,
+                  (int) m_stateArgs.get("Waypoint")),
               false, true);
           break;
         case PRECISE:

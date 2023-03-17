@@ -15,7 +15,7 @@ public abstract class ModuleBase {
 
     abstract void updateModuleInputs();
 
-    abstract void setDriveVolts(double volts);
+    abstract void setDrive(double input, double ff);
 
     abstract void setTurn(double input);
 

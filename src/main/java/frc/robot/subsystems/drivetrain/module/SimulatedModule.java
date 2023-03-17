@@ -48,7 +48,7 @@ public final class SimulatedModule extends ModuleBase {
     }
 
     @Override
-    void setDriveVolts(double volts) {
+    void setDrive(double volts, double ff) {
         m_driveAppliedVolts = MathUtil.clamp(volts, -Constants.NOMINAL_VOLTAGE, Constants.NOMINAL_VOLTAGE);
         driveMotor.setInputVoltage(m_driveAppliedVolts);
     }

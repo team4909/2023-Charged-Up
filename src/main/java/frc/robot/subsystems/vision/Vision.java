@@ -52,9 +52,9 @@ public class Vision extends SubsystemBase {
   }
 
   private Optional<LimelightResults> visionResults() {
-    if (NT.getTable("limelight").getKeys().size() != 0
-        && NT.getTable("limelight").getEntry("tv").getInteger(0) == 1)
-      return Optional.of(LimelightHelpers.getLatestResults("limelight"));
+    // if (NT.getTable("limelight").getKeys().size() != 0
+    // && NT.getTable("limelight").getEntry("tv").getInteger(0) == 1)
+    // return Optional.of(LimelightHelpers.getLatestResults("limelight"));
     return Optional.empty();
   }
 
