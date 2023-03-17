@@ -117,7 +117,7 @@ public final class PhysicalModule extends ModuleBase {
         m_turnMotor.setNeutralMode(NeutralMode.Brake);
         m_turnMotor.setSelectedSensorPosition(Module.convertDegreesToTicks(getWheelHeading()));
         m_turnMotor.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Unsigned_0_to_360);
-        m_turnMotor.config_kP(0, 0.3);
+        m_turnMotor.config_kP(0, 0.4);
 
         m_encoder.configFactoryDefault();
         m_encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);

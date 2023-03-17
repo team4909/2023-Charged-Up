@@ -25,7 +25,7 @@ public class AutoRoutines {
   private final Intake m_intake = Intake.getInstance();
   private final Claw m_claw = Claw.getInstance();
 
-  public final Auto ONE_METER_TEST = new Auto(
+  public final Auto TEST = new Auto(
       loadTrajectory(new DriveTrajectory("Test", true)));
   public final Auto BLANK_AUTO = new Auto();
   public final Auto SCORE_CONE_CHARGE_STATION_COMMUNITY = new Auto(
@@ -43,7 +43,8 @@ public class AutoRoutines {
           loadTrajectory(new DriveTrajectory("TopPieceToTopNode", false)),
           HANDOFF()),
       SCORE_CONE(ElevatorStates.MID_CONE),
-      loadTrajectory(new DriveTrajectory("TopNodeToChargeStation", false)));
+      loadTrajectory(new DriveTrajectory("TopNodeToChargeStation", false, 1.5)),
+      m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
   // public final Auto TWO_PIECE_GRAB
 
   private Command loadTrajectory(DriveTrajectory traj) {

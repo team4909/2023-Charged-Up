@@ -307,9 +307,9 @@ public class Drivetrain extends SubsystemBase {
             trajectory,
             m_poseSupplier,
             getKinematics(),
+            new PIDController(15, 0, 0),
+            new PIDController(15, 0, 0),
             new PIDController(5, 0, 0),
-            new PIDController(5, 0, 0),
-            new PIDController(4, 0, 0.2),
             m_swerveModuleConsumer,
             true,
             this)
