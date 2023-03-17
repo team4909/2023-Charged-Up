@@ -107,7 +107,7 @@ public final class PhysicalModule extends ModuleBase {
         m_driveMotor.setInverted(false);
         m_driveMotor.setNeutralMode(NeutralMode.Brake);
         m_driveMotor.setSelectedSensorPosition(0);
-        m_driveMotor.config_kP(0, 0.05);
+        m_driveMotor.config_kP(0, DrivetrainConstants.DRIVE_kP);
 
         m_turnMotor.configFactoryDefault();
         m_turnMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 1));

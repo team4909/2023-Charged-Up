@@ -70,6 +70,11 @@ public final class Constants {
         public static final double BACK_LEFT_MODULE_STEER_OFFSET = 251.2;
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 91.2;
 
+        public static final double DRIVE_kP = 0.092738;
+        public static final double DRIVE_kS = 0.25231;
+        public static final double DRIVE_kV = 2.1718;
+        public static final double DRIVE_kA = 0.58552;
+
         public static final double TURN_kP = 0.3;
 
         // CAN IDS

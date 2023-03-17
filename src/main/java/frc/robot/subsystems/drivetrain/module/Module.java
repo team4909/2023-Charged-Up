@@ -27,7 +27,8 @@ public final class Module {
         m_module = Constants.SIM ? new SimulatedModule() : new PhysicalModule(index);
         m_index = index;
         m_lastAngle = getModuleState().angle.getDegrees();
-        m_driveFeedforward = new SimpleMotorFeedforward(0.24634, 0.68591, 0.18461);
+        m_driveFeedforward = new SimpleMotorFeedforward(
+                DrivetrainConstants.DRIVE_kS, DrivetrainConstants.DRIVE_kV, DrivetrainConstants.DRIVE_kA);
     }
 
     public void update() {
