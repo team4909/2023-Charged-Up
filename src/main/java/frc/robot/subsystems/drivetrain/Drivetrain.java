@@ -32,6 +32,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -142,9 +143,12 @@ public class Drivetrain extends SubsystemBase {
     m_simChassisAngle = m_simChassisAngle.plus(new Rotation2d(dModuleState.dtheta));
 
     for (int i = 0; i < 4; i++) {
+      double start = Timer.getFPGATimestamp();
       m_modules[i].update();
       m_modules[i].set(setpointModuleStates[i]);
+      double end = Timer.getFPGATimestamp();
       SmartDashboard.putNumber("Drivetrain/Desired Speed " + i, setpointModuleStates[i].speedMetersPerSecond);
+      SmartDashboard.putNumber("Drivetrain/Module Update Time", end - start);
     }
 
     m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
