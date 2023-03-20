@@ -11,6 +11,7 @@ import com.pathplanner.lib.PathPoint;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -61,19 +62,18 @@ public class Vision extends SubsystemBase {
     return Optional.empty();
   }
 
-  public Supplier<Double> latency = () -> visionResults().isPresent()
-      ? Timer.getFPGATimestamp() - (m_results.latency_pipeline / 1000.0) - (m_results.latency_capture / 1000.0)
-      : null;
-
-  public Pose2d getAllianceRelativePose() {
+  public Pair<Pose2d, Double> getAllianceRelativePose() {
     visionResults().ifPresent((results) -> m_results = results.targetingResults);
+    Pair<Pose2d, Double> val = new Pair<>(null, null);
     if (m_results != null) {
+      double latency = Timer.getFPGATimestamp() - (m_results.latency_pipeline / 1000.0)
+          - (m_results.latency_capture / 1000.0);
       if (DriverStation.getAlliance().equals(Alliance.Red))
-        return m_results.getBotPose2d_wpiRed();
+        val = Pair.of(m_results.getBotPose2d_wpiRed(), latency);
       else if (DriverStation.getAlliance().equals(Alliance.Blue))
-        return m_results.getBotPose2d_wpiBlue();
+        val = Pair.of(m_results.getBotPose2d_wpiBlue(), latency);
     }
-    return null;
+    return val;
   }
 
   /**

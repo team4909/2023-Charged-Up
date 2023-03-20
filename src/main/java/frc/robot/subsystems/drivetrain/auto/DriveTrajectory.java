@@ -8,7 +8,7 @@ import frc.robot.Constants.DrivetrainConstants;
 public record DriveTrajectory(PathPlannerTrajectory trajectory, boolean isFirstPath) {
   public DriveTrajectory(String trajectoryName, boolean isFirstPath) {
     this(
-        PathPlanner.loadPath(trajectoryName, DrivetrainConstants.MAX_DRIVETRAIN_SPEED, 3),
+        PathPlanner.loadPath(trajectoryName, DrivetrainConstants.MAX_DRIVETRAIN_SPEED, 1.2),
         isFirstPath);
   }
 

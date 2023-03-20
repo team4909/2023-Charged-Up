@@ -75,7 +75,10 @@ public class Drivetrain extends SubsystemBase {
   private final double MAX_ANGULAR_SPEED = 4;
   private final Vision m_vision = new Vision();
 
-  private Consumer<SwerveModuleState[]> m_swerveModuleConsumer = states -> drive(m_kinematics.toChassisSpeeds(states));
+  private Consumer<SwerveModuleState[]> m_swerveModuleConsumer = states -> {
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_ANGULAR_SPEED);
+    drive(m_kinematics.toChassisSpeeds(states));
+  };
   // For vision poses
   private BiConsumer<String, Pose2d> m_fieldPoseConsumer = (poseName, pose) -> {
     if (!pose.equals(new Pose2d(0d, 0d, new Rotation2d(0d))))
@@ -152,10 +155,12 @@ public class Drivetrain extends SubsystemBase {
     }
 
     m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
-    if (m_vision.getAllianceRelativePose() != null && m_vision.latency.get() != null) {
-      Pose2d estimatedPose = m_vision.getAllianceRelativePose();
-      m_poseEstimator.addVisionMeasurement(estimatedPose, m_vision.latency.get());
-      m_fieldPoseConsumer.accept("FrontLimelightEstimate", estimatedPose);
+    if (m_vision.getAllianceRelativePose().getFirst() != null
+        && m_vision.getAllianceRelativePose().getSecond() != null) {
+      // m_poseEstimator.addVisionMeasurement(
+      // m_vision.getAllianceRelativePose().getFirst(),
+      // m_vision.getAllianceRelativePose().getSecond());
+      m_fieldPoseConsumer.accept("FrontLimelightEstimate", m_vision.getAllianceRelativePose().getFirst());
     }
 
     SmartDashboard.putString("Drivetrain/State", m_state.toString());
@@ -331,7 +336,6 @@ public class Drivetrain extends SubsystemBase {
             m_swerveModuleConsumer,
             true,
             this))
-        // .withTimeout(trajectory.getTotalTimeSeconds()))
         .andThen(setState(DrivetrainStates.IDLE));
   }
 

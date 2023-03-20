@@ -60,7 +60,7 @@ public final class Constants {
         public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
         public static final double DRIVE_REDUCTION = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
         public static final double STEER_REDUCTION = (14.0 / 50.0) * (10.0 / 60.0);
-        public static final double MAX_DRIVETRAIN_SPEED = Units.feetToMeters(16.3); // From SDS
+        public static final double MAX_DRIVETRAIN_SPEED = 4.2; // From SDS
         public static final double PRECISE_SPEED_SCALE = 0.2;
         public static final double DEFAULT_TIMEOUT = 15d; // For auto trajectories
         public static final double DEADBAND = 0.05;
@@ -70,15 +70,15 @@ public final class Constants {
         public static final double BACK_LEFT_MODULE_STEER_OFFSET = 251.2;
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 91.8;
 
-        public static final double DRIVE_kP = 0.04259;
+        public static final double DRIVE_kP = 0.07;
         public static final double DRIVE_kS = 0.26015 / 12d;
-        public static final double DRIVE_kV = 2.1839 / 12d;
+        public static final double DRIVE_kV = 2.5039 / 12d;
         public static final double DRIVE_kA = 0.99695 / 12d;
 
         public static final double TURN_kP = 0.3;
 
-        public static final double X_FOLLOWING_kP = 15;
-        public static final double Y_FOLLOWING_kP = 15;
+        public static final double X_FOLLOWING_kP = 1;
+        public static final double Y_FOLLOWING_kP = 1;
         public static final double THETA_FOLLOWING_kP = 3;
 
         // CAN IDS
