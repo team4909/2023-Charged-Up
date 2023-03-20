@@ -49,10 +49,10 @@ public final class Constants {
     public static final class DrivetrainConstants {
         // The left-to-right distance between the drivetrain wheels, should be measured
         // from center to center.
-        public static final double DRIVETRAIN_TRACKWIDTH_METERS = Units.inchesToMeters(32);
+        public static final double DRIVETRAIN_TRACKWIDTH_METERS = Units.inchesToMeters(20.5);
         // The front-to-back distance between the drivetrain wheels, should be measured
         // from center to center.
-        public static final double DRIVETRAIN_WHEELBASE_METERS = Units.inchesToMeters(32);
+        public static final double DRIVETRAIN_WHEELBASE_METERS = Units.inchesToMeters(20.5);
 
         public static final double FALCON_500_FREE_SPEED = 6380d;
         public static final double TICKS_PER_ROTATION = 2048d;
@@ -66,16 +66,20 @@ public final class Constants {
         public static final double DEADBAND = 0.05;
 
         public static final double FRONT_LEFT_MODULE_STEER_OFFSET = 282.7;
-        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = 186.2;
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = 185.2;
         public static final double BACK_LEFT_MODULE_STEER_OFFSET = 251.2;
-        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 91.2;
+        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 91.8;
 
-        public static final double DRIVE_kP = 0.092738;
-        public static final double DRIVE_kS = 0.25231;
-        public static final double DRIVE_kV = 2.1718;
-        public static final double DRIVE_kA = 0.58552;
+        public static final double DRIVE_kP = 0.04259;
+        public static final double DRIVE_kS = 0.26015 / 12d;
+        public static final double DRIVE_kV = 2.1839 / 12d;
+        public static final double DRIVE_kA = 0.99695 / 12d;
 
         public static final double TURN_kP = 0.3;
+
+        public static final double X_FOLLOWING_kP = 15;
+        public static final double Y_FOLLOWING_kP = 15;
+        public static final double THETA_FOLLOWING_kP = 3;
 
         // CAN IDS
         public static final int PIGEON_ID = 20;

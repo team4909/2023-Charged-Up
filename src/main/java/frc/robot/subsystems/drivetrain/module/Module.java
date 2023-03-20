@@ -6,6 +6,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.team364.CTREModuleState;
 import frc.robot.Constants;
 import frc.robot.Constants.DrivetrainConstants;
@@ -33,10 +34,10 @@ public final class Module {
 
     public void update() {
         m_module.updateModuleInputs();
-        // SmartDashboard.putString("Drivetrain/Module/State " + m_index,
-        // getModuleState().toString());
-        // SmartDashboard.putString("Drivetrain/Module/Position " + m_index,
-        // getModulePosition().toString());
+        SmartDashboard.putString("Drivetrain/Module/State " + m_index, getModuleState().toString());
+        SmartDashboard.putNumber("Drivetrain/Actual Module Speed" + m_index, getModuleState().speedMetersPerSecond);
+        SmartDashboard.putString("Drivetrain/Module/Position " + m_index, getModulePosition().toString());
+        SmartDashboard.putNumber("Absolute Module Angle " + m_index, m_module.turnAbsolutePosition);
     }
 
     public void set(SwerveModuleState desiredstate) {
@@ -49,12 +50,18 @@ public final class Module {
                     optimizedDesiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, 0d);
         } else {
             optimizedDesiredState = CTREModuleState.optimize(desiredstate, getModuleState().angle);
+            // double angle = (Math.abs(
+            // optimizedDesiredState.speedMetersPerSecond) <=
+            // (DrivetrainConstants.MAX_DRIVETRAIN_SPEED * 0.01))
+            // ? m_lastAngle
+            // : optimizedDesiredState.angle.getDegrees();
             m_module.setTurn(convertDegreesToTicks(optimizedDesiredState.angle.getDegrees()));
             double speedTicks = convertMPStoTicks(optimizedDesiredState.speedMetersPerSecond);
-            m_module.setDrive(speedTicks, m_driveFeedforward.calculate(optimizedDesiredState.speedMetersPerSecond));
+            double ff = m_driveFeedforward.calculate(optimizedDesiredState.speedMetersPerSecond);
+            SmartDashboard.putNumber("Drivetrain/Drive FF", ff);
+            m_module.setDrive(speedTicks, ff);
+            // m_lastAngle = angle;
         }
-
-        m_lastAngle = optimizedDesiredState.angle.getDegrees();
     }
 
     private Rotation2d getModuleAngle() {

@@ -3,6 +3,7 @@ package frc.robot.subsystems.drivetrain.module;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -11,8 +12,6 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.Constants.DrivetrainConstants;
@@ -91,7 +90,7 @@ public final class PhysicalModule extends ModuleBase {
     @Override
     void setDrive(double input, double ff) {
         m_driveMotor.set(TalonFXControlMode.Velocity, input, DemandType.ArbitraryFeedForward,
-                ff / Constants.NOMINAL_VOLTAGE);
+                ff);
     }
 
     @Override
@@ -117,13 +116,15 @@ public final class PhysicalModule extends ModuleBase {
         m_turnMotor.setNeutralMode(NeutralMode.Brake);
         m_turnMotor.setSelectedSensorPosition(Module.convertDegreesToTicks(getWheelHeading()));
         m_turnMotor.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Unsigned_0_to_360);
-        m_turnMotor.config_kP(0, 0.4);
+        m_turnMotor.config_kP(0, DrivetrainConstants.TURN_kP);
 
         m_encoder.configFactoryDefault();
         m_encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
         m_encoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
 
         m_driveMotor.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 10);
+        m_driveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 5);
+        m_driveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5);
         m_turnMotor.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 10);
         m_encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 120);
         m_encoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 120);

@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.server.PathPlannerServer;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,6 +26,8 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     Drivetrain.getInstance().resetModules();
+
+    PathPlannerServer.startServer(5811);
   }
 
   @Override

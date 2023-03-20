@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+import com.pathplanner.lib.server.PathPlannerServer;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathUtil;
@@ -120,19 +121,23 @@ public class Drivetrain extends SubsystemBase {
 
     final double dt = Constants.PERIODIC_LOOP_DURATION;
 
-    Twist2d dModuleState = new Pose2d()
-        .log(new Pose2d(
-            m_chassisSpeeds.vxMetersPerSecond * dt,
-            m_chassisSpeeds.vyMetersPerSecond * dt,
-            new Rotation2d(
-                m_chassisSpeeds.omegaRadiansPerSecond * dt)));
+    Pose2d poseVelocity = new Pose2d(
+        m_chassisSpeeds.vxMetersPerSecond * dt,
+        m_chassisSpeeds.vyMetersPerSecond * dt,
+        Rotation2d.fromRadians(
+            m_chassisSpeeds.omegaRadiansPerSecond * dt));
+    Twist2d dModuleState = new Pose2d().log(poseVelocity);
+    ChassisSpeeds updatedChassisSpeeds = new ChassisSpeeds(
+        dModuleState.dx / dt, dModuleState.dy / dt, dModuleState.dtheta / dt);
+    SwerveModuleState[] setpointModuleStates = m_kinematics.toSwerveModuleStates(updatedChassisSpeeds);
+    // SwerveDriveKinematics.desaturateWheelSpeeds(setpointModuleStates,
+    // DrivetrainConstants.MAX_DRIVETRAIN_SPEED);
     m_simChassisAngle = m_simChassisAngle.plus(new Rotation2d(dModuleState.dtheta));
-    SwerveModuleState[] setpointModuleStates = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointModuleStates, DrivetrainConstants.MAX_DRIVETRAIN_SPEED);
 
     for (int i = 0; i < 4; i++) {
       m_modules[i].update();
       m_modules[i].set(setpointModuleStates[i]);
+      SmartDashboard.putNumber("Drivetrain/Desired Speed " + i, setpointModuleStates[i].speedMetersPerSecond);
     }
 
     m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
@@ -307,13 +312,13 @@ public class Drivetrain extends SubsystemBase {
             trajectory,
             m_poseSupplier,
             getKinematics(),
-            new PIDController(15, 0, 0),
-            new PIDController(15, 0, 0),
-            new PIDController(5, 0, 0),
+            new PIDController(DrivetrainConstants.X_FOLLOWING_kP, 0, 0),
+            new PIDController(DrivetrainConstants.Y_FOLLOWING_kP, 0, 0),
+            new PIDController(DrivetrainConstants.THETA_FOLLOWING_kP, 0, 0),
             m_swerveModuleConsumer,
             true,
-            this)
-            .withTimeout(trajectory.getTotalTimeSeconds()))
+            this))
+        // .withTimeout(trajectory.getTotalTimeSeconds()))
         .andThen(setState(DrivetrainStates.IDLE));
   }
 

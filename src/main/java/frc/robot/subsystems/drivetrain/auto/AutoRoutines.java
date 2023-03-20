@@ -42,7 +42,8 @@ public class AutoRoutines {
       Commands.parallel(
           loadTrajectory(new DriveTrajectory("TopPieceToTopNode", false)),
           HANDOFF()),
-      SCORE_CONE(ElevatorStates.MID_CONE),
+      SCORE_CONE(ElevatorStates.TOP));
+  public final Auto TWO_PIECE_CHARGE_STATION = new Auto(
       loadTrajectory(new DriveTrajectory("TopNodeToChargeStation", false, 1.5)),
       m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
   // public final Auto TWO_PIECE_GRAB
@@ -62,7 +63,7 @@ public class AutoRoutines {
 
   private final Command INIT() {
     return Commands.sequence(
-        Commands.runOnce(() -> m_claw.setState(ClawStates.CLOSED)),
+        m_claw.setState(ClawStates.CLOSED),
         m_intake.setState(IntakeStates.CALIBRATE),
         Commands.waitSeconds(1),
         m_intake.setState(IntakeStates.RETRACTED));
