@@ -126,8 +126,8 @@ public final class PhysicalModule extends ModuleBase {
         m_driveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 5);
         m_driveMotor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5);
         m_turnMotor.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 10);
-        m_encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 120);
-        m_encoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 120);
+        m_encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 50);
+        m_encoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 50);
     }
 
     private double getWheelHeading() {
