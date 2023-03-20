@@ -4,6 +4,7 @@ import static frc.robot.Constants.DrivetrainConstants.DRIVETRAIN_TRACKWIDTH_METE
 import static frc.robot.Constants.DrivetrainConstants.DRIVETRAIN_WHEELBASE_METERS;
 
 import java.util.HashMap;
+import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
@@ -14,7 +15,6 @@ import java.util.stream.Stream;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-import com.pathplanner.lib.server.PathPlannerServer;
 
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathUtil;
@@ -74,8 +74,15 @@ public class Drivetrain extends SubsystemBase {
   private final double MAX_ANGULAR_SPEED = 4;
   private final Vision m_vision = new Vision();
 
-  private Consumer<SwerveModuleState[]> m_swerveModuleConsumer = (states) -> drive(
-      m_kinematics.toChassisSpeeds(states));
+  private Consumer<SwerveModuleState[]> m_swerveModuleConsumer = states -> drive(m_kinematics.toChassisSpeeds(states));
+  // For vision poses
+  private BiConsumer<String, Pose2d> m_fieldPoseConsumer = (poseName, pose) -> {
+    if (!pose.equals(new Pose2d(0d, 0d, new Rotation2d(0d))))
+      m_field.getObject(poseName).setPose(pose);
+    else
+      m_field.getObject(poseName).setPose(100, 100, new Rotation2d()); // Take it off the screen
+  };
+
   private Supplier<Pose2d> m_poseSupplier = () -> m_pose;
   // #endregion
 
@@ -141,9 +148,11 @@ public class Drivetrain extends SubsystemBase {
     }
 
     m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
-    if (m_vision.getAllianceRelativePose() != null && m_vision.latency.get() != null)
-      m_poseEstimator.addVisionMeasurement(m_vision.getAllianceRelativePose(),
-          m_vision.latency.get());
+    if (m_vision.getAllianceRelativePose() != null && m_vision.latency.get() != null) {
+      Pose2d estimatedPose = m_vision.getAllianceRelativePose();
+      m_poseEstimator.addVisionMeasurement(estimatedPose, m_vision.latency.get());
+      m_fieldPoseConsumer.accept("FrontLimelightEstimate", estimatedPose);
+    }
 
     SmartDashboard.putString("Drivetrain/State", m_state.toString());
     SmartDashboard.putBoolean("Drivetrain/Joystick Input",

@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.limelight.LimelightHelpers;
 import frc.lib.limelight.LimelightHelpers.LimelightResults;
+import frc.lib.limelight.LimelightHelpers.Results;
 
 public class Vision extends SubsystemBase {
 
@@ -36,6 +37,8 @@ public class Vision extends SubsystemBase {
   private final double kDistTagToTape = Units.inchesToMeters(30.25);
   private final double kTagToSingleSubstationX = Units.inchesToMeters(60.467);
   private final double kTagToSingleSubstationY = Units.inchesToMeters(36.74);
+
+  private Results m_results;
 
   public Vision() {
     NT = NetworkTableInstance.getDefault();
@@ -52,22 +55,23 @@ public class Vision extends SubsystemBase {
   }
 
   private Optional<LimelightResults> visionResults() {
-    // if (NT.getTable("limelight").getKeys().size() != 0
-    // && NT.getTable("limelight").getEntry("tv").getInteger(0) == 1)
-    // return Optional.of(LimelightHelpers.getLatestResults("limelight"));
+    if (NT.getTable("limelight").getKeys().size() != 0
+        && NT.getTable("limelight").getEntry("tv").getDouble(0) == 1)
+      return Optional.of(LimelightHelpers.getLatestResults("limelight"));
     return Optional.empty();
   }
 
   public Supplier<Double> latency = () -> visionResults().isPresent()
-      ? Timer.getFPGATimestamp() - visionResults().get().targetingResults.botpose[6] / 1000
+      ? Timer.getFPGATimestamp() - (m_results.latency_pipeline / 1000.0) - (m_results.latency_capture / 1000.0)
       : null;
 
   public Pose2d getAllianceRelativePose() {
-    if (visionResults().isPresent()) {
+    visionResults().ifPresent((results) -> m_results = results.targetingResults);
+    if (m_results != null) {
       if (DriverStation.getAlliance().equals(Alliance.Red))
-        visionResults().get().targetingResults.getBotPose2d_wpiRed();
+        return m_results.getBotPose2d_wpiRed();
       else if (DriverStation.getAlliance().equals(Alliance.Blue))
-        visionResults().get().targetingResults.getBotPose2d_wpiBlue();
+        return m_results.getBotPose2d_wpiBlue();
     }
     return null;
   }
