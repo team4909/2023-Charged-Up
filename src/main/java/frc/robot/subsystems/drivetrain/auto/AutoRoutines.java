@@ -35,10 +35,11 @@ public class AutoRoutines {
       m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
   public final Auto ONE_PIECE_CHARGE_STATION = new Auto(
       SCORE_CONE(ElevatorStates.TOP),
-      loadTrajectory(new DriveTrajectory("TopNodeToTopPiece", true)),
       Commands.parallel(
-          loadTrajectory(new DriveTrajectory("ThruTopPiece", false)),
-          INTAKE_CONE()),
+          loadTrajectory(new DriveTrajectory("TopNodeToTopPiece", true)),
+          Commands.sequence(
+              Commands.waitSeconds(3),
+              INTAKE_CONE())),
       Commands.parallel(
           loadTrajectory(new DriveTrajectory("TopPieceToTopNode", false)),
           HANDOFF()),

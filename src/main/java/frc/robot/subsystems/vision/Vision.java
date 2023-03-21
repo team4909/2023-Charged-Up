@@ -11,6 +11,7 @@ import com.pathplanner.lib.PathPoint;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.limelight.LimelightHelpers;
 import frc.lib.limelight.LimelightHelpers.LimelightResults;
+import frc.lib.limelight.LimelightHelpers.Results;
 
 public class Vision extends SubsystemBase {
 
@@ -36,6 +38,8 @@ public class Vision extends SubsystemBase {
   private final double kDistTagToTape = Units.inchesToMeters(30.25);
   private final double kTagToSingleSubstationX = Units.inchesToMeters(60.467);
   private final double kTagToSingleSubstationY = Units.inchesToMeters(36.74);
+
+  private Results m_results;
 
   public Vision() {
     NT = NetworkTableInstance.getDefault();
@@ -52,24 +56,24 @@ public class Vision extends SubsystemBase {
   }
 
   private Optional<LimelightResults> visionResults() {
-    // if (NT.getTable("limelight").getKeys().size() != 0
-    // && NT.getTable("limelight").getEntry("tv").getInteger(0) == 1)
-    // return Optional.of(LimelightHelpers.getLatestResults("limelight"));
+    if (NT.getTable("limelight").getKeys().size() != 0
+        && NT.getTable("limelight").getEntry("tv").getDouble(0) == 1)
+      return Optional.of(LimelightHelpers.getLatestResults("limelight"));
     return Optional.empty();
   }
 
-  public Supplier<Double> latency = () -> visionResults().isPresent()
-      ? Timer.getFPGATimestamp() - visionResults().get().targetingResults.botpose[6] / 1000
-      : null;
-
-  public Pose2d getAllianceRelativePose() {
-    if (visionResults().isPresent()) {
+  public Pair<Pose2d, Double> getAllianceRelativePose() {
+    visionResults().ifPresent((results) -> m_results = results.targetingResults);
+    Pair<Pose2d, Double> val = new Pair<>(null, null);
+    if (m_results != null) {
+      double latency = Timer.getFPGATimestamp() - (m_results.latency_pipeline / 1000.0)
+          - (m_results.latency_capture / 1000.0);
       if (DriverStation.getAlliance().equals(Alliance.Red))
-        visionResults().get().targetingResults.getBotPose2d_wpiRed();
+        val = Pair.of(m_results.getBotPose2d_wpiRed(), latency);
       else if (DriverStation.getAlliance().equals(Alliance.Blue))
-        visionResults().get().targetingResults.getBotPose2d_wpiBlue();
+        val = Pair.of(m_results.getBotPose2d_wpiBlue(), latency);
     }
-    return null;
+    return val;
   }
 
   /**
