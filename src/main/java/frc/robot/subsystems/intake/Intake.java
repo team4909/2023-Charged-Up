@@ -74,7 +74,6 @@ public class Intake extends SubsystemBase {
     m_pivotLeft.setInverted(true);
 
     m_pivotRight.follow(m_pivotLeft, true);
-    m_pivotRight.set(0.01);
 
     if (Constants.SIM) {
       m_pivotSim = new SingleJointedArmSim(
@@ -214,7 +213,7 @@ public class Intake extends SubsystemBase {
     return ff;
   }
 
-  public Command setState(IntakeStates  state) {
+  public Command setState(IntakeStates state) {
     return Commands.runOnce(() -> m_state = state);
   }
 
