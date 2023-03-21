@@ -63,10 +63,11 @@ public class Vision extends SubsystemBase {
   }
 
   public Pair<Pose2d, Double> getAllianceRelativePose() {
-    visionResults().ifPresent((results) -> m_results = results.targetingResults);
+    visionResults().ifPresentOrElse(((results) -> m_results = results.targetingResults), () -> m_results = null);
     Pair<Pose2d, Double> val = new Pair<>(null, null);
     if (m_results != null) {
-      double latency = Timer.getFPGATimestamp() - (m_results.latency_pipeline / 1000.0)
+      double latency = Timer.getFPGATimestamp()
+          - (m_results.latency_pipeline / 1000.0)
           - (m_results.latency_capture / 1000.0);
       if (DriverStation.getAlliance().equals(Alliance.Red))
         val = Pair.of(m_results.getBotPose2d_wpiRed(), latency);
