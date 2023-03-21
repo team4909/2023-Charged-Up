@@ -159,8 +159,24 @@ public final class Constants {
 
         }
     }
+        public static final class CubeShooterConstants {
+            public static final int PIVOT_MOTOR = 17; //not right need to get the right numbers 
+            public static final int TOP_ROLLER_MOTOR = 15; //not right need to get the right numbers 
+            public static final int BOTTOM_ROLLER_MOTOR = 16; //not right need to get the right numbers 
 
-    public static final class ElevatorConstants {
+            // public static final double UP_SETPOINT = ; //not right need to get the right numbers 
+            // public static final double DOWN_SETPOINT = ; //not right need to get the right numbers 
+       
+            public static final double OUTPUT_LIMIT = 0.5;
+            public static final double DEGREE_RANGE = 50.19; // from cad
+            // public static final double TICK_RANGE = ; // emperically measured
+            // public static final double DEGREES_PER_TICK = DEGREE_RANGE / TICK_RANGE;
+        
+            public static final double kP = 0.04;
+            public static final double kG = 1.09;
+        }
+    
+        public static final class ElevatorConstants {
 
         public static final int LEFT_MOTOR = 9;
         public static final int RIGHT_MOTOR = 10;

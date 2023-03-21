@@ -214,7 +214,7 @@ public class Intake extends SubsystemBase {
     return ff;
   }
 
-  public Command setState(IntakeStates state) {
+  public Command setState(IntakeStates  state) {
     return Commands.runOnce(() -> m_state = state);
   }
 

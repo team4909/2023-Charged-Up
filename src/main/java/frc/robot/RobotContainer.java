@@ -20,7 +20,9 @@ import frc.robot.subsystems.drivetrain.auto.AutoRoutines;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.Elevator.ElevatorStates;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.CubeShooter;
 import frc.robot.subsystems.intake.Intake.IntakeStates;
+import frc.robot.subsystems.intake.CubeShooter.CubeShooterStates;
 import frc.robot.subsystems.leds.LEDs;
 
 public class RobotContainer {
@@ -38,6 +40,7 @@ public class RobotContainer {
 	private final Claw m_claw = Claw.getInstance();
 	private final Drivetrain m_drivetrain = Drivetrain.getInstance();
 	private final Intake m_intake = Intake.getInstance();
+	private final CubeShooter m_cubeShooter = CubeShooter.getInstance();
 
 	public RobotContainer() {
 		configureBindings();
@@ -79,11 +82,17 @@ public class RobotContainer {
 		m_driverController.leftTrigger().onTrue(m_intake.setState(IntakeStates.INTAKE_CUBE))
 				.onFalse(m_intake.setState(IntakeStates.HANDOFF));
 		m_driverController.leftBumper().onTrue(m_intake.setState(IntakeStates.SPIT_CONE));
-		m_driverController.povDown().onTrue(m_intake.setState(IntakeStates.RETRACTED));
 		m_driverController.start().onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY));
+		m_driverController.povDown().onTrue(m_intake.setState(IntakeStates.RETRACTED));
+		m_driverController.povLeft().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_DOWN));
+		m_driverController.povRight().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_MID));
+		m_driverController.povUp().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_HIGH));
 		// #endregion
 
 		// #region Operator Controlls
+		//m_operatorController.back().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_HIGH));
+		m_operatorController.start().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_SPIT));
+
 		m_operatorController.povRight().whileTrue(m_leds.setLedColor(Color.kYellow));
 		m_operatorController.povLeft().whileTrue(m_leds.setLedColor(Color.kPurple));
 
