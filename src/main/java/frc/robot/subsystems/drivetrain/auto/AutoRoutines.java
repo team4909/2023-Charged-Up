@@ -21,7 +21,7 @@ public class AutoRoutines {
 
   private final Drivetrain m_drivetrain = Drivetrain.getInstance();
   private final Elevator m_elevator = Elevator.getInstance();
-  private final Wrist m_arm = Wrist.getInstance();
+  private final Wrist m_wrist = Wrist.getInstance();
   private final Intake m_intake = Intake.getInstance();
   private final Claw m_claw = Claw.getInstance();
 
@@ -47,7 +47,16 @@ public class AutoRoutines {
   public final Auto TWO_PIECE_CHARGE_STATION = new Auto(
       loadTrajectory(new DriveTrajectory("TopNodeToChargeStation", false, 1.5)),
       m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
-  // public final Auto TWO_PIECE_GRAB
+  public final Auto ONE_CUBE = new Auto(
+      SCORE_CONE(ElevatorStates.TOP),
+      Commands.parallel(
+          loadTrajectory(new DriveTrajectory("TopNodeToTopCube", true)),
+          Commands.sequence(
+              Commands.waitSeconds(3),
+              INTAKE_CONE())),
+      m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+          new HashMap<>(Map.of("Angle", 0d))),
+      loadTrajectory(new DriveTrajectory("TopCubeToTopCubeNode", false)));
 
   private Command loadTrajectory(DriveTrajectory traj) {
     return Commands.waitUntil(m_drivetrain.isTrajectoryFinished)
@@ -74,11 +83,11 @@ public class AutoRoutines {
     return Commands.sequence(
         m_elevator.setState(extensionLevel),
         Commands.waitSeconds(1.5),
-        m_arm.setState(WristStates.DROPPING),
+        m_wrist.setState(WristStates.DROPPING),
         Commands.waitSeconds(0.75),
         m_claw.setState(ClawStates.OPEN),
         Commands.waitSeconds(0.2),
-        m_arm.setState(WristStates.RETRACTED),
+        m_wrist.setState(WristStates.RETRACTED),
         m_elevator.setState(ElevatorStates.RETRACT))
         .alongWith(INIT());
   }
@@ -93,13 +102,13 @@ public class AutoRoutines {
   public final Command HANDOFF() {
     return Commands.sequence(
         m_claw.setState(ClawStates.OPEN),
-        m_arm.setState(WristStates.HANDOFF_CONE),
+        m_wrist.setState(WristStates.HANDOFF_CONE),
         Commands.waitSeconds(1),
         m_claw.setState(ClawStates.CLOSED),
         Commands.waitSeconds(0.5),
         m_intake.setState(IntakeStates.SPIT_CONE),
         Commands.waitSeconds(0.1),
-        m_arm.setState(WristStates.RETRACTED),
+        m_wrist.setState(WristStates.RETRACTED),
         m_intake.setState(IntakeStates.RETRACTED));
   }
 }

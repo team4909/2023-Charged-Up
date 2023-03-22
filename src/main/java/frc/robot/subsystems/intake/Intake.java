@@ -24,7 +24,7 @@ public class Intake extends SubsystemBase {
   private static Intake m_instance;
   private IntakeStates m_state, m_lastState;
 
-  private final CANSparkMax m_pivotRight, m_pivotLeft, m_frontRoller, m_backRoller;
+  private final CANSparkMax m_pivot, m_frontRoller, m_backRoller;
   private double m_pivotSetpoint;
   private final SingleJointedArmSim m_pivotSim;
   private final PIDController m_simPivotPID;
@@ -56,24 +56,20 @@ public class Intake extends SubsystemBase {
 
   private Intake() {
     m_state = IntakeStates.IDLE;
-    m_pivotRight = new CANSparkMax(IntakeConstants.RIGHT_PIVOT_MOTOR, MotorType.kBrushless);
-    m_pivotLeft = new CANSparkMax(IntakeConstants.LEFT_PIVOT_MOTOR, MotorType.kBrushless);
+    m_pivot = new CANSparkMax(IntakeConstants.LEFT_PIVOT_MOTOR, MotorType.kBrushless);
     m_frontRoller = new CANSparkMax(IntakeConstants.FRONT_ROLLER_MOTOR, MotorType.kBrushless);
     m_backRoller = new CANSparkMax(IntakeConstants.BACK_ROLLER_MOTOR, MotorType.kBrushless);
 
-    m_pivotLeft.restoreFactoryDefaults();
-    m_pivotRight.restoreFactoryDefaults();
+    m_pivot.restoreFactoryDefaults();
     m_frontRoller.restoreFactoryDefaults();
     m_backRoller.restoreFactoryDefaults();
 
-    m_pivotLeft.getPIDController().setP(IntakeConstants.kP);
-    m_pivotLeft.getPIDController().setOutputRange(-IntakeConstants.OUTPUT_LIMIT, IntakeConstants.OUTPUT_LIMIT);
+    m_pivot.getPIDController().setP(IntakeConstants.kP);
+    m_pivot.getPIDController().setOutputRange(-IntakeConstants.OUTPUT_LIMIT, IntakeConstants.OUTPUT_LIMIT);
 
-    m_pivotLeft.setSmartCurrentLimit(40, 40);
-    m_pivotLeft.getEncoder().setPositionConversionFactor(IntakeConstants.DEGREES_PER_TICK);
-    m_pivotLeft.setInverted(true);
-
-    m_pivotRight.follow(m_pivotLeft, true);
+    m_pivot.setSmartCurrentLimit(40, 40);
+    m_pivot.getEncoder().setPositionConversionFactor(IntakeConstants.DEGREES_PER_TICK);
+    m_pivot.setInverted(false);
 
     if (Constants.SIM) {
       m_pivotSim = new SingleJointedArmSim(
@@ -96,21 +92,21 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     stateMachine();
     SmartDashboard.putString("Intake/Intake State", m_state.toString());
-    SmartDashboard.putNumber("Intake/Pivot Error", m_pivotLeft.getEncoder().getPosition() - m_pivotSetpoint);
+    SmartDashboard.putNumber("Intake/Pivot Error", m_pivot.getEncoder().getPosition() - m_pivotSetpoint);
     SmartDashboard.putNumber("Intake/Pivot Setpoint", m_pivotSetpoint);
-    SmartDashboard.putNumber("Intake/Pivot Encoder Position", m_pivotLeft.getEncoder().getPosition());
-    SmartDashboard.putNumber("Intake/Pivot Output", m_pivotLeft.getAppliedOutput());
-    SmartDashboard.putNumber("Intake/Pivot Current", m_pivotLeft.getOutputCurrent());
+    SmartDashboard.putNumber("Intake/Pivot Encoder Position", m_pivot.getEncoder().getPosition());
+    SmartDashboard.putNumber("Intake/Pivot Output", m_pivot.getAppliedOutput());
+    SmartDashboard.putNumber("Intake/Pivot Current", m_pivot.getOutputCurrent());
   }
 
   @Override
   public void simulationPeriodic() {
-    double input = m_pivotLeft.getAppliedOutput() * RobotController.getBatteryVoltage()
-        + calcFF(m_pivotLeft.getEncoder().getPosition());
+    double input = m_pivot.getAppliedOutput() * RobotController.getBatteryVoltage()
+        + calcFF(m_pivot.getEncoder().getPosition());
     m_pivotSim.setInput(input);
     m_pivotSim.update(Constants.PERIODIC_LOOP_DURATION);
     double simAngleDegrees = Math.toDegrees(m_pivotSim.getAngleRads());
-    m_pivotLeft.getEncoder().setPosition(simAngleDegrees);
+    m_pivot.getEncoder().setPosition(simAngleDegrees);
     SmartDashboard.putNumber("Intake/Sim Degrees", simAngleDegrees);
     SmartDashboard.putNumber("Intake/Sim Input", input);
     SmartDashboard.putNumber("Intake/Sim I", m_pivotSim.getCurrentDrawAmps());
@@ -169,7 +165,7 @@ public class Intake extends SubsystemBase {
   // #region State Commands
   private Command Idle() {
     return Commands.runOnce(() -> {
-      m_pivotLeft.set(0d);
+      m_pivot.set(0d);
       m_frontRoller.set(0d);
       m_backRoller.set(0d);
     }, this);
@@ -183,27 +179,27 @@ public class Intake extends SubsystemBase {
           m_backRoller.set(backSpeed);
         }, this),
         Commands.run(() -> {
-          double arbFF = MathUtil.clamp(calcFF(m_pivotLeft.getEncoder().getPosition()), -1d, 1d);
+          double arbFF = MathUtil.clamp(calcFF(m_pivot.getEncoder().getPosition()), -1d, 1d);
           if (Constants.SIM) {
             // Rev sim does not support position control
-            double voltage = m_simPivotPID.calculate(m_pivotLeft.getEncoder().getPosition(), m_pivotSetpoint);
-            m_pivotLeft.getPIDController().setReference(voltage, ControlType.kVoltage);
+            double voltage = m_simPivotPID.calculate(m_pivot.getEncoder().getPosition(), m_pivotSetpoint);
+            m_pivot.getPIDController().setReference(voltage, ControlType.kVoltage);
           } else {
-            m_pivotLeft.getPIDController().setReference(m_pivotSetpoint, ControlType.kPosition, 0, arbFF);
+            m_pivot.getPIDController().setReference(m_pivotSetpoint, ControlType.kPosition, 0, arbFF);
           }
         }, this));
   }
 
   private Command Calibrate() {
     return Commands.run(() -> {
-      m_pivotLeft.setSmartCurrentLimit(5, 40);
-      m_pivotLeft.set(0.1);
+      m_pivot.setSmartCurrentLimit(5, 40);
+      m_pivot.set(0.1);
     }, this).withTimeout(0.5)
         .andThen(() -> {
-          m_pivotLeft.getEncoder().setPosition(110d);
+          m_pivot.getEncoder().setPosition(110d);
           m_state = IntakeStates.RETRACTED;
-          m_pivotLeft.setSmartCurrentLimit(40, 40);
-        }, this);
+        }, this)
+        .finallyDo((i) -> m_pivot.setSmartCurrentLimit(40, 40));
   }
   // #endregion
 

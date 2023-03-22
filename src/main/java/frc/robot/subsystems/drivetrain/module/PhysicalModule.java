@@ -2,14 +2,11 @@ package frc.robot.subsystems.drivetrain.module;
 
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatusFrame;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import edu.wpi.first.math.util.Units;
@@ -76,7 +73,7 @@ public final class PhysicalModule extends ModuleBase {
         // TICKS_PER_ROTATION)
         // * DrivetrainConstants.STEER_REDUCTION;
 
-        super.turnPositionRad = Module.convertTicksToDegrees(m_turnMotor.getSelectedSensorPosition());
+        super.turnPosition = Module.convertTicksToDegrees(m_turnMotor.getSelectedSensorPosition());
         super.turnVelocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(
                 m_turnMotor.getSelectedSensorVelocity() * (600 / TICKS_PER_ROTATION))
                 * DrivetrainConstants.STEER_REDUCTION;
@@ -84,7 +81,7 @@ public final class PhysicalModule extends ModuleBase {
         // super.turnCurrentAmps = m_turnMotor.getSupplyCurrent();
         // super.turnAppliedVolts = m_turnMotor.getMotorOutputVoltage();
 
-        super.turnAbsolutePosition = getWheelHeading();
+        super.turnAbsolutePositionRad = 0;
     }
 
     @Override

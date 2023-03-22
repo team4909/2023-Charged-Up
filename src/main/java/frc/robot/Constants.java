@@ -60,7 +60,7 @@ public final class Constants {
         public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
         public static final double DRIVE_REDUCTION = (14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0);
         public static final double STEER_REDUCTION = (14.0 / 50.0) * (10.0 / 60.0);
-        public static final double MAX_DRIVETRAIN_SPEED = 4.2; // From SDS
+        public static final double MAX_DRIVETRAIN_SPEED = 4.2;
         public static final double PRECISE_SPEED_SCALE = 0.2;
         public static final double DEFAULT_TIMEOUT = 15d; // For auto trajectories
         public static final double DEADBAND = 0.05;
@@ -107,15 +107,14 @@ public final class Constants {
 
     public static final class IntakeConstants {
 
-        public static final int LEFT_PIVOT_MOTOR = 2;
-        public static final int RIGHT_PIVOT_MOTOR = 3;
+        public static final int LEFT_PIVOT_MOTOR = 3;
         public static final int FRONT_ROLLER_MOTOR = 1;
         public static final int BACK_ROLLER_MOTOR = 4;
 
         // https://www.reca.lc/arm?armMass=%7B%22s%22%3A4%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A7.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A105%2C%22u%22%3A%22A%22%7D&efficiency=100&endAngle=%7B%22s%22%3A93%2C%22u%22%3A%22deg%22%7D&iterationLimit=20000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22NEO%22%7D&ratio=%7B%22magnitude%22%3A14.2857%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
 
-        public static final double kP = 0.015;
-        public static final double kG = 0.66;
+        public static final double kP = 0.01;
+        public static final double kG = 0.7;
 
         public static final double OUTPUT_LIMIT = 0.5;
         public static final double DEGREE_RANGE = 110d; // from cad
@@ -167,16 +166,18 @@ public final class Constants {
         public static final int TOP_ROLLER_MOTOR = 15;
         public static final int BOTTOM_ROLLER_MOTOR = 16;
 
-        public static final double UP_SETPOINT = 0;
-        public static final double DOWN_SETPOINT = 0;
+        public static final double UP_SETPOINT = 104.0;
+        public static final double DOWN_SETPOINT = 0.0;
+        public static final double CUBE_MID = 60.0;
 
-        public static final double OUTPUT_LIMIT = 0.5;
-        public static final double DEGREE_RANGE = 111; // from cad
-        public static final double TICK_RANGE = 9.833375; // emperically measured
+        public static final double OUTPUT_LIMIT = 1.0;
+        public static final double DEGREE_RANGE = 111.0; // from cad
+        public static final double TICK_RANGE = 16.545471; // emperically measured
         public static final double DEGREES_PER_TICK = DEGREE_RANGE / TICK_RANGE;
 
         // https://www.reca.lc/arm?armMass=%7B%22s%22%3A11.3%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A11%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=65&endAngle=%7B%22s%22%3A100%2C%22u%22%3A%22deg%22%7D&iterationLimit=20000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22NEO%22%7D&ratio=%7B%22magnitude%22%3A30%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
-        public static final double kP = 0.04;
+        public static final double kP = 0.011; // 0.04 / 4;
+        public static final double kD = 0.04;
         public static final double kG = 1.09;
     }
 

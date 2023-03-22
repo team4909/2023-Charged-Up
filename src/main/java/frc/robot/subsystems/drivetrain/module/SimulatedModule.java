@@ -40,8 +40,8 @@ public final class SimulatedModule extends ModuleBase {
         super.driveVelocityRadPerSec = driveMotor.getAngularVelocityRadPerSec();
         super.driveCurrentAmps = Math.abs(driveMotor.getCurrentDrawAmps());
 
-        super.turnAbsolutePosition = m_turnAbsolutePositionRad;
-        super.turnPositionRad = m_turnRelativePositionRad;
+        super.turnAbsolutePositionRad = m_turnAbsolutePositionRad;
+        super.turnPosition = m_turnRelativePositionRad;
         super.turnAppliedVolts = m_turnAppliedVolts;
         super.turnVelocityRadPerSec = turnMotor.getAngularVelocityRadPerSec();
         super.turnCurrentAmps = Math.abs(turnMotor.getCurrentDrawAmps());

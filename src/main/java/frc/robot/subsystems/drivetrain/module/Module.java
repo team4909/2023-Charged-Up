@@ -36,7 +36,7 @@ public final class Module {
         m_module.updateModuleInputs();
         SmartDashboard.putString("Drivetrain/Module/State " + m_index, getModuleState().toString());
         SmartDashboard.putString("Drivetrain/Module/Position " + m_index, getModulePosition().toString());
-        SmartDashboard.putNumber("Absolute Module Angle " + m_index, m_module.turnAbsolutePosition);
+        SmartDashboard.putNumber("Absolute Module Angle " + m_index, m_module.turnPosition);
         SmartDashboard.putNumber("Drivetrain/Actual Module Speed" + m_index,
                 Math.abs(getModuleState().speedMetersPerSecond));
     }
@@ -66,8 +66,8 @@ public final class Module {
     }
 
     private Rotation2d getModuleAngle() {
-        return Constants.SIM ? new Rotation2d(MathUtil.angleModulus(m_module.turnAbsolutePosition))
-                : Rotation2d.fromDegrees(m_module.turnPositionRad);
+        return Constants.SIM ? new Rotation2d(MathUtil.angleModulus(m_module.turnAbsolutePositionRad))
+                : Rotation2d.fromDegrees(m_module.turnPosition);
     }
 
     private double getPositionMeters() {

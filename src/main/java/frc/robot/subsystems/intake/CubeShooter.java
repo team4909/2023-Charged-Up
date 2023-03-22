@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CubeShooterConstants;
-import frc.robot.Constants.IntakeConstants;
 
 public class CubeShooter extends SubsystemBase {
   private static CubeShooter m_instance;
@@ -50,64 +49,64 @@ public class CubeShooter extends SubsystemBase {
     m_bottomRoller.restoreFactoryDefaults();
 
     m_cubePivot.getPIDController().setP(CubeShooterConstants.kP);
+    m_cubePivot.getPIDController().setD(CubeShooterConstants.kD);
     m_cubePivot.getPIDController().setOutputRange(-CubeShooterConstants.OUTPUT_LIMIT,
         CubeShooterConstants.OUTPUT_LIMIT);
 
-    m_cubePivot.setSmartCurrentLimit(10, 40);
+    m_cubePivot.setSmartCurrentLimit(40, 40);
     m_cubePivot.getEncoder().setPositionConversionFactor(CubeShooterConstants.DEGREES_PER_TICK);
-    m_cubePivot.setInverted(true);
+    m_cubePivot.setInverted(false);
 
   }
 
   @Override
   public void periodic() {
     stateMachine();
-    SmartDashboard.putString("Cube Shooter/Intake State", m_state.toString());
-    SmartDashboard.putNumber("cubeshooter/Pivot Error",
+    SmartDashboard.putNumber("Cube Shooter/Pivot Error",
         m_cubePivot.getEncoder().getPosition() - m_cubePivotSetpoint);
-    SmartDashboard.putNumber("cubeshooter/Pivot Setpoint", m_cubePivotSetpoint);
-    SmartDashboard.putNumber("cubeshooter/Pivot Encoder Position", m_cubePivot.getEncoder().getPosition());
-    SmartDashboard.putNumber("cubeshooter/Pivot Output", m_cubePivot.getAppliedOutput());
-    SmartDashboard.putNumber("cubeshooter/Pivot Current", m_cubePivot.getOutputCurrent());
-
+    SmartDashboard.putNumber("Cube Shooter/Pivot Setpoint", m_cubePivotSetpoint);
+    SmartDashboard.putNumber("Cube Shooter/Pivot Encoder Position", m_cubePivot.getEncoder().getPosition());
+    SmartDashboard.putNumber("Cube Shooter/Pivot Output", m_cubePivot.getAppliedOutput());
+    SmartDashboard.putNumber("Cube Shooter/Pivot Current", m_cubePivot.getOutputCurrent());
+    SmartDashboard.putString("Cube Shooter/State", m_state.toString());
   }
 
   private void stateMachine() {
-    Command currentIntakeCommand = null;
+    Command currentCubeShooterCommand = null;
     if (!m_state.equals(m_lastState)) {
       switch (m_state) {
         case IDLE:
-          currentIntakeCommand = Idle();
+          currentCubeShooterCommand = Idle();
           break;
         // Need to make DOWN_SETPOINT
         case CUBE_DOWN:
-          currentIntakeCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, 0.25d,
-              0.25d);
+          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, -0.50d,
+              -0.50d);
           break;
         case CUBE_UP:
-          currentIntakeCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.UP_SETPOINT, 0d, 0d);
+          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.UP_SETPOINT, 0d, 0d);
           break;
         case CUBE_MID:
-          currentIntakeCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.UP_SETPOINT, 0.25d,
-              0.25d);
+          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.CUBE_MID, 0d,
+              0d);
           break;
         case CUBE_HIGH:
-          currentIntakeCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.UP_SETPOINT, 0.25d,
+          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.UP_SETPOINT, 0.25d,
               0.25d);
           break;
         case CUBE_SPIT:
-          currentIntakeCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, -0.25d,
+          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, -0.25d,
               -0.25d);
         case CALIBRATE:
-          currentIntakeCommand = Calibrate();
+          currentCubeShooterCommand = Calibrate();
           break;
         default:
           break;
       }
       m_lastState = m_state;
 
-      if (currentIntakeCommand != null) {
-        currentIntakeCommand.schedule();
+      if (currentCubeShooterCommand != null) {
+        currentCubeShooterCommand.schedule();
       }
 
     }
@@ -130,6 +129,7 @@ public class CubeShooter extends SubsystemBase {
         .andThen(() -> {
           m_cubePivot.getEncoder().setPosition(CubeShooterConstants.DEGREE_RANGE - 7.0);
           m_state = CubeShooterStates.CUBE_UP;
+          m_cubePivot.setSmartCurrentLimit(40, 40);
         }, this);
   }
 
@@ -147,8 +147,8 @@ public class CubeShooter extends SubsystemBase {
   }
 
   private double calcFF(double thetaDegrees) {
-    double ff = IntakeConstants.kG * Math.cos(Math.toRadians(thetaDegrees));
-    SmartDashboard.putNumber("cubeshooter/Feed Forward", ff);
+    double ff = CubeShooterConstants.kG * Math.cos(Math.toRadians(thetaDegrees));
+    SmartDashboard.putNumber("Cube Shooter/Feed Forward", ff);
     return ff;
   }
 

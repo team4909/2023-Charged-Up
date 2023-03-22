@@ -27,7 +27,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    Drivetrain.getInstance().resetModules();
+    Drivetrain.getInstance().reseedModules();
 
     PathPlannerServer.startServer(5811);
   }
@@ -43,7 +43,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    Drivetrain.getInstance().resetModules();
+    Drivetrain.getInstance().reseedModules();
   }
 
   @Override

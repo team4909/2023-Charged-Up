@@ -36,7 +36,7 @@ public class Wrist extends SubsystemBase {
     IDLE("Idle"),
     RETRACTED("Retracted"),
     HANDOFF_CONE("Handoff Cone"),
-    HANDOFF_CUBE("Handoff Cube"),
+    HALF_DUNK("Half Dunk"),
     DROPPING("Dropping"),
     SUBSTATION("Substation");
 
@@ -110,8 +110,8 @@ public class Wrist extends SubsystemBase {
         case HANDOFF_CONE:
           currentWristCommand = SetWristPosition(-47.361);
           break;
-        case HANDOFF_CUBE:
-          currentWristCommand = SetWristPosition(-7.966);
+        case HALF_DUNK:
+          currentWristCommand = SetWristPosition(45);
           break;
         case DROPPING:
           currentWristCommand = SetWristPosition(0);

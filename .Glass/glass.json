@@ -19,7 +19,7 @@
     "Plot <0>": {
       "plots": [
         {
-          "height": 445,
+          "height": 209,
           "series": [
             {
               "color": [
@@ -40,6 +40,9 @@
               "id": "NT:/SmartDashboard/elevatorError"
             }
           ]
+        },
+        {
+          "height": 209
         }
       ]
     },

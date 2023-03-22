@@ -36,7 +36,7 @@ public class RobotContainer {
 	private final Elevator m_elevator = Elevator.getInstance();
 	private final LEDs m_leds = LEDs.getInstance();
 
-	private final Wrist m_arm = Wrist.getInstance();
+	private final Wrist m_wrist = Wrist.getInstance();
 	private final Claw m_claw = Claw.getInstance();
 	private final Drivetrain m_drivetrain = Drivetrain.getInstance();
 	private final Intake m_intake = Intake.getInstance();
@@ -61,9 +61,9 @@ public class RobotContainer {
 				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
 
 		m_driverController.y()
-				.onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+				.toggleOnTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
 						new HashMap<>(Map.of("Angle", 0d))))
-				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+				.toggleOnFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
 		m_driverController.b()
 				.onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
 						new HashMap<>(Map.of("Angle", 270d))))
@@ -82,44 +82,50 @@ public class RobotContainer {
 		m_driverController.leftTrigger().onTrue(m_intake.setState(IntakeStates.INTAKE_CUBE))
 				.onFalse(m_intake.setState(IntakeStates.HANDOFF));
 		m_driverController.leftBumper().onTrue(m_intake.setState(IntakeStates.SPIT_CONE));
-		m_driverController.start().onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY));
+		m_driverController.start().onTrue(Commands.runOnce(() -> m_drivetrain.reseedModules()));
 		m_driverController.povDown().onTrue(m_intake.setState(IntakeStates.RETRACTED));
 		m_driverController.povLeft().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_DOWN));
 		m_driverController.povRight().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_MID));
-		m_driverController.povUp().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_HIGH));
+		m_driverController.povUp().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_UP));
 		// #endregion
 
 		// #region Operator Controlls
-		//m_operatorController.back().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_HIGH));
+		// m_operatorController.back().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_HIGH));
 		m_operatorController.start().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_SPIT));
 
 		m_operatorController.povRight().whileTrue(m_leds.setLedColor(Color.kYellow));
 		m_operatorController.povLeft().whileTrue(m_leds.setLedColor(Color.kPurple));
 
-		m_operatorController.povUp().onTrue(m_arm.setState(WristStates.RETRACTED));
-		m_operatorController.povDown().onTrue(m_arm.setState(WristStates.DROPPING));
+		m_operatorController.povUp().onTrue(m_wrist.setState(WristStates.RETRACTED));
+		m_operatorController.povDown().onTrue(m_wrist.setState(WristStates.DROPPING));
 		m_operatorController.leftBumper().onTrue(
 				Commands.sequence(
 						m_claw.setState(ClawStates.OPEN),
-						m_arm.setState(WristStates.SUBSTATION)));
+						m_wrist.setState(WristStates.SUBSTATION)));
 
 		m_operatorController.x().onTrue(m_claw.setState(ClawStates.OPEN));
 		m_operatorController.y().onTrue(m_claw.setState(ClawStates.CLOSED));
 
-		m_operatorController.rightTrigger().onTrue(m_elevator.setState(ElevatorStates.MID_CONE));
-		m_operatorController.rightBumper().onTrue(m_elevator.setState(ElevatorStates.TOP));
+		m_operatorController.rightTrigger().onTrue(
+				Commands.sequence(
+						m_elevator.setState(ElevatorStates.MID_CONE),
+						m_wrist.setState(WristStates.HALF_DUNK)));
+		m_operatorController.rightBumper().onTrue(
+				Commands.sequence(
+						m_elevator.setState(ElevatorStates.TOP),
+						m_wrist.setState(WristStates.HALF_DUNK)));
 
 		// m_operatorController.start().onTrue(substationToggle());
 		// Handoff Cone Sequence
 		m_operatorController.a().onTrue(m_routines.HANDOFF());
 
 		// Drop Game Piece
-		m_operatorController.b().onTrue(m_arm.setState(WristStates.DROPPING)
+		m_operatorController.b().onTrue(m_wrist.setState(WristStates.DROPPING)
 				.andThen(new WaitCommand(0.5))
 				.andThen(m_claw.setState(ClawStates.OPEN))
 				.andThen(new WaitCommand(0.2))
 				.andThen(m_elevator.setState(ElevatorStates.RETRACT))
-				.andThen(m_arm.setState(WristStates.RETRACTED)));
+				.andThen(m_wrist.setState(WristStates.RETRACTED)));
 		// #endregion
 
 		// m_testController.leftBumper()
@@ -160,6 +166,7 @@ public class RobotContainer {
 		m_chooser.addOption("Score Cone & Balance Charge Station", m_routines.SCORE_CONE_CHARGE_STATION_COMMUNITY);
 		m_chooser.addOption("One Meter Test", m_routines.TEST);
 		m_chooser.addOption("One Piece + Charge Station", m_routines.ONE_PIECE_CHARGE_STATION);
+		m_chooser.addOption("One Cube", m_routines.ONE_CUBE);
 		SmartDashboard.putData(m_chooser);
 	}
 

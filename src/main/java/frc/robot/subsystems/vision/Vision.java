@@ -2,7 +2,6 @@ package frc.robot.subsystems.vision;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;

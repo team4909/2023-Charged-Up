@@ -19,6 +19,7 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import edu.wpi.first.math.MatBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -155,12 +156,12 @@ public class Drivetrain extends SubsystemBase {
     }
 
     m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
-    if (m_vision.getAllianceRelativePose().getFirst() != null
-        && m_vision.getAllianceRelativePose().getSecond() != null) {
+    Pair<Pose2d, Double> visionReading = m_vision.getAllianceRelativePose();
+    if (visionReading.getFirst() != null && visionReading != null) {
       // m_poseEstimator.addVisionMeasurement(
       // m_vision.getAllianceRelativePose().getFirst(),
       // m_vision.getAllianceRelativePose().getSecond());
-      m_fieldPoseConsumer.accept("FrontLimelightEstimate", m_vision.getAllianceRelativePose().getFirst());
+      m_fieldPoseConsumer.accept("FrontLimelightEstimate", visionReading.getFirst());
     }
 
     SmartDashboard.putString("Drivetrain/State", m_state.toString());
@@ -320,6 +321,7 @@ public class Drivetrain extends SubsystemBase {
           .transformTrajectoryForAlliance(trajectory, DriverStation.getAlliance());
       if (isFirstPath) {
         resetGyro(trajectory.getInitialHolonomicPose().getRotation());
+        Timer.delay(0.04); // For gyro reset, CAN is not instant
         resetPose(transformedTrajectory.getInitialHolonomicPose());
       }
       setFieldTrajectory(onTheFly ? trajectory : transformedTrajectory);
@@ -342,12 +344,12 @@ public class Drivetrain extends SubsystemBase {
   private Command SnapToAngle(double angle) {
     PIDController snapPID = new PIDController(0.012, 0.0, 0.0);
     snapPID.enableContinuousInput(-180, 180);
-    snapPID.setSetpoint(angle);
-    return new RunCommand(
-        () -> {
-          double omega = snapPID.calculate(
-              (MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180)),
-              snapPID.getSetpoint());
+    snapPID.setTolerance(1.5); // degrees
+    return new PIDCommand(
+        snapPID,
+        () -> MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180),
+        () -> angle,
+        (omega) -> {
           drive(ChassisSpeeds.fromFieldRelativeSpeeds(
               isJoystickInputPresent()
                   ? -m_joystickTranslationX.getAsDouble() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED
@@ -357,7 +359,9 @@ public class Drivetrain extends SubsystemBase {
                   : 0,
               (m_joystickRotationOmega.getAsDouble() + omega) * MAX_ANGULAR_SPEED, getGyroYaw()));
         },
-        this).andThen(() -> snapPID.close());
+        this)
+        .until(() -> snapPID.atSetpoint())
+        .andThen(setState(DrivetrainStates.IDLE));
   }
 
   private Command AutoBalance() {
@@ -411,7 +415,7 @@ public class Drivetrain extends SubsystemBase {
     return Math.copySign(Math.pow(value, 3), value);
   }
 
-  public void resetModules() {
+  public void reseedModules() {
     for (Module module : m_modules) {
       module.resetTurn();
     }
