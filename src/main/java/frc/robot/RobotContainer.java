@@ -88,34 +88,28 @@ public class RobotContainer {
 		m_driverController.povDown().onTrue(m_intake.setState(IntakeStates.RETRACTED));
 
 		m_driverController.povLeft().onTrue(new SequentialCommandGroup(
-				m_cubeShooter.setState(CubeShooterStates.CUBE_MID),
-				new WaitCommand(.25),
 				m_cubeShooter.setState(CubeShooterStates.CUBE_DOWN)));
 
-		m_driverController.povRight().onTrue(new ConditionalCommand(
-				m_cubeShooter.setState(CubeShooterStates.CUBE_SPIT),
-				(Command) new SequentialCommandGroup(
-						m_cubeShooter.setState(CubeShooterStates.CUBE_MID),
-						new WaitCommand(.25)),
-				() -> CubeShooter.getInstance().getState() == CubeShooterStates.CUBE_MID));
-
-		m_driverController.povUp().onTrue(new ConditionalCommand(
-				m_cubeShooter.setState(CubeShooterStates.CUBE_SPIT_HIGH),
-				(Command) new SequentialCommandGroup(
-						m_cubeShooter.setState(CubeShooterStates.CUBE_UP),
-						new WaitCommand(.25)),
-				() -> CubeShooter.getInstance().getState() == CubeShooterStates.CUBE_UP));
+		m_driverController.a()
+				.onTrue(m_cubeShooter.setState(CubeShooterStates.SHOOT))
+				.onFalse(m_cubeShooter.setState(CubeShooterStates.CUBE_UP));
 		// #endregion
 
 		// #region Operator Controlls
-		// m_operatorController.back().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_HIGH));
-		m_operatorController.start().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_SPIT));
 
-		m_operatorController.povRight().whileTrue(m_leds.setLedColor(Color.kYellow));
-		m_operatorController.povLeft().whileTrue(m_leds.setLedColor(Color.kPurple));
+		m_operatorController.back().whileTrue(m_leds.setLedColor(Color.kYellow));
+		m_operatorController.start().whileTrue(m_leds.setLedColor(Color.kPurple));
 
 		m_operatorController.povUp().onTrue(m_wrist.setState(WristStates.RETRACTED));
 		m_operatorController.povDown().onTrue(m_wrist.setState(WristStates.DROPPING));
+
+		m_operatorController.povRight()
+				.onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_HIGH))
+				.onFalse(m_cubeShooter.setState(CubeShooterStates.CUBE_UP));
+		m_operatorController.povLeft()
+				.onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_MID))
+				.onFalse(m_cubeShooter.setState(CubeShooterStates.CUBE_UP));
+
 		m_operatorController.leftBumper().onTrue(
 				Commands.sequence(
 						m_claw.setState(ClawStates.OPEN),

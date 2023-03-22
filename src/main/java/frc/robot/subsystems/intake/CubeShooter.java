@@ -23,11 +23,11 @@ public class CubeShooter extends SubsystemBase {
     IDLE("Idle"),
     CUBE_DOWN("Down"),
     CUBE_UP("Up"),
+    CUBE_LOW("Cube Low"),
     CUBE_MID("Cube Mid"),
     CUBE_HIGH("Cube High"),
-    CALIBRATE("Cube Calibrate"),
-    CUBE_SPIT("Cube Spit"),
-    CUBE_SPIT_HIGH("Cube Spit High");
+    SHOOT("Shoot"),
+    CALIBRATE("Cube Calibrate");
 
     String stateName;
 
@@ -80,27 +80,36 @@ public class CubeShooter extends SubsystemBase {
         case IDLE:
           currentCubeShooterCommand = Idle();
           break;
-        // Need to make DOWN_SETPOINT
         case CUBE_DOWN:
-          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, -0.70d,
+          currentCubeShooterCommand = Shoot(CubeShooterConstants.DOWN_SETPOINT, -0.70d,
               -0.70d);
           break;
         case CUBE_UP:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.UP_SETPOINT, 0d, 0d);
           break;
+        case CUBE_LOW:
+          currentCubeShooterCommand = setPosition(CubeShooterConstants.UP_SETPOINT);
+          break;
         case CUBE_MID:
-          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.CUBE_MID, 0d,
-              0d);
+          currentCubeShooterCommand = setPosition(CubeShooterConstants.CUBE_MID);
           break;
         case CUBE_HIGH:
-          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.UP_SETPOINT, 0.25d,
-              0.25d);
+          currentCubeShooterCommand = setPosition(CubeShooterConstants.UP_SETPOINT);
           break;
-        case CUBE_SPIT:
-          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.CUBE_MID, .4, .4);
-          break;
-        case CUBE_SPIT_HIGH:
-          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.UP_SETPOINT, .5, .5);
+        case SHOOT:
+          switch (m_lastState) {
+            case CUBE_LOW:
+              currentCubeShooterCommand = setRollerSpeed(0.4d, 0.4d);
+              break;
+            case CUBE_MID:
+              currentCubeShooterCommand = setRollerSpeed(0.45d, 0.45d);
+              break;
+            case CUBE_HIGH:
+              currentCubeShooterCommand = setRollerSpeed(0.75, 0.75);
+              break;
+            default:
+              break;
+          }
           break;
         case CALIBRATE:
           currentCubeShooterCommand = Calibrate();
@@ -138,8 +147,7 @@ public class CubeShooter extends SubsystemBase {
         .andThen(() -> {
           m_cubePivot.getEncoder().setPosition(CubeShooterConstants.DEGREE_RANGE - 7.0);
           m_state = CubeShooterStates.CUBE_UP;
-          m_cubePivot.setSmartCurrentLimit(40, 40);
-        }, this);
+        }).finallyDo((i) -> m_cubePivot.setSmartCurrentLimit(40, 40));
   }
 
   private Command SetPivotPositionAndRollerSpeed(double position, double frontSpeed, double backSpeed) {
@@ -153,6 +161,35 @@ public class CubeShooter extends SubsystemBase {
           double arbFF = MathUtil.clamp(calcFF(m_cubePivot.getEncoder().getPosition()), -1d, 1d);
           m_cubePivot.getPIDController().setReference(m_cubePivotSetpoint, ControlType.kPosition, 0, arbFF);
         }, this));
+  }
+
+  private Command setPosition(double position) {
+    m_cubePivotSetpoint = position;
+    return Commands.run(() -> {
+      double arbFF = MathUtil.clamp(calcFF(m_cubePivot.getEncoder().getPosition()), -1d, 1d);
+      m_cubePivot.getPIDController().setReference(m_cubePivotSetpoint, ControlType.kPosition, 0, arbFF);
+    }, this).until(() -> (m_cubePivot.getEncoder().getPosition() - position < 1.5));
+  }
+
+  private Command setRollerSpeed(double frontSpeed, double backSpeed) {
+    return Commands.runOnce(() -> {
+      m_topRoller.set(frontSpeed);
+      m_bottomRoller.set(backSpeed);
+    }, this);
+  }
+
+  private Command Shoot(double position, double frontSpeed, double backSpeed) {
+    m_cubePivotSetpoint = position; // variable exists for telemetry purposes
+    return Commands.sequence(
+        Commands.run(() -> {
+          double arbFF = MathUtil.clamp(calcFF(m_cubePivot.getEncoder().getPosition()), -1d, 1d);
+          m_cubePivot.getPIDController().setReference(m_cubePivotSetpoint, ControlType.kPosition, 0, arbFF);
+        }, this).until(() -> (m_cubePivot.getEncoder().getPosition() - position < 1.5)))
+        .andThen(
+            Commands.runOnce(() -> {
+              m_topRoller.set(frontSpeed);
+              m_bottomRoller.set(backSpeed);
+            }, this));
   }
 
   private double calcFF(double thetaDegrees) {
