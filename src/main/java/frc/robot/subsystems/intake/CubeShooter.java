@@ -8,6 +8,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CubeShooterConstants;
 
@@ -25,7 +26,8 @@ public class CubeShooter extends SubsystemBase {
     CUBE_MID("Cube Mid"),
     CUBE_HIGH("Cube High"),
     CALIBRATE("Cube Calibrate"),
-    CUBE_SPIT("Cube Spit");
+    CUBE_SPIT("Cube Spit"),
+    CUBE_SPIT_HIGH("Cube Spit High");
 
     String stateName;
 
@@ -80,8 +82,8 @@ public class CubeShooter extends SubsystemBase {
           break;
         // Need to make DOWN_SETPOINT
         case CUBE_DOWN:
-          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, -0.50d,
-              -0.50d);
+          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, -0.70d,
+              -0.70d);
           break;
         case CUBE_UP:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.UP_SETPOINT, 0d, 0d);
@@ -95,8 +97,11 @@ public class CubeShooter extends SubsystemBase {
               0.25d);
           break;
         case CUBE_SPIT:
-          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, -0.25d,
-              -0.25d);
+          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.CUBE_MID, .4, .4);
+          break;
+        case CUBE_SPIT_HIGH:
+          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.UP_SETPOINT, .5, .5);
+          break;
         case CALIBRATE:
           currentCubeShooterCommand = Calibrate();
           break;
@@ -111,6 +116,10 @@ public class CubeShooter extends SubsystemBase {
 
     }
 
+  }
+
+  public CubeShooterStates getState() {
+    return m_state;
   }
 
   private Command Idle() {
@@ -153,7 +162,7 @@ public class CubeShooter extends SubsystemBase {
   }
 
   public Command setState(CubeShooterStates state) {
-    return Commands.runOnce(() -> m_state = state);
+    return new InstantCommand(() -> m_state = state);
   }
 
   public static CubeShooter getInstance() {

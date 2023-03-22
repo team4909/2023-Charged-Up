@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.arm.Wrist;
@@ -84,9 +86,25 @@ public class RobotContainer {
 		m_driverController.leftBumper().onTrue(m_intake.setState(IntakeStates.SPIT_CONE));
 		m_driverController.start().onTrue(Commands.runOnce(() -> m_drivetrain.reseedModules()));
 		m_driverController.povDown().onTrue(m_intake.setState(IntakeStates.RETRACTED));
-		m_driverController.povLeft().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_DOWN));
-		m_driverController.povRight().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_MID));
-		m_driverController.povUp().onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_UP));
+
+		m_driverController.povLeft().onTrue(new SequentialCommandGroup(
+				m_cubeShooter.setState(CubeShooterStates.CUBE_MID),
+				new WaitCommand(.25),
+				m_cubeShooter.setState(CubeShooterStates.CUBE_DOWN)));
+
+		m_driverController.povRight().onTrue(new ConditionalCommand(
+				m_cubeShooter.setState(CubeShooterStates.CUBE_SPIT),
+				(Command) new SequentialCommandGroup(
+						m_cubeShooter.setState(CubeShooterStates.CUBE_MID),
+						new WaitCommand(.25)),
+				() -> CubeShooter.getInstance().getState() == CubeShooterStates.CUBE_MID));
+
+		m_driverController.povUp().onTrue(new ConditionalCommand(
+				m_cubeShooter.setState(CubeShooterStates.CUBE_SPIT_HIGH),
+				(Command) new SequentialCommandGroup(
+						m_cubeShooter.setState(CubeShooterStates.CUBE_UP),
+						new WaitCommand(.25)),
+				() -> CubeShooter.getInstance().getState() == CubeShooterStates.CUBE_UP));
 		// #endregion
 
 		// #region Operator Controlls
