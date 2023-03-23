@@ -17,17 +17,15 @@ public class CubeShooter extends SubsystemBase {
   private CubeShooterStates m_state, m_lastState;
 
   private final CANSparkMax m_cubePivot, m_topRoller, m_bottomRoller;
-  private double m_cubePivotSetpoint;
+  private double m_pivotSetpoint, m_frontRollerSetpoint, m_backRollerSetpoint;
 
   public enum CubeShooterStates {
     IDLE("Idle"),
-    CUBE_DOWN("Down"),
-    CUBE_UP("Up"),
-    CUBE_LOW("Cube Low"),
-    CUBE_MID("Cube Mid"),
-    CUBE_HIGH("Cube High"),
-    SHOOT("Shoot"),
-    CALIBRATE("Cube Calibrate");
+    INTAKE("Intake"),
+    RETRACTED("Retracted"),
+    SPIT("Spit"),
+    SCORE("Score"),
+    CALIBRATE("Calibrate");
 
     String stateName;
 
@@ -65,8 +63,8 @@ public class CubeShooter extends SubsystemBase {
   public void periodic() {
     stateMachine();
     SmartDashboard.putNumber("Cube Shooter/Pivot Error",
-        m_cubePivot.getEncoder().getPosition() - m_cubePivotSetpoint);
-    SmartDashboard.putNumber("Cube Shooter/Pivot Setpoint", m_cubePivotSetpoint);
+        m_cubePivot.getEncoder().getPosition() - m_pivotSetpoint);
+    SmartDashboard.putNumber("Cube Shooter/Pivot Setpoint", m_pivotSetpoint);
     SmartDashboard.putNumber("Cube Shooter/Pivot Encoder Position", m_cubePivot.getEncoder().getPosition());
     SmartDashboard.putNumber("Cube Shooter/Pivot Output", m_cubePivot.getAppliedOutput());
     SmartDashboard.putNumber("Cube Shooter/Pivot Current", m_cubePivot.getOutputCurrent());
@@ -80,41 +78,24 @@ public class CubeShooter extends SubsystemBase {
         case IDLE:
           currentCubeShooterCommand = Idle();
           break;
-        case CUBE_DOWN:
-          currentCubeShooterCommand = Shoot(CubeShooterConstants.DOWN_SETPOINT, -0.70d,
-              -0.70d);
+        case INTAKE:
+          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, -0.7, -0.7);
           break;
-        case CUBE_UP:
-          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.UP_SETPOINT, 0d, 0d);
+        case RETRACTED:
+          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.RETRACTED_SETPOINT, 0.0, 0.0);
           break;
-        case CUBE_LOW:
-          currentCubeShooterCommand = setPosition(CubeShooterConstants.UP_SETPOINT);
+        case SCORE:
+          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.CUBE_MID,
+              m_frontRollerSetpoint, m_backRollerSetpoint);
           break;
-        case CUBE_MID:
-          currentCubeShooterCommand = setPosition(CubeShooterConstants.CUBE_MID);
-          break;
-        case CUBE_HIGH:
-          currentCubeShooterCommand = setPosition(CubeShooterConstants.UP_SETPOINT);
-          break;
-        case SHOOT:
-          switch (m_lastState) {
-            case CUBE_LOW:
-              currentCubeShooterCommand = setRollerSpeed(0.4d, 0.4d);
-              break;
-            case CUBE_MID:
-              currentCubeShooterCommand = setRollerSpeed(0.45d, 0.45d);
-              break;
-            case CUBE_HIGH:
-              currentCubeShooterCommand = setRollerSpeed(0.75, 0.75);
-              break;
-            default:
-              break;
-          }
+        case SPIT:
+          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, 0.2, 0.2);
           break;
         case CALIBRATE:
           currentCubeShooterCommand = Calibrate();
           break;
         default:
+          currentCubeShooterCommand = Idle();
           break;
       }
       m_lastState = m_state;
@@ -146,51 +127,29 @@ public class CubeShooter extends SubsystemBase {
     }, this).withTimeout(0.5)
         .andThen(() -> {
           m_cubePivot.getEncoder().setPosition(CubeShooterConstants.DEGREE_RANGE - 7.0);
-          m_state = CubeShooterStates.CUBE_UP;
+          m_state = CubeShooterStates.RETRACTED;
         }).finallyDo((i) -> m_cubePivot.setSmartCurrentLimit(40, 40));
   }
 
   private Command SetPivotPositionAndRollerSpeed(double position, double frontSpeed, double backSpeed) {
-    m_cubePivotSetpoint = position; // variable exists for telemetry purposes
+    m_pivotSetpoint = position; // variable exists for telemetry purposes
     return Commands.sequence(
+        Commands.run(() -> {
+          double arbFF = MathUtil.clamp(calcFF(m_cubePivot.getEncoder().getPosition()), -1d, 1d);
+          m_cubePivot.getPIDController().setReference(m_pivotSetpoint, ControlType.kPosition, 0, arbFF);
+        }, this).until(() -> (position - m_cubePivot.getEncoder().getPosition() < 1.5)),
         Commands.runOnce(() -> {
           m_topRoller.set(frontSpeed);
           m_bottomRoller.set(backSpeed);
-        }, this),
-        Commands.run(() -> {
-          double arbFF = MathUtil.clamp(calcFF(m_cubePivot.getEncoder().getPosition()), -1d, 1d);
-          m_cubePivot.getPIDController().setReference(m_cubePivotSetpoint, ControlType.kPosition, 0, arbFF);
         }, this));
   }
 
-  private Command setPosition(double position) {
-    m_cubePivotSetpoint = position;
-    return Commands.run(() -> {
-      double arbFF = MathUtil.clamp(calcFF(m_cubePivot.getEncoder().getPosition()), -1d, 1d);
-      m_cubePivot.getPIDController().setReference(m_cubePivotSetpoint, ControlType.kPosition, 0, arbFF);
-    }, this).until(() -> (m_cubePivot.getEncoder().getPosition() - position < 1.5));
-  }
-
-  private Command setRollerSpeed(double frontSpeed, double backSpeed) {
+  public Command SetRollerSpeeds(double front, double back) {
     return Commands.runOnce(() -> {
-      m_topRoller.set(frontSpeed);
-      m_bottomRoller.set(backSpeed);
-    }, this);
-  }
-
-  private Command Shoot(double position, double frontSpeed, double backSpeed) {
-    m_cubePivotSetpoint = position; // variable exists for telemetry purposes
-    return Commands.sequence(
-        Commands.run(() -> {
-          double arbFF = MathUtil.clamp(calcFF(m_cubePivot.getEncoder().getPosition()), -1d, 1d);
-          m_cubePivot.getPIDController().setReference(m_cubePivotSetpoint, ControlType.kPosition, 0, arbFF);
-        }, this).until(() -> (m_cubePivot.getEncoder().getPosition() - position < 1.5)))
-        .andThen(
-            Commands.runOnce(() -> {
-              m_topRoller.set(frontSpeed);
-              m_bottomRoller.set(backSpeed);
-            }, this));
-  }
+      m_frontRollerSetpoint = front;
+      m_backRollerSetpoint = back;
+    });
+  };
 
   private double calcFF(double thetaDegrees) {
     double ff = CubeShooterConstants.kG * Math.cos(Math.toRadians(thetaDegrees));

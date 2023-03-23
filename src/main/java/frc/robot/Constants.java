@@ -166,7 +166,7 @@ public final class Constants {
         public static final int TOP_ROLLER_MOTOR = 15;
         public static final int BOTTOM_ROLLER_MOTOR = 16;
 
-        public static final double UP_SETPOINT = 102;
+        public static final double RETRACTED_SETPOINT = 102;
         public static final double DOWN_SETPOINT = 0.0;
         public static final double CUBE_MID = 75;
 

@@ -28,9 +28,9 @@ public class LEDs extends SubsystemBase {
       boolean hitBrightnessLimit;
     };
     return Commands.run(() -> {
-      currentColor.r = (currentColor.a / 256d) * initialColor.red;
-      currentColor.g = (currentColor.a / 256d) * initialColor.green;
-      currentColor.b = (currentColor.a / 256d) * initialColor.blue;
+      currentColor.r = (currentColor.a / 256.0) * initialColor.red;
+      currentColor.g = (currentColor.a / 256.0) * initialColor.green;
+      currentColor.b = (currentColor.a / 256.0) * initialColor.blue;
       final Color c = new Color(currentColor.r, currentColor.g, currentColor.b);
       for (int i = 0; i < m_ledBuffer.getLength(); i++) {
         m_ledBuffer.setLED(i, c);
@@ -48,11 +48,9 @@ public class LEDs extends SubsystemBase {
       m_leds.setData(m_ledBuffer);
     }, this)
         .ignoringDisable(true);
-
   }
 
   public Command setLedColor(Color color) {
-
     return Commands.runOnce(() -> {
       for (int i = 0; i < kledLength; i++) {
         m_ledBuffer.setLED(i, color);
@@ -61,7 +59,6 @@ public class LEDs extends SubsystemBase {
     }, this)
         .andThen(Commands.none().repeatedly())
         .ignoringDisable(true);
-
   }
 
   public static LEDs getInstance() {

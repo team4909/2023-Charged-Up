@@ -8,23 +8,21 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.arm.Wrist;
-import frc.robot.subsystems.arm.Wrist.WristStates;
 import frc.robot.subsystems.arm.Claw;
 import frc.robot.subsystems.arm.Claw.ClawStates;
+import frc.robot.subsystems.arm.Wrist;
+import frc.robot.subsystems.arm.Wrist.WristStates;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Drivetrain.DrivetrainStates;
 import frc.robot.subsystems.drivetrain.auto.AutoRoutines;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.Elevator.ElevatorStates;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.CubeShooter;
-import frc.robot.subsystems.intake.Intake.IntakeStates;
 import frc.robot.subsystems.intake.CubeShooter.CubeShooterStates;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.Intake.IntakeStates;
 import frc.robot.subsystems.leds.LEDs;
 
 public class RobotContainer {
@@ -87,15 +85,13 @@ public class RobotContainer {
 		m_driverController.start().onTrue(Commands.runOnce(() -> m_drivetrain.reseedModules()));
 		m_driverController.povDown().onTrue(m_intake.setState(IntakeStates.RETRACTED));
 
-		m_driverController.povLeft().onTrue(new SequentialCommandGroup(
-				m_cubeShooter.setState(CubeShooterStates.CUBE_DOWN)));
-
+		m_driverController.povLeft().onTrue(m_cubeShooter.setState(CubeShooterStates.INTAKE));
 		m_driverController.a()
-				.onTrue(m_cubeShooter.setState(CubeShooterStates.SHOOT))
-				.onFalse(m_cubeShooter.setState(CubeShooterStates.CUBE_UP));
+				.onTrue(m_cubeShooter.setState(CubeShooterStates.SCORE))
+				.onFalse(m_cubeShooter.setState(CubeShooterStates.RETRACTED));
 		// #endregion
 
-		// #region Operator Controlls
+		// #region Operator Controls
 
 		m_operatorController.back().whileTrue(m_leds.setLedColor(Color.kYellow));
 		m_operatorController.start().whileTrue(m_leds.setLedColor(Color.kPurple));
@@ -104,11 +100,13 @@ public class RobotContainer {
 		m_operatorController.povDown().onTrue(m_wrist.setState(WristStates.DROPPING));
 
 		m_operatorController.povRight()
-				.onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_HIGH))
-				.onFalse(m_cubeShooter.setState(CubeShooterStates.CUBE_UP));
+				.onTrue(Commands.sequence(
+						m_cubeShooter.SetRollerSpeeds(0.45, 0.45),
+						m_leds.setLedColor(Color.kHotPink)));
 		m_operatorController.povLeft()
-				.onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_MID))
-				.onFalse(m_cubeShooter.setState(CubeShooterStates.CUBE_UP));
+				.onTrue(Commands.sequence(
+						m_cubeShooter.SetRollerSpeeds(0.75, 0.75),
+						m_leds.setLedColor(Color.kRed)));
 
 		m_operatorController.leftBumper().onTrue(
 				Commands.sequence(

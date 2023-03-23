@@ -147,12 +147,15 @@ public class Drivetrain extends SubsystemBase {
     m_simChassisAngle = m_simChassisAngle.plus(new Rotation2d(dModuleState.dtheta));
 
     for (int i = 0; i < 4; i++) {
-      double start = Timer.getFPGATimestamp();
+      double start1 = Timer.getFPGATimestamp();
       m_modules[i].update();
+      double end1 = Timer.getFPGATimestamp();
+      double start2 = Timer.getFPGATimestamp();
       m_modules[i].set(setpointModuleStates[i]);
-      double end = Timer.getFPGATimestamp();
+      double end2 = Timer.getFPGATimestamp();
       SmartDashboard.putNumber("Drivetrain/Desired Speed " + i, setpointModuleStates[i].speedMetersPerSecond);
-      SmartDashboard.putNumber("Drivetrain/Module Update Time", end - start);
+      SmartDashboard.putNumber("Drivetrain/Module Update Time", end1 - start1);
+      SmartDashboard.putNumber("Drivetrain/Module Set Time", end2 - start2);
     }
 
     m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
