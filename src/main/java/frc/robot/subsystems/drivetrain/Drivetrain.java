@@ -161,9 +161,9 @@ public class Drivetrain extends SubsystemBase {
     m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
     Pair<Pose2d, Double> visionReading = m_vision.getAllianceRelativePose();
     if (visionReading.getFirst() != null && visionReading != null) {
-      // m_poseEstimator.addVisionMeasurement(
-      // m_vision.getAllianceRelativePose().getFirst(),
-      // m_vision.getAllianceRelativePose().getSecond());
+      m_poseEstimator.addVisionMeasurement(
+          m_vision.getAllianceRelativePose().getFirst(),
+          m_vision.getAllianceRelativePose().getSecond());
       m_fieldPoseConsumer.accept("FrontLimelightEstimate", visionReading.getFirst());
     }
 

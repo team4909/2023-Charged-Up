@@ -37,12 +37,12 @@ public final class Constants {
          * Bottom back right corner is the origin in OUR coords (x,y,z) -> (Y,Z,X)
          * Forward: +x, Left: +y, Up: +z
          */
-        public static final double CAMERA_X = Units.inchesToMeters(24);
-        public static final double CAMERA_Y = Units.inchesToMeters(13);
-        public static final double CAMERA_Z = Units.inchesToMeters(25);
 
-        public static final Transform3d ROBOT_TO_CAM_DIST = new Transform3d(
-                new Translation3d(Units.inchesToMeters(13.0), Units.inchesToMeters(4.75), Units.inchesToMeters(4.0)),
+        public static final Transform3d ROBOT_TO_CAM = new Transform3d(
+                new Translation3d(
+                        Units.inchesToMeters(7.462),
+                        Units.inchesToMeters(5.772),
+                        Units.inchesToMeters(23.785)),
                 new Rotation3d(0.0, 0.0, 0.0));
     }
 
