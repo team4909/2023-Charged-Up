@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.limelight.LimelightHelpers;
 import frc.lib.limelight.LimelightHelpers.LimelightResults;
 import frc.lib.limelight.LimelightHelpers.Results;
+import frc.robot.Constants.VisionConstants;
 
 public class Vision extends SubsystemBase {
 
@@ -43,6 +44,14 @@ public class Vision extends SubsystemBase {
   public Vision() {
     NT = NetworkTableInstance.getDefault();
     m_aprilTagFieldLayout = loadFieldLayout();
+    LimelightHelpers.setLEDMode_ForceOff("limelight");
+    LimelightHelpers.setCameraPose_RobotSpace("limelight",
+        VisionConstants.ROBOT_TO_CAM.getX(),
+        VisionConstants.ROBOT_TO_CAM.getY(),
+        VisionConstants.ROBOT_TO_CAM.getZ(),
+        VisionConstants.ROBOT_TO_CAM.getRotation().getX(),
+        VisionConstants.ROBOT_TO_CAM.getRotation().getY(),
+        VisionConstants.ROBOT_TO_CAM.getRotation().getZ());
   }
 
   private AprilTagFieldLayout loadFieldLayout() {

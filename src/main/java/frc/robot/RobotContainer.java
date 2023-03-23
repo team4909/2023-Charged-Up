@@ -8,23 +8,22 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.arm.Wrist;
-import frc.robot.subsystems.arm.Wrist.WristStates;
 import frc.robot.subsystems.arm.Claw;
 import frc.robot.subsystems.arm.Claw.ClawStates;
+import frc.robot.subsystems.arm.Wrist;
+import frc.robot.subsystems.arm.Wrist.WristStates;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Drivetrain.DrivetrainStates;
 import frc.robot.subsystems.drivetrain.auto.AutoRoutines;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.Elevator.ElevatorStates;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.CubeShooter;
-import frc.robot.subsystems.intake.Intake.IntakeStates;
 import frc.robot.subsystems.intake.CubeShooter.CubeShooterStates;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.Intake.IntakeStates;
 import frc.robot.subsystems.leds.LEDs;
 
 public class RobotContainer {
@@ -62,37 +61,47 @@ public class RobotContainer {
 				.onTrue(m_drivetrain.setState(DrivetrainStates.PRECISE))
 				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
 
-		m_driverController.y()
-				.toggleOnTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
-						new HashMap<>(Map.of("Angle", 0d))))
-				.toggleOnFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
-		m_driverController.b()
-				.onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
-						new HashMap<>(Map.of("Angle", 270d))))
-				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
-		m_driverController.a()
-				.onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
-						new HashMap<>(Map.of("Angle", 180d))))
-				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
-		m_driverController.x()
-				.onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
-						new HashMap<>(Map.of("Angle", 90d))))
-				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+		// m_driverController.povUp()
+		// .toggleOnTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+		// new HashMap<>(Map.of("Angle", 0d))))
+		// .toggleOnFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+		// m_driverController.povRight()
+		// .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+		// new HashMap<>(Map.of("Angle", 270d))))
+		// .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+		// m_driverController.povDown()
+		// .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+		// new HashMap<>(Map.of("Angle", 180d))))
+		// .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+		// m_driverController.povLeft()
+		// .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+		// new HashMap<>(Map.of("Angle", 90d))))
+		// .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
 
 		m_driverController.rightTrigger().onTrue(m_intake.setState(IntakeStates.INTAKE_CONE))
 				.onFalse(m_intake.setState(IntakeStates.HANDOFF));
-		m_driverController.leftTrigger().onTrue(m_intake.setState(IntakeStates.INTAKE_CUBE))
-				.onFalse(m_intake.setState(IntakeStates.HANDOFF));
 		m_driverController.leftBumper().onTrue(m_intake.setState(IntakeStates.SPIT_CONE));
+		m_driverController.leftTrigger()
+				.onTrue(m_cubeShooter.setState(CubeShooterStates.CUBE_DOWN))
+				.onFalse(m_cubeShooter.setState(CubeShooterStates.CUBE_UP));
 		m_driverController.start().onTrue(Commands.runOnce(() -> m_drivetrain.reseedModules()));
 		m_driverController.povDown().onTrue(m_intake.setState(IntakeStates.RETRACTED));
 
 		m_driverController.povLeft().onTrue(new SequentialCommandGroup(
 				m_cubeShooter.setState(CubeShooterStates.CUBE_DOWN)));
 
-		m_driverController.a()
+		m_driverController.b()
 				.onTrue(m_cubeShooter.setState(CubeShooterStates.SHOOT))
 				.onFalse(m_cubeShooter.setState(CubeShooterStates.CUBE_UP));
+
+		// Drop Game Piece
+		m_driverController.a().onTrue(m_wrist.setState(WristStates.DROPPING)
+				.andThen(new WaitCommand(0.5))
+				.andThen(m_claw.setState(ClawStates.OPEN))
+				.andThen(new WaitCommand(0.2))
+				.andThen(m_elevator.setState(ElevatorStates.RETRACT))
+				.andThen(m_wrist.setState(WristStates.RETRACTED)));
+
 		// #endregion
 
 		// #region Operator Controlls
@@ -131,13 +140,6 @@ public class RobotContainer {
 		// Handoff Cone Sequence
 		m_operatorController.a().onTrue(m_routines.HANDOFF());
 
-		// Drop Game Piece
-		m_operatorController.b().onTrue(m_wrist.setState(WristStates.DROPPING)
-				.andThen(new WaitCommand(0.5))
-				.andThen(m_claw.setState(ClawStates.OPEN))
-				.andThen(new WaitCommand(0.2))
-				.andThen(m_elevator.setState(ElevatorStates.RETRACT))
-				.andThen(m_wrist.setState(WristStates.RETRACTED)));
 		// #endregion
 
 		// m_testController.leftBumper()

@@ -99,15 +99,17 @@ public class CubeShooter extends SubsystemBase {
         case SHOOT:
           switch (m_lastState) {
             case CUBE_LOW:
-              currentCubeShooterCommand = setRollerSpeed(0.4d, 0.4d);
+              currentCubeShooterCommand = setRollerSpeed(0.2, 0.2);
               break;
             case CUBE_MID:
-              currentCubeShooterCommand = setRollerSpeed(0.45d, 0.45d);
+              currentCubeShooterCommand = setRollerSpeed(0.45, 0.45);
               break;
             case CUBE_HIGH:
               currentCubeShooterCommand = setRollerSpeed(0.75, 0.75);
               break;
             default:
+
+              currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.CUBE_MID, 0.2, 0.2);
               break;
           }
           break;
