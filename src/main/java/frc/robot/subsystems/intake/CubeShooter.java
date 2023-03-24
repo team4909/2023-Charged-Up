@@ -141,7 +141,7 @@ public class CubeShooter extends SubsystemBase {
         .andThen(() -> {
           m_cubePivot.getEncoder().setPosition(CubeShooterConstants.DEGREE_RANGE - 7.0);
           m_state = CubeShooterStates.RETRACTED;
-        }).finallyDo((i) -> m_cubePivot.setSmartCurrentLimit(40, 40));
+        }, this).finallyDo((i) -> m_cubePivot.setSmartCurrentLimit(40, 40));
   }
 
   private Command SetPivotPositionAndRollerSpeed(double position, double frontSpeed, double backSpeed) {
