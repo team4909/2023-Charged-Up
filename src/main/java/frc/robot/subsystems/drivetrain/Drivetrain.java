@@ -158,14 +158,18 @@ public class Drivetrain extends SubsystemBase {
       SmartDashboard.putNumber("Drivetrain/Module Set Time", end2 - start2);
     }
 
+    double start = Timer.getFPGATimestamp();
     m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
     Pair<Pose2d, Double> visionReading = m_vision.getAllianceRelativePose();
-    if (visionReading.getFirst() != null && visionReading != null) {
-      m_poseEstimator.addVisionMeasurement(
-          m_vision.getAllianceRelativePose().getFirst(),
-          m_vision.getAllianceRelativePose().getSecond());
-      m_fieldPoseConsumer.accept("FrontLimelightEstimate", visionReading.getFirst());
-    }
+    double end = Timer.getFPGATimestamp();
+    SmartDashboard.putNumber("Drivetrain/Pose Estimator Update Time", end - start);
+    // if (visionReading.getFirst() != null && visionReading != null) {
+    // m_poseEstimator.addVisionMeasurement(
+    // m_vision.getAllianceRelativePose().getFirst(),
+    // m_vision.getAllianceRelativePose().getSecond());
+    // m_fieldPoseConsumer.accept("FrontLimelightEstimate",
+    // visionReading.getFirst());
+    // }
 
     SmartDashboard.putString("Drivetrain/State", m_state.toString());
     SmartDashboard.putBoolean("Drivetrain/Joystick Input",
@@ -369,15 +373,26 @@ public class Drivetrain extends SubsystemBase {
 
   private Command AutoBalance() {
     // All values tuned by hand, works well enough - do not touch
-    PIDController balanceController = new PIDController(0.03, 0.02, 0.002);
+    PIDController balanceController = new PIDController(0.02, 0.01, 0.0);
     balanceController.setTolerance(6d);
-    balanceController.setIntegratorRange(0.01, 0.05);
+    balanceController.setIntegratorRange(0.01, 0.03);
+    // SwerveModuleState[] locked = new SwerveModuleState[] {
+    // new SwerveModuleState(0d, 45d),
+    // new SwerveModuleState(0d, 45d),
+    // new SwerveModuleState(0d, 45d),
+    // new SwerveModuleState(0d, 45d)
+    // };
     return new PIDCommand(
         balanceController,
         () -> m_pigeon.getRoll(), // "Roll" is actually our pitch for the default pigeon configuration
         () -> 0,
         (output) -> {
+
+          // if (balanceController.atSetpoint())
           drive(ChassisSpeeds.fromFieldRelativeSpeeds(output, 0d, 0d, getGyroYaw()));
+          // else
+          // m_swerveModuleConsumer.accept(
+
           SmartDashboard.putNumber("Pitch PID Output", output);
         },
         this)

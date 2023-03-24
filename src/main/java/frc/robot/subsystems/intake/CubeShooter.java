@@ -19,6 +19,19 @@ public class CubeShooter extends SubsystemBase {
   private final CANSparkMax m_cubePivot, m_topRoller, m_bottomRoller;
   private double m_pivotSetpoint, m_frontRollerSetpoint, m_backRollerSetpoint;
 
+  public enum ShooterLevels {
+    MID(CubeShooterConstants.CUBE_MID, 0.45, 45),
+    HIGH(CubeShooterConstants.RETRACTED_SETPOINT, 0.75, 0.75);
+
+    double pivotSetpoint, frontRollerSetpoint, backRollerSetpoint;
+
+    private ShooterLevels(double pivot, double front, double back) {
+      pivotSetpoint = pivot;
+      frontRollerSetpoint = front;
+      backRollerSetpoint = back;
+    }
+  }
+
   public enum CubeShooterStates {
     IDLE("Idle"),
     INTAKE("Intake"),
@@ -85,8 +98,8 @@ public class CubeShooter extends SubsystemBase {
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.RETRACTED_SETPOINT, 0.0, 0.0);
           break;
         case SCORE:
-          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.CUBE_MID,
-              m_frontRollerSetpoint, m_backRollerSetpoint);
+          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(m_pivotSetpoint, m_frontRollerSetpoint,
+              m_backRollerSetpoint);
           break;
         case SPIT:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, 0.2, 0.2);
@@ -144,10 +157,11 @@ public class CubeShooter extends SubsystemBase {
         }, this));
   }
 
-  public Command SetRollerSpeeds(double front, double back) {
+  public Command Config(ShooterLevels shooterLevel) {
     return Commands.runOnce(() -> {
-      m_frontRollerSetpoint = front;
-      m_backRollerSetpoint = back;
+      m_pivotSetpoint = shooterLevel.pivotSetpoint;
+      m_frontRollerSetpoint = shooterLevel.frontRollerSetpoint;
+      m_backRollerSetpoint = shooterLevel.backRollerSetpoint;
     });
   };
 

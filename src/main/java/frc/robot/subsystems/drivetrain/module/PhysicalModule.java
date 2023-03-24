@@ -23,8 +23,10 @@ public final class PhysicalModule extends ModuleBase {
     private final double m_encoderOffset;
 
     private final double TICKS_PER_ROTATION = 2048d;
+    final double i;
 
     public PhysicalModule(int index) {
+        i = index;
         switch (index) {
             case 0:
                 m_driveMotor = new TalonFX(DrivetrainConstants.FRONT_LEFT_DRIVE_MOTOR, Constants.CANFD_BUS);
@@ -86,7 +88,7 @@ public final class PhysicalModule extends ModuleBase {
 
         super.turnAbsolutePositionRad = 0;
         double end = Timer.getFPGATimestamp();
-        SmartDashboard.putNumber("Drivetrain/CTRE Call Time", end - start);
+        SmartDashboard.putNumber("Drivetrain/CTRE Call Time " + i, end - start);
     }
 
     @Override

@@ -18,6 +18,7 @@ import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.Elevator.ElevatorStates;
 import frc.robot.subsystems.intake.CubeShooter;
 import frc.robot.subsystems.intake.CubeShooter.CubeShooterStates;
+import frc.robot.subsystems.intake.CubeShooter.ShooterLevels;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.Intake.IntakeStates;
 import frc.robot.subsystems.leds.LEDs;
@@ -107,11 +108,11 @@ public class RobotContainer {
 
 		m_operatorController.povRight()
 				.onTrue(Commands.sequence(
-						m_cubeShooter.SetRollerSpeeds(0.45, 0.45),
+						m_cubeShooter.Config(ShooterLevels.MID),
 						m_leds.setLedColor(Color.kHotPink)));
 		m_operatorController.povLeft()
 				.onTrue(Commands.sequence(
-						m_cubeShooter.SetRollerSpeeds(0.75, 0.75),
+						m_cubeShooter.Config(ShooterLevels.HIGH),
 						m_leds.setLedColor(Color.kRed)));
 
 		m_operatorController.leftBumper().onTrue(

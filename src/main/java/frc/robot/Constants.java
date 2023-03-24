@@ -77,8 +77,8 @@ public final class Constants {
 
         public static final double TURN_kP = 0.3;
 
-        public static final double X_FOLLOWING_kP = 1;
-        public static final double Y_FOLLOWING_kP = 1;
+        public static final double X_FOLLOWING_kP = 1.8;
+        public static final double Y_FOLLOWING_kP = 1.8;
         public static final double THETA_FOLLOWING_kP = 3;
 
         // CAN IDS

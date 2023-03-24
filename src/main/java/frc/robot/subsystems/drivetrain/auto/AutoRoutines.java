@@ -6,14 +6,17 @@ import java.util.Map;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.subsystems.arm.Wrist;
-import frc.robot.subsystems.arm.Wrist.WristStates;
 import frc.robot.subsystems.arm.Claw;
 import frc.robot.subsystems.arm.Claw.ClawStates;
+import frc.robot.subsystems.arm.Wrist;
+import frc.robot.subsystems.arm.Wrist.WristStates;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Drivetrain.DrivetrainStates;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.Elevator.ElevatorStates;
+import frc.robot.subsystems.intake.CubeShooter;
+import frc.robot.subsystems.intake.CubeShooter.CubeShooterStates;
+import frc.robot.subsystems.intake.CubeShooter.ShooterLevels;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.Intake.IntakeStates;
 
@@ -24,9 +27,10 @@ public class AutoRoutines {
   private final Wrist m_wrist = Wrist.getInstance();
   private final Intake m_intake = Intake.getInstance();
   private final Claw m_claw = Claw.getInstance();
+  private final CubeShooter m_cubeShooter = CubeShooter.getInstance();
 
   public final Auto TEST = new Auto(
-      loadTrajectory(new DriveTrajectory("Test", true)));
+      loadTrajectory(new DriveTrajectory("Test2", true)));
   public final Auto BLANK_AUTO = new Auto();
   public final Auto SCORE_CONE_CHARGE_STATION_COMMUNITY = new Auto(
       SCORE_CONE(ElevatorStates.TOP),
@@ -51,12 +55,13 @@ public class AutoRoutines {
       SCORE_CONE(ElevatorStates.TOP),
       Commands.parallel(
           loadTrajectory(new DriveTrajectory("TopNodeToTopCube", true)),
-          Commands.sequence(
-              Commands.waitSeconds(3),
-              INTAKE_CONE())),
+          INTAKE_CUBE()),
       m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
           new HashMap<>(Map.of("Angle", 0d))),
-      loadTrajectory(new DriveTrajectory("TopCubeToTopCubeNode", false)));
+      loadTrajectory(new DriveTrajectory("TopCubeToTopCubeNode", false)),
+      SCORE_CUBE_HIGH(),
+      loadTrajectory(new DriveTrajectory("TopCubeToChargeStation", false)),
+      m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
 
   private Command loadTrajectory(DriveTrajectory traj) {
     return Commands.waitUntil(m_drivetrain.isTrajectoryFinished)
@@ -75,8 +80,10 @@ public class AutoRoutines {
     return Commands.sequence(
         m_claw.setState(ClawStates.CLOSED),
         m_intake.setState(IntakeStates.CALIBRATE),
+        m_cubeShooter.setState(CubeShooterStates.CALIBRATE),
         Commands.waitSeconds(1),
-        m_intake.setState(IntakeStates.RETRACTED));
+        m_intake.setState(IntakeStates.RETRACTED),
+        m_cubeShooter.setState(CubeShooterStates.RETRACTED));
   }
 
   private final Command SCORE_CONE(ElevatorStates extensionLevel) {
@@ -97,6 +104,21 @@ public class AutoRoutines {
         m_intake.setState(IntakeStates.INTAKE_CONE),
         Commands.waitSeconds(2d),
         m_intake.setState(IntakeStates.HANDOFF));
+  }
+
+  private final Command INTAKE_CUBE() {
+    return Commands.sequence(
+        m_cubeShooter.setState(CubeShooterStates.INTAKE),
+        Commands.waitSeconds(4.5),
+        m_cubeShooter.setState(CubeShooterStates.RETRACTED));
+  }
+
+  private final Command SCORE_CUBE_HIGH() {
+    return Commands.sequence(
+        m_cubeShooter.Config(ShooterLevels.HIGH),
+        m_cubeShooter.setState(CubeShooterStates.SCORE),
+        Commands.waitSeconds(0.5),
+        m_cubeShooter.setState(CubeShooterStates.RETRACTED));
   }
 
   public final Command HANDOFF() {

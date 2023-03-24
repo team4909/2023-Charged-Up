@@ -34,6 +34,7 @@ public final class Module {
 
     public void update() {
         m_module.updateModuleInputs();
+
         SmartDashboard.putString("Drivetrain/Module/State " + m_index, getModuleState().toString());
         SmartDashboard.putString("Drivetrain/Module/Position " + m_index, getModulePosition().toString());
         SmartDashboard.putNumber("Absolute Module Angle " + m_index, m_module.turnPosition);
