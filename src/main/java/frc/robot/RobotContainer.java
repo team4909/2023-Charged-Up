@@ -177,6 +177,7 @@ public class RobotContainer {
 		m_chooser.addOption("One Meter Test", m_routines.TEST);
 		m_chooser.addOption("One Piece + Charge Station", m_routines.ONE_PIECE_CHARGE_STATION);
 		m_chooser.addOption("One Cube", m_routines.ONE_CUBE);
+		m_chooser.addOption("Two Cube", m_routines.TWO_PIECE_CHARGE_STATION);
 		SmartDashboard.putData(m_chooser);
 	}
 
