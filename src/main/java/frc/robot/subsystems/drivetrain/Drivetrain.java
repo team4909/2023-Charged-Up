@@ -80,6 +80,11 @@ public class Drivetrain extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_ANGULAR_SPEED);
     drive(m_kinematics.toChassisSpeeds(states));
   };
+  private Consumer<SwerveModuleState[]> m_setStatesConsumer = states -> {
+    for (int i = 0; i < 4; i++) {
+      m_modules[i].set(states[i]);
+    }
+  };
   // For vision poses
   private BiConsumer<String, Pose2d> m_fieldPoseConsumer = (poseName, pose) -> {
     if (!pose.equals(new Pose2d(0d, 0d, new Rotation2d(0d))))
@@ -100,7 +105,8 @@ public class Drivetrain extends SubsystemBase {
     ON_THE_FLY_TRAJECTORY("On The Fly Trajectory"),
     PRECISE("Precise"),
     SNAP_TO_ANGLE("Snapping To Angle"),
-    AUTO_BALANCE("Auto Balance");
+    AUTO_BALANCE("Auto Balance"),
+    LOCKED("Locked");
 
     String stateName;
 
@@ -151,7 +157,8 @@ public class Drivetrain extends SubsystemBase {
       m_modules[i].update();
       double end1 = Timer.getFPGATimestamp();
       double start2 = Timer.getFPGATimestamp();
-      m_modules[i].set(setpointModuleStates[i]);
+      if (!m_state.equals(DrivetrainStates.LOCKED))
+        m_modules[i].set(setpointModuleStates[i]);
       double end2 = Timer.getFPGATimestamp();
       SmartDashboard.putNumber("Drivetrain/Desired Speed " + i, setpointModuleStates[i].speedMetersPerSecond);
       SmartDashboard.putNumber("Drivetrain/Module Update Time", end1 - start1);
@@ -259,6 +266,9 @@ public class Drivetrain extends SubsystemBase {
           break;
         case AUTO_BALANCE:
           currentDrivetrainCommand = AutoBalance();
+          break;
+        case LOCKED:
+          currentDrivetrainCommand = LockDrivetrain();
           break;
         default:
           m_state = DrivetrainStates.IDLE;
@@ -372,35 +382,44 @@ public class Drivetrain extends SubsystemBase {
   }
 
   private Command AutoBalance() {
+    var c = new Object() {
+      int count = 0;
+    };
     // All values tuned by hand, works well enough - do not touch
-    PIDController balanceController = new PIDController(0.02, 0.01, 0.0);
-    balanceController.setTolerance(6d);
+    PIDController balanceController = new PIDController(0.02, 0.0, 0.0);
+    balanceController.setTolerance(2.0);
     balanceController.setIntegratorRange(0.01, 0.03);
-    // SwerveModuleState[] locked = new SwerveModuleState[] {
-    // new SwerveModuleState(0d, 45d),
-    // new SwerveModuleState(0d, 45d),
-    // new SwerveModuleState(0d, 45d),
-    // new SwerveModuleState(0d, 45d)
-    // };
     return new PIDCommand(
         balanceController,
         () -> m_pigeon.getRoll(), // "Roll" is actually our pitch for the default pigeon configuration
         () -> 0,
         (output) -> {
-
-          // if (balanceController.atSetpoint())
           drive(ChassisSpeeds.fromFieldRelativeSpeeds(output, 0d, 0d, getGyroYaw()));
-          // else
-          // m_swerveModuleConsumer.accept(
+          if (balanceController.atSetpoint()) {
+            c.count++;
+          }
+          if (c.count >= 8) {
+            setState(DrivetrainStates.LOCKED).schedule();
+          }
 
-          SmartDashboard.putNumber("Pitch PID Output", output);
+          SmartDashboard.putNumber("Drivetrain/AutoBalance/Pitch PID Output", output);
+          SmartDashboard.putNumber("Drivetrain/AutoBalance/Pitch", m_pigeon.getRoll());
+          SmartDashboard.putNumber("Drivetrain/AutoBalance/Pitch PID Error", balanceController.getPositionError());
+          SmartDashboard.putBoolean("Drivetrain/AutoBalance/Is Balanced", balanceController.atSetpoint());
         },
-        this)
-        .alongWith(Commands.run(() -> {
-          SmartDashboard.putNumber("Pitch", m_pigeon.getRoll());
-          SmartDashboard.putNumber("Pitch PID Error", balanceController.getPositionError());
-          SmartDashboard.putBoolean("Is Balanced", balanceController.atSetpoint());
-        }));
+        this);
+  }
+
+  private Command LockDrivetrain() {
+    SwerveModuleState[] lockedStates = new SwerveModuleState[] {
+        new SwerveModuleState(0.0, Rotation2d.fromDegrees(-45)),
+        new SwerveModuleState(0.0, Rotation2d.fromDegrees(45)),
+        new SwerveModuleState(0.0, Rotation2d.fromDegrees(-135)),
+        new SwerveModuleState(0.0, Rotation2d.fromDegrees(-45)),
+    };
+    return Commands.run(() -> {
+      m_setStatesConsumer.accept(lockedStates);
+    }, this);
   }
   // #endregion
 

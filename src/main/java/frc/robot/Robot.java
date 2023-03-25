@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.drivetrain.Drivetrain;
+import frc.robot.subsystems.drivetrain.Drivetrain.DrivetrainStates;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.CubeShooter;
 import frc.robot.subsystems.intake.Intake.IntakeStates;
@@ -22,7 +23,7 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     m_robotContainer = new RobotContainer();
-    addPeriodic(m_robotContainer.getControlLoop(), 0.01, 0.005);
+    addPeriodic(m_robotContainer.controlLoop(), 0.01, 0.005);
   }
 
   @Override
@@ -74,6 +75,7 @@ public class Robot extends TimedRobot {
     }
     Intake.getInstance().setState(IntakeStates.CALIBRATE).schedule();
     CubeShooter.getInstance().setState(CubeShooterStates.CALIBRATE).schedule();
+    Drivetrain.getInstance().setState(DrivetrainStates.IDLE).schedule();
   }
 
   @Override

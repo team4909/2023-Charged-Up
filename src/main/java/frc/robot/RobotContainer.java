@@ -119,6 +119,7 @@ public class RobotContainer {
 				Commands.sequence(
 						m_claw.setState(ClawStates.OPEN),
 						m_wrist.setState(WristStates.SUBSTATION)));
+		m_operatorController.leftTrigger().onTrue(m_routines.ONE_CUBE);
 
 		m_operatorController.x().onTrue(m_claw.setState(ClawStates.OPEN));
 		m_operatorController.y().onTrue(m_claw.setState(ClawStates.CLOSED));
@@ -135,7 +136,7 @@ public class RobotContainer {
 		// m_operatorController.start().onTrue(substationToggle());
 		// Handoff Cone Sequence
 		m_operatorController.a().onTrue(m_routines.HANDOFF());
-
+		m_operatorController.back().onTrue(m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
 		// #endregion
 
 		// m_testController.leftBumper()
@@ -187,7 +188,7 @@ public class RobotContainer {
 
 	// Useful for running pid controllers and motion profiles faster than the
 	// default 20 ms loop time.
-	public Runnable getControlLoop() {
+	public Runnable controlLoop() {
 		return () -> {
 
 		};
