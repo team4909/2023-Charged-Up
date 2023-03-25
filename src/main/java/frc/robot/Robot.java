@@ -74,7 +74,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     Intake.getInstance().setState(IntakeStates.CALIBRATE).schedule();
-    CubeShooter.getInstance().setState(CubeShooterStates.CALIBRATE).schedule();
+    // CubeShooter.getInstance().setState(CubeShooterStates.CALIBRATE).schedule();
     Drivetrain.getInstance().setState(DrivetrainStates.IDLE).schedule();
   }
 

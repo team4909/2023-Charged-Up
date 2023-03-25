@@ -89,7 +89,9 @@ public class RobotContainer {
 		m_driverController.leftTrigger()
 				.onTrue(m_cubeShooter.setState(CubeShooterStates.INTAKE))
 				.onFalse(m_cubeShooter.setState(CubeShooterStates.RETRACTED));
-		m_driverController.x().onTrue(m_cubeShooter.setState(CubeShooterStates.SPIT));
+		m_driverController.x().onTrue(m_cubeShooter.setState(CubeShooterStates.SPIT))
+				.onFalse(m_cubeShooter.setState(CubeShooterStates.RETRACTED));
+		m_driverController.y().onTrue(m_cubeShooter.setState(CubeShooterStates.CALIBRATE));
 
 		// Drop Game Piece
 		m_driverController.a().onTrue(m_wrist.setState(WristStates.DROPPING)
