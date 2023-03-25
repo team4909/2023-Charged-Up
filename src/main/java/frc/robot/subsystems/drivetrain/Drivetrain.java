@@ -386,17 +386,19 @@ public class Drivetrain extends SubsystemBase {
       int count = 0;
     };
     // All values tuned by hand, works well enough - do not touch
-    PIDController balanceController = new PIDController(0.02, 0.01, 0.0);
-    balanceController.setTolerance(6.0);
+    final PIDController balanceController = new PIDController(0.008, 0.0, 0.0);
+    final double feedForward = 0.1; // m/s
+    balanceController.setTolerance(8.0);
     balanceController.setIntegratorRange(0.01, 0.03);
     return new PIDCommand(
         balanceController,
         () -> m_pigeon.getRoll(), // "Roll" is actually our pitch for the default pigeon configuration
         () -> 0,
         (output) -> {
-          drive(ChassisSpeeds.fromFieldRelativeSpeeds(output, 0d, 0d, getGyroYaw()));
+          var multiplier = balanceController.atSetpoint() ? 0 : 1;
+          drive(ChassisSpeeds.fromFieldRelativeSpeeds(output + (Math.copySign(feedForward, output) * multiplier), 0d,
+              0d, getGyroYaw()));
           if (balanceController.atSetpoint()) {
-            c.count++;
           }
           if (c.count >= 8) {
             // setState(DrivetrainStates.LOCKED).schedule();

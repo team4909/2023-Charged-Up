@@ -54,11 +54,10 @@ public class AutoRoutines {
           loadTrajectory(new DriveTrajectory("TopNodeToTopCube", true)),
           INTAKE_CUBE()),
       loadTrajectory(new DriveTrajectory("TopCubeToTopCubeNode", false)),
-      SCORE_CUBE_HIGH(),
-      Commands.parallel(
-          loadTrajectory(new DriveTrajectory("TopNodeToTopCube", false)),
-          INTAKE_CUBE().beforeStarting(Commands.waitSeconds(3))),
-      m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE).withTimeout(15.0));
+      SCORE_CUBE_HIGH());
+  // Commands.parallel(
+  // loadTrajectory(new DriveTrajectory("TopNodeToTopCube", false)),
+  // INTAKE_CUBE().beforeStarting(Commands.waitSeconds(3))),
 
   private Command loadTrajectory(DriveTrajectory traj) {
     return Commands.waitUntil(m_drivetrain.isTrajectoryFinished)
