@@ -69,6 +69,7 @@ public class Intake extends SubsystemBase {
 
     m_pivot.setSmartCurrentLimit(40, 40);
     m_pivot.getEncoder().setPositionConversionFactor(IntakeConstants.DEGREES_PER_TICK);
+    m_pivot.getEncoder().setPosition(110d);
     m_pivot.setInverted(false);
 
     if (Constants.SIM) {

@@ -67,6 +67,7 @@ public class CubeShooter extends SubsystemBase {
 
     m_cubePivot.setSmartCurrentLimit(40, 40);
     m_cubePivot.getEncoder().setPositionConversionFactor(CubeShooterConstants.DEGREES_PER_TICK);
+    m_cubePivot.getEncoder().setPosition(CubeShooterConstants.DEGREE_RANGE - 7.0);
     m_cubePivot.setInverted(false);
 
   }
