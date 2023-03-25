@@ -53,8 +53,8 @@ public class AutoRoutines {
       Commands.parallel(
           loadTrajectory(new DriveTrajectory("TopNodeToTopCube", true)),
           INTAKE_CUBE()),
-      loadTrajectory(new DriveTrajectory("TopCubeToTopCubeNode", false)));
-  // SCORE_CUBE_HIGH());
+      loadTrajectory(new DriveTrajectory("TopCubeToTopCubeNode", false)),
+      SCORE_CUBE_HIGH());
   // Commands.parallel(
   // loadTrajectory(new DriveTrajectory("TopCubeNodeToSecondPiece", false)),
   // INTAKE_CUBE().beforeStarting(Commands.waitSeconds(3))));
