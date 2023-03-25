@@ -386,8 +386,8 @@ public class Drivetrain extends SubsystemBase {
       int count = 0;
     };
     // All values tuned by hand, works well enough - do not touch
-    PIDController balanceController = new PIDController(0.02, 0.0, 0.0);
-    balanceController.setTolerance(2.0);
+    PIDController balanceController = new PIDController(0.02, 0.01, 0.0);
+    balanceController.setTolerance(6.0);
     balanceController.setIntegratorRange(0.01, 0.03);
     return new PIDCommand(
         balanceController,
@@ -399,7 +399,7 @@ public class Drivetrain extends SubsystemBase {
             c.count++;
           }
           if (c.count >= 8) {
-            setState(DrivetrainStates.LOCKED).schedule();
+            // setState(DrivetrainStates.LOCKED).schedule();
           }
 
           SmartDashboard.putNumber("Drivetrain/AutoBalance/Pitch PID Output", output);

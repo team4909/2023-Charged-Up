@@ -192,14 +192,12 @@ public class Intake extends SubsystemBase {
 
   private Command Calibrate() {
     return Commands.run(() -> {
-      m_pivot.setSmartCurrentLimit(5, 40);
-      m_pivot.set(0.1);
+      m_pivot.set(0.05);
     }, this).withTimeout(0.5)
         .andThen(() -> {
           m_pivot.getEncoder().setPosition(110d);
           m_state = IntakeStates.RETRACTED;
-        }, this)
-        .finallyDo((i) -> m_pivot.setSmartCurrentLimit(40, 40));
+        }, this);
   }
   // #endregion
 

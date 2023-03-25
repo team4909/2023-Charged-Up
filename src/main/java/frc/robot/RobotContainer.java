@@ -82,12 +82,14 @@ public class RobotContainer {
 		m_driverController.povDown().onTrue(m_intake.setState(IntakeStates.RETRACTED));
 
 		m_driverController.povLeft().onTrue(m_cubeShooter.setState(CubeShooterStates.INTAKE));
+		m_driverController.povUp().onTrue(m_cubeShooter.setState(CubeShooterStates.RETRACTED));
 		m_driverController.b()
 				.onTrue(m_cubeShooter.setState(CubeShooterStates.SCORE))
 				.onFalse(m_cubeShooter.setState(CubeShooterStates.RETRACTED));
 		m_driverController.leftTrigger()
 				.onTrue(m_cubeShooter.setState(CubeShooterStates.INTAKE))
 				.onFalse(m_cubeShooter.setState(CubeShooterStates.RETRACTED));
+		m_driverController.x().onTrue(m_cubeShooter.setState(CubeShooterStates.SPIT));
 
 		// Drop Game Piece
 		m_driverController.a().onTrue(m_wrist.setState(WristStates.DROPPING)
@@ -107,19 +109,16 @@ public class RobotContainer {
 		m_operatorController.povDown().onTrue(m_wrist.setState(WristStates.DROPPING));
 
 		m_operatorController.povRight()
-				.onTrue(Commands.sequence(
-						m_cubeShooter.Config(ShooterLevels.MID),
-						m_leds.setLedColor(Color.kHotPink)));
+				.onTrue(m_cubeShooter.Config(ShooterLevels.MID))
+				.whileTrue(m_leds.setLedColor(Color.kBlue));
 		m_operatorController.povLeft()
-				.onTrue(Commands.sequence(
-						m_cubeShooter.Config(ShooterLevels.HIGH),
-						m_leds.setLedColor(Color.kRed)));
+				.onTrue(m_cubeShooter.Config(ShooterLevels.HIGH))
+				.whileTrue(m_leds.setLedColor(Color.kRed));
 
 		m_operatorController.leftBumper().onTrue(
 				Commands.sequence(
 						m_claw.setState(ClawStates.OPEN),
 						m_wrist.setState(WristStates.SUBSTATION)));
-		m_operatorController.leftTrigger().onTrue(m_routines.ONE_CUBE);
 
 		m_operatorController.x().onTrue(m_claw.setState(ClawStates.OPEN));
 		m_operatorController.y().onTrue(m_claw.setState(ClawStates.CLOSED));
@@ -136,7 +135,7 @@ public class RobotContainer {
 		// m_operatorController.start().onTrue(substationToggle());
 		// Handoff Cone Sequence
 		m_operatorController.a().onTrue(m_routines.HANDOFF());
-		m_operatorController.back().onTrue(m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
+		// m_operatorController.back().onTrue(m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
 		// #endregion
 
 		// m_testController.leftBumper()
@@ -178,7 +177,6 @@ public class RobotContainer {
 		m_chooser.addOption("One Meter Test", m_routines.TEST);
 		m_chooser.addOption("One Piece + Charge Station", m_routines.ONE_PIECE_CHARGE_STATION);
 		m_chooser.addOption("One Cube", m_routines.ONE_CUBE);
-		m_chooser.addOption("Two Cube", m_routines.TWO_PIECE_CHARGE_STATION);
 		SmartDashboard.putData(m_chooser);
 	}
 

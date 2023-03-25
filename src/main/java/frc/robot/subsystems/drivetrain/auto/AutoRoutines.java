@@ -48,19 +48,16 @@ public class AutoRoutines {
           loadTrajectory(new DriveTrajectory("TopPieceToTopNode", false)),
           HANDOFF()),
       SCORE_CONE(ElevatorStates.TOP));
-  public final Auto TWO_PIECE_CHARGE_STATION = new Auto(
-      loadTrajectory(new DriveTrajectory("TopNodeToChargeStation", false, 1.5)),
-      m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
   public final Auto ONE_CUBE = new Auto(
       SCORE_CONE(ElevatorStates.TOP),
       Commands.parallel(
           loadTrajectory(new DriveTrajectory("TopNodeToTopCube", true)),
           INTAKE_CUBE()),
-      m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
-          new HashMap<>(Map.of("Angle", 0d))),
       loadTrajectory(new DriveTrajectory("TopCubeToTopCubeNode", false)),
       SCORE_CUBE_HIGH(),
-      loadTrajectory(new DriveTrajectory("TopCubeToChargeStation", false)),
+      Commands.parallel(
+          loadTrajectory(new DriveTrajectory("TopNodeToTopCube", false)),
+          INTAKE_CUBE().beforeStarting(Commands.waitSeconds(3))),
       m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE).withTimeout(15.0));
 
   private Command loadTrajectory(DriveTrajectory traj) {
