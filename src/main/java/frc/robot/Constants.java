@@ -13,7 +13,7 @@ public final class Constants {
     public static final double PERIODIC_LOOP_DURATION = 0.02;
     public static final double NOMINAL_VOLTAGE = 12d;
     public static final String CANFD_BUS = "CANivore1";
-    public static final Color TEAM_COLOR = new Color(0, 255, 0);
+    public static final Color TEAM_COLOR = new Color(0, 170.0, 0);
 
     public static final class VisionConstants {
 
@@ -186,7 +186,7 @@ public final class Constants {
         public static final int LEFT_MOTOR = 9;
         public static final int RIGHT_MOTOR = 10;
 
-        public static final double kP = 0.04;
+        public static final double kP = 0.022;
         // Gains were recalced
         public static final double kS = 0.40921;
         public static final double kG = 0.12654;
@@ -203,7 +203,7 @@ public final class Constants {
         public static final double BOTTOM_SETPOINT = 0d;
         public static final double MID_CONE_SETPOINT = 13_982d * METERS_PER_TICK;
         public static final double MID_CUBE_SETPOINT = 13_908d * METERS_PER_TICK;
-        public static final double TOP_SETPOINT = 28_500d * METERS_PER_TICK;
+        public static final double TOP_SETPOINT = 1.03;
         public static final double DOUBLE_SUBSTATION_SETPOINT = 28_500d * METERS_PER_TICK;
         public static final double SUBSTATION_SETPOINT = 1234 * METERS_PER_TICK;
 

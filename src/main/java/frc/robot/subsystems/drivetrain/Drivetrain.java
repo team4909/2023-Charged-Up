@@ -382,9 +382,6 @@ public class Drivetrain extends SubsystemBase {
   }
 
   private Command AutoBalance() {
-    var c = new Object() {
-      int count = 0;
-    };
     // All values tuned by hand, works well enough - do not touch
     final PIDController balanceController = new PIDController(0.008, 0.0, 0.0);
     final double feedForward = 0.1; // m/s
@@ -398,11 +395,6 @@ public class Drivetrain extends SubsystemBase {
           var multiplier = balanceController.atSetpoint() ? 0 : 1;
           drive(ChassisSpeeds.fromFieldRelativeSpeeds(output + (Math.copySign(feedForward, output) * multiplier), 0d,
               0d, getGyroYaw()));
-          if (balanceController.atSetpoint()) {
-          }
-          if (c.count >= 8) {
-            // setState(DrivetrainStates.LOCKED).schedule();
-          }
 
           SmartDashboard.putNumber("Drivetrain/AutoBalance/Pitch PID Output", output);
           SmartDashboard.putNumber("Drivetrain/AutoBalance/Pitch", m_pigeon.getRoll());
