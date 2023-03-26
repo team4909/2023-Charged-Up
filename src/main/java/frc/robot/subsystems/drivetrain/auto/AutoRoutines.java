@@ -111,7 +111,7 @@ public class AutoRoutines {
 
   private final Command SCORE_CUBE_HIGH() {
     return Commands.sequence(
-        m_cubeShooter.Config(ShooterLevels.HIGH),
+        m_cubeShooter.Configure(ShooterLevels.HIGH),
         m_cubeShooter.setState(CubeShooterStates.SCORE),
         Commands.waitSeconds(0.5),
         m_cubeShooter.setState(CubeShooterStates.RETRACTED));

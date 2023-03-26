@@ -150,25 +150,34 @@ public class CubeShooter extends SubsystemBase {
   private Command SetPivotPositionAndRollerSpeed(double position, double frontSpeed, double backSpeed,
       boolean spinFirst) {
     m_pivotSetpoint = position; // variable exists for telemetry purposes
-    Command rollers = Commands.runOnce(() -> {
-      m_topRoller.set(frontSpeed);
-      m_bottomRoller.set(backSpeed);
-    }, this);
-    Command pivot = Commands.run(() -> {
-      double arbFF = MathUtil.clamp(calcFF(m_cubePivot.getEncoder().getPosition()), -1d, 1d);
-      m_cubePivot.getPIDController().setReference(m_pivotSetpoint, ControlType.kPosition, 0, arbFF);
-    }, this).until(() -> (position - m_cubePivot.getEncoder().getPosition() < 1.5));
+    Command rollers = RunRollers(frontSpeed, backSpeed);
+    Command pivot = Pivot(position);
     return spinFirst ? Commands.sequence(rollers, pivot)
         : Commands.sequence(pivot.andThen(Commands.waitSeconds(0.5)), rollers);
   }
 
-  public Command Config(ShooterLevels shooterLevel) {
+  public Command Configure(ShooterLevels shooterLevel) {
     return Commands.runOnce(() -> {
       m_pivotSetpoint = shooterLevel.pivotSetpoint;
       m_frontRollerSetpoint = shooterLevel.frontRollerSetpoint;
       m_backRollerSetpoint = shooterLevel.backRollerSetpoint;
-    });
+    }, this).andThen(
+        () -> Pivot(m_pivotSetpoint).schedule(), this);
   };
+
+  Command RunRollers(double frontSpeed, double backSpeed) {
+    return Commands.runOnce(() -> {
+      m_topRoller.set(frontSpeed);
+      m_bottomRoller.set(backSpeed);
+    }, this);
+  }
+
+  Command Pivot(double position) {
+    return Commands.run(() -> {
+      double arbFF = MathUtil.clamp(calcFF(m_cubePivot.getEncoder().getPosition()), -1d, 1d);
+      m_cubePivot.getPIDController().setReference(m_pivotSetpoint, ControlType.kPosition, 0, arbFF);
+    }, this).until(() -> (position - m_cubePivot.getEncoder().getPosition() < 1.5));
+  }
 
   private double calcFF(double thetaDegrees) {
     double ff = CubeShooterConstants.kG * Math.cos(Math.toRadians(thetaDegrees));

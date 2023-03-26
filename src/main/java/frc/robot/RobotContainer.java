@@ -111,10 +111,10 @@ public class RobotContainer {
 		m_operatorController.povDown().onTrue(m_wrist.setState(WristStates.DROPPING));
 
 		m_operatorController.povRight()
-				.onTrue(m_cubeShooter.Config(ShooterLevels.MID))
+				.onTrue(m_cubeShooter.Configure(ShooterLevels.MID))
 				.whileTrue(m_leds.setLedColor(Color.kBlue));
 		m_operatorController.povLeft()
-				.onTrue(m_cubeShooter.Config(ShooterLevels.HIGH))
+				.onTrue(m_cubeShooter.Configure(ShooterLevels.HIGH))
 				.whileTrue(m_leds.setLedColor(Color.kRed));
 
 		m_operatorController.leftBumper().onTrue(
