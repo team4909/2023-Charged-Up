@@ -107,10 +107,16 @@
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
+        "Cube Shooter": {
+          "open": true
+        },
         "Drivetrain": {
           "open": true
         },
         "Elevator": {
+          "open": true
+        },
+        "Intake": {
           "open": true
         },
         "open": true
@@ -126,7 +132,7 @@
               "autoFit": true
             }
           ],
-          "height": 218,
+          "height": 182,
           "series": [
             {
               "color": [
@@ -174,7 +180,7 @@
     "Plot <1>": {
       "plots": [
         {
-          "height": 218,
+          "height": 182,
           "series": [
             {
               "color": [
@@ -231,7 +237,7 @@
     "Plot <2>": {
       "plots": [
         {
-          "height": 218,
+          "height": 182,
           "series": [
             {
               "color": [
@@ -279,7 +285,7 @@
     "Plot <3>": {
       "plots": [
         {
-          "height": 218,
+          "height": 413,
           "series": [
             {
               "color": [

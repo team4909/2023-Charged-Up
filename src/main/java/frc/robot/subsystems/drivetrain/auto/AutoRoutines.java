@@ -98,7 +98,7 @@ public class AutoRoutines {
   private final Command INTAKE_CONE() {
     return Commands.sequence(
         m_intake.setState(IntakeStates.INTAKE_CONE),
-        Commands.waitSeconds(2d),
+        Commands.waitSeconds(1.5d),
         m_intake.setState(IntakeStates.HANDOFF));
   }
 

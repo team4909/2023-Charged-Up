@@ -213,6 +213,10 @@ public class Intake extends SubsystemBase {
     return Commands.runOnce(() -> m_state = state);
   }
 
+  public IntakeStates getState() {
+    return m_state;
+  }
+
   public static Intake getInstance() {
     return m_instance = (m_instance == null) ? new Intake() : m_instance;
   }
