@@ -51,7 +51,6 @@ public class CubeShooter extends SubsystemBase {
   }
 
   private CubeShooter() {
-    m_state = CubeShooterStates.IDLE;
     m_cubePivot = new CANSparkMax(CubeShooterConstants.PIVOT_MOTOR, MotorType.kBrushless);
     m_topRoller = new CANSparkMax(CubeShooterConstants.TOP_ROLLER_MOTOR, MotorType.kBrushless);
     m_bottomRoller = new CANSparkMax(CubeShooterConstants.BOTTOM_ROLLER_MOTOR, MotorType.kBrushless);
@@ -70,6 +69,7 @@ public class CubeShooter extends SubsystemBase {
     m_cubePivot.getEncoder().setPosition(CubeShooterConstants.DEGREE_RANGE - 7.0);
     m_cubePivot.setInverted(false);
 
+    m_state = CubeShooterStates.IDLE;
   }
 
   @Override
@@ -161,8 +161,8 @@ public class CubeShooter extends SubsystemBase {
       m_pivotSetpoint = shooterLevel.pivotSetpoint;
       m_frontRollerSetpoint = shooterLevel.frontRollerSetpoint;
       m_backRollerSetpoint = shooterLevel.backRollerSetpoint;
-    }, this).andThen(
-        () -> Pivot(m_pivotSetpoint).schedule(), this);
+    }).andThen(
+        () -> Pivot(m_pivotSetpoint).schedule());
   };
 
   Command RunRollers(double frontSpeed, double backSpeed) {

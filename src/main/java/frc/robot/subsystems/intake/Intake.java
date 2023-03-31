@@ -55,7 +55,6 @@ public class Intake extends SubsystemBase {
   }
 
   private Intake() {
-    m_state = IntakeStates.IDLE;
     m_pivot = new CANSparkMax(IntakeConstants.LEFT_PIVOT_MOTOR, MotorType.kBrushless);
     m_frontRoller = new CANSparkMax(IntakeConstants.FRONT_ROLLER_MOTOR, MotorType.kBrushless);
     m_backRoller = new CANSparkMax(IntakeConstants.BACK_ROLLER_MOTOR, MotorType.kBrushless);
@@ -71,6 +70,8 @@ public class Intake extends SubsystemBase {
     m_pivot.getEncoder().setPositionConversionFactor(IntakeConstants.DEGREES_PER_TICK);
     m_pivot.getEncoder().setPosition(110d);
     m_pivot.setInverted(false);
+
+    m_state = IntakeStates.IDLE;
 
     if (Constants.SIM) {
       m_pivotSim = new SingleJointedArmSim(
