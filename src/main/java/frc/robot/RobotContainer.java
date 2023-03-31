@@ -130,10 +130,12 @@ public class RobotContainer {
 		m_operatorController.rightTrigger().onTrue(
 				Commands.sequence(
 						m_elevator.setState(ElevatorStates.MID_CONE),
+						Commands.waitSeconds(0.75),
 						m_wrist.setState(WristStates.HALF_DUNK)));
 		m_operatorController.rightBumper().onTrue(
 				Commands.sequence(
 						m_elevator.setState(ElevatorStates.TOP),
+						Commands.waitSeconds(0.75),
 						m_wrist.setState(WristStates.HALF_DUNK)));
 
 		// m_operatorController.start().onTrue(substationToggle());
