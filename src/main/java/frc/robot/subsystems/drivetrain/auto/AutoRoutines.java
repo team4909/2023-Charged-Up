@@ -75,8 +75,6 @@ public class AutoRoutines {
   private final Command INIT() {
     return Commands.sequence(
         m_claw.setState(ClawStates.CLOSED),
-        // m_intake.setState(IntakeStates.CALIBRATE),
-        // m_cubeShooter.setState(CubeShooterStates.CALIBRATE),
         Commands.waitSeconds(1),
         m_intake.setState(IntakeStates.RETRACTED),
         m_cubeShooter.setState(CubeShooterStates.RETRACTED));

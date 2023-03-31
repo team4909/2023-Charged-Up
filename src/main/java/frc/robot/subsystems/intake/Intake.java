@@ -32,7 +32,6 @@ public class Intake extends SubsystemBase {
   public enum IntakeStates {
     IDLE("Idle"),
     RETRACTED("Retracted"),
-    CALIBRATE("Calibrate"),
     INTAKE_CUBE("Intake Cube"),
     INTAKE_CONE("Intake Cone"),
     SPIT_CONE("Spit Cone"),
@@ -137,9 +136,6 @@ public class Intake extends SubsystemBase {
         case SPIT_CONE:
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.SPIT_CONE_SETPOINT, 0.3d, -0.3d);
           break;
-        case CALIBRATE:
-          currentIntakeCommand = Calibrate();
-          break;
         case HANDOFF:
           if (m_lastState.was(IntakeStates.INTAKE_CUBE)) {
             IntakeStates.HANDOFF.stateName = "Handoff Cube";
@@ -191,15 +187,6 @@ public class Intake extends SubsystemBase {
         }, this));
   }
 
-  private Command Calibrate() {
-    return Commands.run(() -> {
-      m_pivot.set(0.05);
-    }, this).withTimeout(0.5)
-        .andThen(() -> {
-          m_pivot.getEncoder().setPosition(110d);
-          m_state = IntakeStates.RETRACTED;
-        }, this);
-  }
   // #endregion
 
   private double calcFF(double thetaDegrees) {

@@ -4,7 +4,7 @@
       "DockNode    ID=0x00000001 Pos=236,29 Size=1320,280 Split=X",
       "DockNode  ID=0x00000002 Parent=0x00000001 SizeRef=702,283 Selected=0x2D9B9756",
       "DockNode  ID=0x00000003 Parent=0x00000001 SizeRef=616,283 Selected=0xB804B83F",
-      "DockNode    ID=0x00000004 Pos=550,776 Size=862,197 Split=X",
+      "DockNode    ID=0x00000004 Pos=548,779 Size=862,197 Split=X",
       "DockNode  ID=0x00000005 Parent=0x00000004 SizeRef=191,73 Selected=0x6AE6D891",
       "DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=603,73 Selected=0x138219D4",
       "DockNode    ID=0x00000007 Pos=365,332 Size=1120,420 Split=X",
@@ -20,7 +20,7 @@
       "style": "1",
       "userScale": "2",
       "width": "1920",
-      "xpos": "-1920",
+      "xpos": "0",
       "ypos": "23"
     }
   },
@@ -67,7 +67,7 @@
     "###Joysticks": {
       "Collapsed": "0",
       "DockId": "0x00000006,0",
-      "Pos": "759,776",
+      "Pos": "757,779",
       "Size": "653,197"
     },
     "###NetworkTables": {
@@ -118,7 +118,7 @@
     "###System Joysticks": {
       "Collapsed": "0",
       "DockId": "0x00000005,0",
-      "Pos": "550,776",
+      "Pos": "548,779",
       "Size": "207,197"
     },
     "###Timing": {

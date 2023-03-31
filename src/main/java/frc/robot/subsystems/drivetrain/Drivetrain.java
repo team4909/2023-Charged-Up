@@ -46,6 +46,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.subsystems.drivetrain.module.Module;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionUtils;
 
 public class Drivetrain extends SubsystemBase {
 
@@ -75,6 +76,7 @@ public class Drivetrain extends SubsystemBase {
   private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(m_moduleTranslations);
   private final double MAX_ANGULAR_SPEED = 4;
   private final Vision m_vision = new Vision();
+  private final VisionUtils m_visionUtils = new VisionUtils();
 
   private Consumer<SwerveModuleState[]> m_swerveModuleConsumer = states -> {
     SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_ANGULAR_SPEED);
@@ -170,13 +172,13 @@ public class Drivetrain extends SubsystemBase {
     Pair<Pose2d, Double> visionReading = m_vision.getAllianceRelativePose();
     double end = Timer.getFPGATimestamp();
     SmartDashboard.putNumber("Drivetrain/Pose Estimator Update Time", end - start);
-    // if (visionReading.getFirst() != null && visionReading != null) {
-    // m_poseEstimator.addVisionMeasurement(
-    // m_vision.getAllianceRelativePose().getFirst(),
-    // m_vision.getAllianceRelativePose().getSecond());
-    // m_fieldPoseConsumer.accept("FrontLimelightEstimate",
-    // visionReading.getFirst());
-    // }
+    if (visionReading.getFirst() != null && visionReading != null) {
+      m_poseEstimator.addVisionMeasurement(
+          m_vision.getAllianceRelativePose().getFirst(),
+          m_vision.getAllianceRelativePose().getSecond());
+      m_fieldPoseConsumer.accept("FrontLimelightEstimate",
+          visionReading.getFirst());
+    }
 
     SmartDashboard.putString("Drivetrain/State", m_state.toString());
     SmartDashboard.putBoolean("Drivetrain/Joystick Input",
@@ -253,7 +255,7 @@ public class Drivetrain extends SubsystemBase {
           break;
         case ON_THE_FLY_TRAJECTORY:
           currentDrivetrainCommand = TrajectoryDrive(
-              m_vision.generateOnTheFlyTrajectory(m_pose, m_chassisSpeeds,
+              m_visionUtils.generateOnTheFlyTrajectory(m_pose, m_chassisSpeeds,
                   (int) m_stateArgs.get("Waypoint")),
               false, true);
           break;
