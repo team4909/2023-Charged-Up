@@ -54,10 +54,10 @@ public class AutoRoutines {
           loadTrajectory(new DriveTrajectory("TopNodeToTopCube", true)),
           INTAKE_CUBE()),
       loadTrajectory(new DriveTrajectory("TopCubeToTopCubeNode", false)),
-      SCORE_CUBE_HIGH());
-  // Commands.parallel(
-  // loadTrajectory(new DriveTrajectory("TopCubeNodeToSecondPiece", false)),
-  // INTAKE_CUBE().beforeStarting(Commands.waitSeconds(3))));
+      SCORE_CUBE_HIGH(),
+      Commands.parallel(
+          loadTrajectory(new DriveTrajectory("TopCubeNodeToSecondPiece", false)),
+          INTAKE_CONE().beforeStarting(Commands.waitSeconds(2.2))));
 
   private Command loadTrajectory(DriveTrajectory traj) {
     return Commands.waitUntil(m_drivetrain.isTrajectoryFinished)
@@ -105,7 +105,7 @@ public class AutoRoutines {
   private final Command INTAKE_CUBE() {
     return Commands.sequence(
         m_cubeShooter.setState(CubeShooterStates.INTAKE),
-        Commands.waitSeconds(4),
+        Commands.waitSeconds(3),
         m_cubeShooter.setState(CubeShooterStates.RETRACTED));
   }
 
