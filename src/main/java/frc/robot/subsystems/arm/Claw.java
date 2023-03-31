@@ -23,8 +23,7 @@ public class Claw extends SubsystemBase {
     public enum ClawStates {
         IDLE("Idle"),
         CLOSED("Closed"),
-        OPEN("Open"),
-        CUBE("Cube");
+        OPEN("Open");
 
         String stateName;
 
@@ -72,9 +71,6 @@ public class Claw extends SubsystemBase {
                 case OPEN:
                     currentClawCommand = SetClawPos(0.15);
                     break;
-                case CUBE:
-                    currentClawCommand = SetClawPos(0);
-                    break;
                 default:
                     m_state = ClawStates.IDLE;
             }
@@ -88,7 +84,7 @@ public class Claw extends SubsystemBase {
     }
 
     private Command Idle() {
-        return null;
+        return Commands.runOnce(() -> m_clawMotor.set(0.0), this);
     }
 
     private Command SetClawPos(double setpoint) {

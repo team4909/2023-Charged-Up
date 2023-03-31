@@ -23,10 +23,12 @@ public class SimVisualizer {
   private final double kElevatorHeightOffsetInches = 7.65; // from cad
 
   private final Mechanism2d m_mechanismWindow;
-  private final MechanismRoot2d m_elevatorRoot;
-  private final MechanismLigament2d m_baseLigament, m_intakeLigament, m_wristLigament, m_elevatorLigament;
+  private final MechanismRoot2d m_elevatorRoot, m_cubeShooterRoot;
+  private final MechanismLigament2d m_baseLigament, m_intakeLigament, m_cubeShooterLigament, m_wristLigament,
+      m_elevatorLigament;
 
   public final Consumer<Double> intakeAngle;
+  public final Consumer<Double> cubeShooterAngle;
   public final Consumer<Double> wristAngle;
   public final Consumer<Double> elevatorExtension;
 
@@ -40,6 +42,10 @@ public class SimVisualizer {
     m_intakeLigament = m_baseLigament
         .append(new MechanismLigament2d("intake", IntakeConstants.SIM.ARM_LENGTH * kLengthScaleFactor, 90d, 15d,
             new Color8Bit(Color.kBlack)));
+    m_cubeShooterRoot = m_mechanismWindow.getRoot("cube_shooter_root", kWidth / 3d, kHeight / 4d);
+    m_cubeShooterLigament = m_cubeShooterRoot
+        .append(new MechanismLigament2d("Cube Shooter", Units.inchesToMeters(26d) * kLengthScaleFactor, 110d));
+    m_cubeShooterLigament.setColor(new Color8Bit(Color.kGray));
 
     // #region Elevator & End Effector
     m_elevatorRoot = m_mechanismWindow.getRoot("elevator_root", kWidth / 3d, kHeight / 6d);
@@ -60,6 +66,7 @@ public class SimVisualizer {
     m_wristLigament.setColor(new Color8Bit(Color.kBlack));
     // #endregion
     intakeAngle = inputDeg -> m_intakeLigament.setAngle(inputDeg);
+    cubeShooterAngle = inputDeg -> m_cubeShooterLigament.setAngle(inputDeg);
     wristAngle = inputDeg -> m_wristLigament.setAngle(inputDeg - 45d);
     elevatorExtension = inputMeters -> m_elevatorLigament
         .setLength(inputMeters * kLengthScaleFactor);
