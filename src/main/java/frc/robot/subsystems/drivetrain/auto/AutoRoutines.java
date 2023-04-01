@@ -31,13 +31,16 @@ public class AutoRoutines {
 
   public final Auto TEST = new Auto(
       loadTrajectory(new DriveTrajectory("Test2", true)));
+
   public final Auto BLANK_AUTO = new Auto();
-  public final Auto SCORE_CONE_CHARGE_STATION_COMMUNITY = new Auto(
+
+  public final Auto ONE_CONE_CHARGE_STATION = new Auto(
       SCORE_CONE(ElevatorStates.TOP),
       loadTrajectory(new DriveTrajectory("ChargeStationStraight", true, 1.5)),
       loadTrajectory(new DriveTrajectory("BackChargeStation", false, 1.5)),
       m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
-  public final Auto ONE_PIECE_CHARGE_STATION = new Auto(
+
+  public final Auto TWO_CONE_CHARGE_STATION = new Auto(
       SCORE_CONE(ElevatorStates.TOP),
       Commands.parallel(
           loadTrajectory(new DriveTrajectory("TopNodeToTopPiece", true)),
@@ -48,7 +51,8 @@ public class AutoRoutines {
           loadTrajectory(new DriveTrajectory("TopPieceToTopNode", false)),
           HANDOFF()),
       SCORE_CONE(ElevatorStates.TOP));
-  public final Auto ONE_CUBE = new Auto(
+
+  public final Auto ONE_CONE_ONE_CUBE = new Auto(
       SCORE_CONE(ElevatorStates.TOP),
       Commands.parallel(
           loadTrajectory(new DriveTrajectory("TopNodeToTopCube", true)),
@@ -57,7 +61,28 @@ public class AutoRoutines {
       SCORE_CUBE_HIGH(),
       Commands.parallel(
           loadTrajectory(new DriveTrajectory("TopCubeNodeToSecondPiece", false)),
-          INTAKE_CONE().beforeStarting(Commands.waitSeconds(2.2))));
+          INTAKE_CONE().beforeStarting(Commands.waitSeconds(2.2))),
+      HANDOFF());
+
+  public final Auto ONE_CONE_ONE_CUBE_BUMP = new Auto(
+      SCORE_CONE(ElevatorStates.TOP),
+      Commands.parallel(
+          loadTrajectory(new DriveTrajectory("BottomPieceBumpSide", true, 1.5)),
+          INTAKE_CUBE().beforeStarting(Commands.waitSeconds(2))),
+      loadTrajectory(new DriveTrajectory("BottomPieceToBottomNode", false, 1.5)),
+      SCORE_CUBE_HIGH(),
+      loadTrajectory(new DriveTrajectory("BottomNodeToOutside", false, 1.5)));
+
+  public final Auto ONE_CONE_PICKUP_CUBE_BUMP = new Auto(
+      SCORE_CONE(ElevatorStates.TOP),
+      Commands.parallel(
+          loadTrajectory(new DriveTrajectory("BottomPieceBumpSide", true, 1.5)),
+          INTAKE_CUBE().beforeStarting(Commands.waitSeconds(2))),
+      loadTrajectory(new DriveTrajectory("BottomPieceToBottomNode", false, 1.5)));
+
+  public final Auto ONE_CONE_BUMP = new Auto(
+      SCORE_CONE(ElevatorStates.TOP),
+      loadTrajectory(new DriveTrajectory("BottomPieceBumpSide", true, 1.5)));
 
   private Command loadTrajectory(DriveTrajectory traj) {
     return Commands.waitUntil(m_drivetrain.isTrajectoryFinished)
@@ -85,9 +110,9 @@ public class AutoRoutines {
   private final Command SCORE_CONE(ElevatorStates extensionLevel) {
     return Commands.sequence(
         m_elevator.setState(extensionLevel),
-        Commands.waitSeconds(1.5),
-        m_wrist.setState(WristStates.DROPPING),
         Commands.waitSeconds(0.75),
+        m_wrist.setState(WristStates.DROPPING),
+        Commands.waitSeconds(0.5),
         m_claw.setState(ClawStates.OPEN),
         Commands.waitSeconds(0.2),
         m_wrist.setState(WristStates.RETRACTED),
@@ -105,7 +130,7 @@ public class AutoRoutines {
   private final Command INTAKE_CUBE() {
     return Commands.sequence(
         m_cubeShooter.setState(CubeShooterStates.INTAKE),
-        Commands.waitSeconds(3),
+        Commands.waitSeconds(2.75),
         m_cubeShooter.setState(CubeShooterStates.RETRACTED));
   }
 
@@ -121,9 +146,9 @@ public class AutoRoutines {
     return Commands.sequence(
         m_claw.setState(ClawStates.OPEN),
         m_wrist.setState(WristStates.HANDOFF_CONE),
-        Commands.waitSeconds(1),
-        m_claw.setState(ClawStates.CLOSED),
         Commands.waitSeconds(0.5),
+        m_claw.setState(ClawStates.CLOSED),
+        Commands.waitSeconds(0.2),
         m_intake.setState(IntakeStates.SPIT_CONE),
         Commands.waitSeconds(0.1),
         m_wrist.setState(WristStates.RETRACTED),

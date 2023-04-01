@@ -146,7 +146,7 @@ public final class Constants {
         public static final double kV = 0.28;
         public static final double kA = 0.02;
 
-        public static final double OUTPUT_LIMIT = 0.15;
+        public static final double OUTPUT_LIMIT = 0.25;
         public static final double DEGREE_RANGE = 191d; // from cad
         public static final double TICK_RANGE = 7.976211547851562; // emperically measured
         public static final double DEGREES_PER_TICK = DEGREE_RANGE / TICK_RANGE;

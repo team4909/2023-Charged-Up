@@ -163,8 +163,7 @@ public class Wrist extends SubsystemBase {
     m_wristMotor.setInverted(true);
     m_wristMotor.getPIDController().setP(WristConstants.kP);
 
-    // We dont know which one is up or down
-    m_wristMotor.getPIDController().setOutputRange(-WristConstants.OUTPUT_LIMIT, 0.25);
+    m_wristMotor.getPIDController().setOutputRange(-WristConstants.OUTPUT_LIMIT, WristConstants.OUTPUT_LIMIT);
     m_wristMotor.setIdleMode(IdleMode.kBrake);
 
     m_wristMotor.getPIDController().setSmartMotionAllowedClosedLoopError(200, 0);

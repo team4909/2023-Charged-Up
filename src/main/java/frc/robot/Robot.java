@@ -73,9 +73,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    if (Intake.getInstance().getState() != IntakeStates.HANDOFF) {
-      Intake.getInstance().setState(IntakeStates.RETRACTED).schedule();
-    }
+
+    Intake.getInstance().setState(IntakeStates.RETRACTED).schedule();
     CubeShooter.getInstance().setState(CubeShooterStates.RETRACTED).schedule();
     Drivetrain.getInstance().setState(DrivetrainStates.IDLE).schedule();
   }
