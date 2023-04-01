@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.bioniclib.SparkManager;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.SimVisualizer;
@@ -32,10 +33,8 @@ public class Intake extends SubsystemBase {
   public enum IntakeStates {
     IDLE("Idle"),
     RETRACTED("Retracted"),
-    INTAKE_CUBE("Intake Cube"),
     INTAKE_CONE("Intake Cone"),
     SPIT_CONE("Spit Cone"),
-    SPIT_CUBE("Spit Cube"),
     HANDOFF("Handoff");
 
     String stateName;
@@ -58,17 +57,22 @@ public class Intake extends SubsystemBase {
     m_frontRoller = new CANSparkMax(IntakeConstants.FRONT_ROLLER_MOTOR, MotorType.kBrushless);
     m_backRoller = new CANSparkMax(IntakeConstants.BACK_ROLLER_MOTOR, MotorType.kBrushless);
 
-    m_pivot.restoreFactoryDefaults();
-    m_frontRoller.restoreFactoryDefaults();
-    m_backRoller.restoreFactoryDefaults();
+    SparkManager sparkManager = new SparkManager("Intake Pivot & Rollers");
+    sparkManager.statusTracker.accept(m_pivot.restoreFactoryDefaults());
+    sparkManager.statusTracker.accept(m_frontRoller.restoreFactoryDefaults());
+    sparkManager.statusTracker.accept(m_backRoller.restoreFactoryDefaults());
 
-    m_pivot.getPIDController().setP(IntakeConstants.kP);
-    m_pivot.getPIDController().setOutputRange(-IntakeConstants.OUTPUT_LIMIT, IntakeConstants.OUTPUT_LIMIT);
+    sparkManager.statusTracker.accept(m_pivot.getPIDController().setP(IntakeConstants.kP));
+    sparkManager.statusTracker
+        .accept(m_pivot.getPIDController().setOutputRange(-IntakeConstants.OUTPUT_LIMIT, IntakeConstants.OUTPUT_LIMIT));
 
-    m_pivot.setSmartCurrentLimit(40, 40);
-    m_pivot.getEncoder().setPositionConversionFactor(IntakeConstants.DEGREES_PER_TICK);
-    m_pivot.getEncoder().setPosition(110d);
+    sparkManager.statusTracker.accept(m_pivot.setSmartCurrentLimit(40, 40));
+    sparkManager.statusTracker
+        .accept(m_pivot.getEncoder().setPositionConversionFactor(IntakeConstants.DEGREES_PER_TICK));
+    sparkManager.statusTracker.accept(m_pivot.getEncoder().setPosition(110d));
     m_pivot.setInverted(false);
+
+    sparkManager.reportErrors();
 
     m_state = IntakeStates.IDLE;
 
@@ -125,23 +129,14 @@ public class Intake extends SubsystemBase {
         case RETRACTED:
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.RETRACTED_SETPOINT, 0d, 0d);
           break;
-        case INTAKE_CUBE:
-          currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CUBE_SETPOINT, 0.5, -0.5);
-          break;
         case INTAKE_CONE:
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CONE_SETPOINT, 0.75, 0.75);
-          break;
-        case SPIT_CUBE:
-          currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CUBE_SETPOINT, -0.75, 0.75);
           break;
         case SPIT_CONE:
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.SPIT_CONE_SETPOINT, 0.3d, -0.3d);
           break;
         case HANDOFF:
-          if (m_lastState.was(IntakeStates.INTAKE_CUBE)) {
-            IntakeStates.HANDOFF.stateName = "Handoff Cube";
-            currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.HANDOFF_SETPOINT, 0.2d, -0.05d);
-          } else if (m_lastState.was(IntakeStates.INTAKE_CONE)) {
+          if (m_lastState.was(IntakeStates.INTAKE_CONE)) {
             IntakeStates.HANDOFF.stateName = "Handoff Cone";
             currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.HANDOFF_SETPOINT, 0.2d, 0.15d);
           }

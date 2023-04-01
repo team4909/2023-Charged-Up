@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.bioniclib.SparkManager;
 import frc.robot.Constants.CubeShooterConstants;
 
 public class CubeShooter extends SubsystemBase {
@@ -55,20 +56,23 @@ public class CubeShooter extends SubsystemBase {
     m_topRoller = new CANSparkMax(CubeShooterConstants.TOP_ROLLER_MOTOR, MotorType.kBrushless);
     m_bottomRoller = new CANSparkMax(CubeShooterConstants.BOTTOM_ROLLER_MOTOR, MotorType.kBrushless);
 
-    m_cubePivot.restoreFactoryDefaults();
-    m_topRoller.restoreFactoryDefaults();
-    m_bottomRoller.restoreFactoryDefaults();
+    SparkManager sparkManager = new SparkManager("Cube Shooter Pivot & Rollers");
+    sparkManager.statusTracker.accept(m_cubePivot.restoreFactoryDefaults());
+    sparkManager.statusTracker.accept(m_topRoller.restoreFactoryDefaults());
+    sparkManager.statusTracker.accept(m_bottomRoller.restoreFactoryDefaults());
 
-    m_cubePivot.getPIDController().setP(CubeShooterConstants.kP);
-    m_cubePivot.getPIDController().setD(CubeShooterConstants.kD);
-    m_cubePivot.getPIDController().setOutputRange(-CubeShooterConstants.OUTPUT_LIMIT,
-        CubeShooterConstants.OUTPUT_LIMIT);
+    sparkManager.statusTracker.accept(m_cubePivot.getPIDController().setP(CubeShooterConstants.kP));
+    sparkManager.statusTracker.accept(m_cubePivot.getPIDController().setD(CubeShooterConstants.kD));
+    sparkManager.statusTracker.accept(m_cubePivot.getPIDController().setOutputRange(-CubeShooterConstants.OUTPUT_LIMIT,
+        CubeShooterConstants.OUTPUT_LIMIT));
 
-    m_cubePivot.setSmartCurrentLimit(40, 40);
-    m_cubePivot.getEncoder().setPositionConversionFactor(CubeShooterConstants.DEGREES_PER_TICK);
-    m_cubePivot.getEncoder().setPosition(CubeShooterConstants.DEGREE_RANGE - 7.0);
+    sparkManager.statusTracker.accept(m_cubePivot.setSmartCurrentLimit(40, 40));
+    sparkManager.statusTracker
+        .accept(m_cubePivot.getEncoder().setPositionConversionFactor(CubeShooterConstants.DEGREES_PER_TICK));
+    sparkManager.statusTracker.accept(m_cubePivot.getEncoder().setPosition(CubeShooterConstants.DEGREE_RANGE - 7.0));
     m_cubePivot.setInverted(false);
 
+    sparkManager.reportErrors();
     m_state = CubeShooterStates.IDLE;
   }
 
