@@ -19,7 +19,7 @@ public class CubeShooter extends SubsystemBase {
   private double m_pivotSetpoint, m_frontRollerSetpoint, m_backRollerSetpoint;
 
   public enum ShooterLevels {
-    MID(CubeShooterConstants.CUBE_MID, 0.45, 45),
+    MID(CubeShooterConstants.CUBE_MID, 0.45, 0.45),
     HIGH(CubeShooterConstants.RETRACTED_SETPOINT, 0.75, 0.75);
 
     double pivotSetpoint, frontRollerSetpoint, backRollerSetpoint;

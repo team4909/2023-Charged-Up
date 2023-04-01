@@ -97,7 +97,7 @@ public class RobotContainer {
 
 		// Drop Game Piece
 		m_driverController.a().onTrue(m_wrist.setState(WristStates.DROPPING)
-				.andThen(new WaitCommand(0.5))
+				.andThen(new WaitCommand(0.15))
 				.andThen(m_claw.setState(ClawStates.OPEN))
 				.andThen(new WaitCommand(0.2))
 				.andThen(m_elevator.setState(ElevatorStates.RETRACT))
