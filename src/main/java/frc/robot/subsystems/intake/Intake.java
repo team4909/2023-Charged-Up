@@ -12,12 +12,14 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.bioniclib.SparkManager;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.subsystems.leds.LEDs;
 import frc.robot.SimVisualizer;
 
 public class Intake extends SubsystemBase {
@@ -58,21 +60,24 @@ public class Intake extends SubsystemBase {
     m_backRoller = new CANSparkMax(IntakeConstants.BACK_ROLLER_MOTOR, MotorType.kBrushless);
 
     SparkManager sparkManager = new SparkManager("Intake Pivot & Rollers");
-    sparkManager.statusTracker.accept(m_pivot.restoreFactoryDefaults());
-    sparkManager.statusTracker.accept(m_frontRoller.restoreFactoryDefaults());
-    sparkManager.statusTracker.accept(m_backRoller.restoreFactoryDefaults());
+    Runnable config = () -> {
+      sparkManager.statusTracker.accept(m_pivot.restoreFactoryDefaults());
+      sparkManager.statusTracker.accept(m_frontRoller.restoreFactoryDefaults());
+      sparkManager.statusTracker.accept(m_backRoller.restoreFactoryDefaults());
 
-    sparkManager.statusTracker.accept(m_pivot.getPIDController().setP(IntakeConstants.kP));
-    sparkManager.statusTracker
-        .accept(m_pivot.getPIDController().setOutputRange(-IntakeConstants.OUTPUT_LIMIT, IntakeConstants.OUTPUT_LIMIT));
+      sparkManager.statusTracker.accept(m_pivot.getPIDController().setP(IntakeConstants.kP));
+      sparkManager.statusTracker
+          .accept(
+              m_pivot.getPIDController().setOutputRange(-IntakeConstants.OUTPUT_LIMIT, IntakeConstants.OUTPUT_LIMIT));
 
-    sparkManager.statusTracker.accept(m_pivot.setSmartCurrentLimit(40, 40));
-    sparkManager.statusTracker
-        .accept(m_pivot.getEncoder().setPositionConversionFactor(IntakeConstants.DEGREES_PER_TICK));
-    sparkManager.statusTracker.accept(m_pivot.getEncoder().setPosition(110d));
-    m_pivot.setInverted(false);
-
-    sparkManager.reportErrors();
+      sparkManager.statusTracker.accept(m_pivot.setSmartCurrentLimit(40, 40));
+      sparkManager.statusTracker
+          .accept(m_pivot.getEncoder().setPositionConversionFactor(IntakeConstants.DEGREES_PER_TICK));
+      sparkManager.statusTracker.accept(m_pivot.getEncoder().setPosition(110d));
+      m_pivot.setInverted(false);
+    };
+    sparkManager.setConfigRunnable(config);
+    sparkManager.forceConfig();
 
     m_state = IntakeStates.IDLE;
 
@@ -102,6 +107,8 @@ public class Intake extends SubsystemBase {
     SmartDashboard.putNumber("Intake/Pivot Encoder Position", m_pivot.getEncoder().getPosition());
     SmartDashboard.putNumber("Intake/Pivot Output", m_pivot.getAppliedOutput());
     SmartDashboard.putNumber("Intake/Pivot Current", m_pivot.getOutputCurrent());
+    SmartDashboard.putNumber("Intake/Front Roller Current", m_frontRoller.getOutputCurrent());
+    SmartDashboard.putNumber("Intake/Back Roller Current", m_backRoller.getOutputCurrent());
   }
 
   @Override
@@ -130,7 +137,8 @@ public class Intake extends SubsystemBase {
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.RETRACTED_SETPOINT, 0d, 0d);
           break;
         case INTAKE_CONE:
-          currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CONE_SETPOINT, 0.75, 0.75);
+          currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CONE_SETPOINT, 0.75, 0.75)
+              .deadlineWith(CheckConePresence());
           break;
         case SPIT_CONE:
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.SPIT_CONE_SETPOINT, 0.3d, -0.3d);
@@ -181,6 +189,23 @@ public class Intake extends SubsystemBase {
             m_pivot.getPIDController().setReference(m_pivotSetpoint, ControlType.kPosition, 0, arbFF);
           }
         }, this));
+  }
+
+  private Command CheckConePresence() {
+    var o = new Object() {
+      public int count = 0;
+    };
+    return Commands.run(() -> {
+      if (m_backRoller.getOutputCurrent() >= 40) {
+        o.count++;
+      }
+      if (o.count >= 5) {
+        LEDs.getInstance().setLedColor(Color.kGreenYellow).schedule();
+      }
+    }).finallyDo((i) -> {
+      o.count = 0;
+      LEDs.getInstance().getCurrentCommand().cancel();
+    });
   }
 
   // #endregion

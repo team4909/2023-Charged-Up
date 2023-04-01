@@ -39,11 +39,8 @@ public final class Constants {
          */
 
         public static final Transform3d ROBOT_TO_CAM = new Transform3d(
-                new Translation3d(
-                        Units.inchesToMeters(7.462),
-                        Units.inchesToMeters(5.772),
-                        Units.inchesToMeters(23.785)),
-                new Rotation3d(0.0, 0.0, 0.0));
+                new Translation3d(0.32385, -0.19685, 0.71755),
+                new Rotation3d(0.0, -22.0, 0.0));
     }
 
     public static final class DrivetrainConstants {
