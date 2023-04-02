@@ -10,6 +10,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -19,8 +20,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.bioniclib.SparkManager;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
-import frc.robot.subsystems.leds.LEDs;
 import frc.robot.SimVisualizer;
+import frc.robot.subsystems.leds.LEDs;
 
 public class Intake extends SubsystemBase {
 
@@ -192,20 +193,17 @@ public class Intake extends SubsystemBase {
   }
 
   private Command CheckConePresence() {
-    var o = new Object() {
-      public int count = 0;
-    };
+    Timer stallTimer = new Timer();
+    stallTimer.start();
     return Commands.run(() -> {
-      if (m_backRoller.getOutputCurrent() >= 40) {
-        o.count++;
-      }
-      if (o.count >= 5) {
-        LEDs.getInstance().setLedColor(Color.kGreenYellow).schedule();
-      }
-    }).finallyDo((i) -> {
-      o.count = 0;
-      LEDs.getInstance().getCurrentCommand().cancel();
-    });
+      if (m_backRoller.getOutputCurrent() >= 40)
+        stallTimer.start();
+      else
+        stallTimer.stop();
+
+      if (stallTimer.get() >= 0.75)
+        LEDs.getInstance().setLedColor(Color.kGreenYellow).asProxy();
+    }).finallyDo(i -> stallTimer.reset());
   }
 
   // #endregion

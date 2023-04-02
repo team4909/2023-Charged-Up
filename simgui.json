@@ -47,7 +47,8 @@
       "/SmartDashboard/Mech2d": "Mechanism2d",
       "/SmartDashboard/Robot Mechanism Simulation": "Mechanism2d",
       "/SmartDashboard/Scheduler": "Scheduler",
-      "/SmartDashboard/SendableChooser[0]": "String Chooser"
+      "/SmartDashboard/SendableChooser[0]": "String Chooser",
+      "/SmartDashboard/SendableChooser[1]": "String Chooser"
     },
     "windows": {
       "/SmartDashboard/Field": {
@@ -68,7 +69,6 @@
           "width": 0.7900000214576721
         },
         "height": 8.013679504394531,
-        "image": "D:\\VisualCodeProjects\\2023-Charged-Up\\res\\field23.png",
         "traj": {
           "arrowColor": [
             1.0,
@@ -102,24 +102,29 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/SendableChooser[1]": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
-        "Cube Shooter": {
-          "open": true
-        },
-        "Drivetrain": {
+        "Config Errors": {
           "open": true
         },
         "Elevator": {
           "open": true
         },
-        "Intake": {
+        "Wrist": {
           "open": true
         },
+        "open": true
+      },
+      "limelight": {
         "open": true
       }
     }
@@ -133,7 +138,7 @@
               "autoFit": true
             }
           ],
-          "height": 182,
+          "height": 237,
           "series": [
             {
               "color": [
@@ -181,7 +186,7 @@
     "Plot <1>": {
       "plots": [
         {
-          "height": 182,
+          "height": 237,
           "series": [
             {
               "color": [
@@ -238,7 +243,7 @@
     "Plot <2>": {
       "plots": [
         {
-          "height": 182,
+          "height": 237,
           "series": [
             {
               "color": [
@@ -286,7 +291,7 @@
     "Plot <3>": {
       "plots": [
         {
-          "height": 413,
+          "height": 237,
           "series": [
             {
               "color": [
