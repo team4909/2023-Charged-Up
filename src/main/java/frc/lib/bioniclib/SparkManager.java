@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SparkManager {
 
+  private final int kMaxInitAttempts = 5;
   private ArrayList<REVLibError> m_statusList = new ArrayList<>();
   private String m_systemName;
   private int m_attempt = 1;
@@ -21,24 +22,32 @@ public class SparkManager {
 
   private boolean checkErrors() {
     ArrayList<REVLibError> errors = new ArrayList<>();
-    for (REVLibError e : m_statusList) {
+    Consumer<String> outputMessage = msg -> {
+      SmartDashboard.putString("Config Errors/" + m_systemName + " [Attempt " + m_attempt + "]", msg);
+    };
+    m_statusList.forEach((e) -> {
       if (!e.equals(REVLibError.kOk))
         errors.add(e);
-      if (errors.size() != 0) {
-        SmartDashboard.putString("Config Errors/" + m_systemName + " Attempt " + m_attempt, errors.toString());
+    });
+    if (errors.size() != 0) {
+      if (m_attempt < kMaxInitAttempts) {
+        outputMessage.accept(errors.toString());
         return true;
       } else {
-        SmartDashboard.putString("Config Errors/" + m_systemName + " Attempt " + m_attempt, "No errors detected");
+        outputMessage.accept("Failed!");
+        return false;
       }
+    } else {
+      outputMessage.accept("No Errors");
+      return false;
     }
-    return false;
   }
 
   public void forceConfig() {
     m_config.run();
     if (checkErrors()) {
       m_attempt++;
-      m_config.run();
+      forceConfig();
     }
   }
 
