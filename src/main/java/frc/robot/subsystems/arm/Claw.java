@@ -15,94 +15,95 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClawConstants;
 
 public class Claw extends SubsystemBase {
-    private static Claw m_instance;
-    private ClawStates m_state, m_lastState;
-    private final CANSparkMax m_clawMotor;
-    private final SparkMaxAbsoluteEncoder m_clawEncoder;
+  private static Claw m_instance;
+  private ClawStates m_state, m_lastState;
+  private final CANSparkMax m_clawMotor;
+  private final SparkMaxAbsoluteEncoder m_clawEncoder;
 
-    public enum ClawStates {
-        IDLE("Idle"),
-        CLOSED("Closed"),
-        OPEN("Open");
+  public enum ClawStates {
+    IDLE("Idle"),
+    CLOSED("Closed"),
+    OPEN("Open");
 
-        String stateName;
+    String stateName;
 
-        private ClawStates(String name) {
-            this.stateName = name;
-        }
-
-        public String toString() {
-            return this.stateName;
-        }
+    private ClawStates(String name) {
+      this.stateName = name;
     }
 
-    private Claw() {
-        m_state = ClawStates.IDLE;
-        m_clawMotor = new CANSparkMax(5, MotorType.kBrushless);
-        m_clawEncoder = m_clawMotor.getAbsoluteEncoder(Type.kDutyCycle);
+    public String toString() {
+      return this.stateName;
+    }
+  }
 
-        m_clawMotor.restoreFactoryDefaults();
-        m_clawMotor.getPIDController().setFeedbackDevice(m_clawEncoder);
-        m_clawMotor.getPIDController().setP(ClawConstants.kP);
-        m_clawMotor.getPIDController().setOutputRange(-ClawConstants.OUTPUT_LIMIT, ClawConstants.OUTPUT_LIMIT);
-        m_clawMotor.setIdleMode(IdleMode.kCoast);
-        m_clawMotor.setInverted(false);
-        m_clawMotor.setSmartCurrentLimit(10);
-        m_clawEncoder.setZeroOffset(0.39);
+  private Claw() {
+    m_state = ClawStates.IDLE;
+    m_clawMotor = new CANSparkMax(5, MotorType.kBrushless);
+    m_clawEncoder = m_clawMotor.getAbsoluteEncoder(Type.kDutyCycle);
+
+    m_clawMotor.restoreFactoryDefaults();
+    m_clawMotor.getPIDController().setFeedbackDevice(m_clawEncoder);
+    m_clawMotor.getPIDController().setP(ClawConstants.kP);
+    m_clawMotor.getPIDController().setOutputRange(-ClawConstants.OUTPUT_LIMIT, ClawConstants.OUTPUT_LIMIT);
+    m_clawMotor.setIdleMode(IdleMode.kCoast);
+    m_clawMotor.setInverted(false);
+    m_clawMotor.setSmartCurrentLimit(10);
+    m_clawEncoder.setZeroOffset(0.39);
+  }
+
+  @Override
+  public void periodic() {
+    stateMachine();
+    SmartDashboard.putString("Claw/State", m_state.toString());
+    SmartDashboard.putNumber("Claw/Encoder Position", m_clawEncoder.getPosition());
+  }
+
+  private void stateMachine() {
+    Command currentClawCommand = null;
+    if (!m_state.equals(m_lastState)) {
+      switch (m_state) {
+        case IDLE:
+          currentClawCommand = Idle();
+          break;
+        case CLOSED:
+          currentClawCommand = SetClawPos(0);
+          break;
+        case OPEN:
+          currentClawCommand = SetClawPos(0.15);
+          break;
+        default:
+          m_state = ClawStates.IDLE;
+          break;
+      }
     }
 
-    @Override
-    public void periodic() {
-        stateMachine();
-        SmartDashboard.putString("Claw/State", m_state.toString());
-        SmartDashboard.putNumber("Claw/Encoder Position", m_clawEncoder.getPosition());
+    m_lastState = m_state;
+
+    if (currentClawCommand != null) {
+      currentClawCommand.schedule();
     }
+  }
 
-    private void stateMachine() {
-        Command currentClawCommand = null;
-        if (!m_state.equals(m_lastState)) {
-            switch (m_state) {
-                case IDLE:
-                    currentClawCommand = Idle();
-                    break;
-                case CLOSED:
-                    currentClawCommand = SetClawPos(0);
-                    break;
-                case OPEN:
-                    currentClawCommand = SetClawPos(0.15);
-                    break;
-                default:
-                    m_state = ClawStates.IDLE;
-            }
-        }
+  private Command Idle() {
+    return Commands.runOnce(() -> m_clawMotor.set(0.0), this);
+  }
 
-        m_lastState = m_state;
+  private Command SetClawPos(double setpoint) {
+    return new InstantCommand(() -> {
+      SmartDashboard.putNumber("Claw/Setpoint", setpoint);
+      m_clawMotor.getPIDController().setReference(setpoint, ControlType.kPosition);
+    }, this);
+  }
 
-        if (currentClawCommand != null) {
-            currentClawCommand.schedule();
-        }
+  public Command setState(ClawStates state) {
+    return Commands.runOnce(() -> m_state = state);
+  }
+
+  public static Claw getInstance() {
+    if (m_instance == null) {
+      m_instance = new Claw();
     }
+    return m_instance;
 
-    private Command Idle() {
-        return Commands.runOnce(() -> m_clawMotor.set(0.0), this);
-    }
-
-    private Command SetClawPos(double setpoint) {
-        return new InstantCommand(() -> {
-            SmartDashboard.putNumber("Claw/Setpoint", setpoint);
-            m_clawMotor.getPIDController().setReference(setpoint, ControlType.kPosition);
-        }, this);
-    }
-
-    public Command setState(ClawStates state) {
-        return Commands.runOnce(() -> m_state = state);
-    }
-
-    public static Claw getInstance() {
-        if (m_instance == null) {
-            m_instance = new Claw();
-        }
-        return m_instance;
-
-    }
+  }
 }

@@ -7,7 +7,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -28,7 +27,6 @@ public class Wrist extends SubsystemBase {
   private WristStates m_state, m_lastState;
 
   private final CANSparkMax m_wristMotor;
-  private final ArmFeedforward m_wristFeedForward;
   private final SingleJointedArmSim m_wristSim;
   private final PIDController m_simWristPID;
 
@@ -54,8 +52,6 @@ public class Wrist extends SubsystemBase {
   private Wrist() {
     m_state = WristStates.IDLE;
     m_wristMotor = new CANSparkMax(6, MotorType.kBrushless);
-    m_wristFeedForward = new ArmFeedforward(WristConstants.kS, WristConstants.kG, WristConstants.kV,
-        WristConstants.kA);
     configureHardware();
 
     if (Constants.SIM) {

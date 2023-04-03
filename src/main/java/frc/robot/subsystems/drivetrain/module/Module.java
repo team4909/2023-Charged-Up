@@ -20,14 +20,12 @@ public final class Module {
     private final double MAX_VELOCITY_METERS_PER_SECOND = DrivetrainConstants.FALCON_500_FREE_SPEED / 60.0 *
             DrivetrainConstants.DRIVE_REDUCTION *
             DrivetrainConstants.WHEEL_DIAMETER * Math.PI;
-    private final PIDController m_simTurnPID = new PIDController(23.0, 0.0, 0.1); // Tuned for SIM!
-    private double m_lastAngle;
+    private final PIDController m_simTurnPID = new PIDController(23.0, 0.0, 0.1);
     private final SimpleMotorFeedforward m_driveFeedforward;
 
     public Module(int index) {
         m_module = Constants.SIM ? new SimulatedModule() : new PhysicalModule(index);
         m_index = index;
-        m_lastAngle = getModuleState().angle.getDegrees();
         m_driveFeedforward = new SimpleMotorFeedforward(
                 DrivetrainConstants.DRIVE_kS, DrivetrainConstants.DRIVE_kV, DrivetrainConstants.DRIVE_kA);
     }
@@ -52,17 +50,11 @@ public final class Module {
                     optimizedDesiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, 0d);
         } else {
             optimizedDesiredState = CTREModuleState.optimize(desiredstate, getModuleState().angle);
-            // double angle = (Math.abs(
-            // optimizedDesiredState.speedMetersPerSecond) <=
-            // (DrivetrainConstants.MAX_DRIVETRAIN_SPEED * 0.01))
-            // ? m_lastAngle
-            // : optimizedDesiredState.angle.getDegrees();
             m_module.setTurn(convertDegreesToTicks(optimizedDesiredState.angle.getDegrees()));
             double speedTicks = convertMPStoTicks(optimizedDesiredState.speedMetersPerSecond);
             double ff = m_driveFeedforward.calculate(optimizedDesiredState.speedMetersPerSecond);
             SmartDashboard.putNumber("Drivetrain/Drive FF", ff);
             m_module.setDrive(speedTicks, ff);
-            // m_lastAngle = angle;
         }
     }
 
@@ -110,13 +102,13 @@ public final class Module {
     }
 
     public static double convertRPMToTicks(double RPM) {
-        double motorRPM = RPM * 6.75; // TODO extract into a const
+        double motorRPM = RPM / DrivetrainConstants.DRIVE_REDUCTION;
         return motorRPM * (2048.0 / 600.0);
     }
 
     public static double convertTicksToRPM(double ticks) {
         double motorRPM = ticks * (600.0 / 2048.0);
-        double mechRPM = motorRPM / 6.75;
+        double mechRPM = motorRPM * DrivetrainConstants.DRIVE_REDUCTION;
         return mechRPM;
     }
 

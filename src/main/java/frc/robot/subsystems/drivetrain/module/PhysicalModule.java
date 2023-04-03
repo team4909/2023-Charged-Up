@@ -10,8 +10,6 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Constants.DrivetrainConstants;
 
@@ -60,7 +58,6 @@ public final class PhysicalModule extends ModuleBase {
 
     @Override
     void updateModuleInputs() {
-        double start = Timer.getFPGATimestamp();
         super.drivePositionRad = Units.rotationsToRadians(m_driveMotor.getSelectedSensorPosition() / TICKS_PER_ROTATION)
                 * DrivetrainConstants.DRIVE_REDUCTION;
 
@@ -87,8 +84,6 @@ public final class PhysicalModule extends ModuleBase {
         // super.turnAppliedVolts = m_turnMotor.getMotorOutputVoltage();
 
         super.turnAbsolutePositionRad = 0;
-        double end = Timer.getFPGATimestamp();
-        SmartDashboard.putNumber("Drivetrain/CTRE Call Time " + i, end - start);
     }
 
     @Override

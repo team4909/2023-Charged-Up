@@ -5,6 +5,7 @@ import static frc.robot.Constants.DrivetrainConstants.DRIVETRAIN_WHEELBASE_METER
 
 import java.util.HashMap;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
@@ -35,6 +36,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -44,6 +46,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DrivetrainConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.drivetrain.module.Module;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionUtils;
@@ -65,6 +68,7 @@ public class Drivetrain extends SubsystemBase {
   private DoubleSupplier m_joystickTranslationX, m_joystickTranslationY, m_joystickRotationOmega;
   private SwerveDrivePoseEstimator m_poseEstimator;
   private Pose2d m_pose;
+  private SendableChooser<Boolean> m_useVisionChooser = new SendableChooser<>();
 
   private final Pigeon2 m_pigeon = new Pigeon2(DrivetrainConstants.PIGEON_ID);
   private final Translation2d[] m_moduleTranslations = new Translation2d[] {
@@ -75,7 +79,7 @@ public class Drivetrain extends SubsystemBase {
   };
   private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(m_moduleTranslations);
   private final double MAX_ANGULAR_SPEED = 4;
-  private final Vision m_vision = new Vision();
+  private final Vision m_vision = new Vision("limelight");
   private final VisionUtils m_visionUtils = new VisionUtils();
 
   private Consumer<SwerveModuleState[]> m_swerveModuleConsumer = states -> {
@@ -93,6 +97,10 @@ public class Drivetrain extends SubsystemBase {
       m_field.getObject(poseName).setPose(pose);
     else
       m_field.getObject(poseName).setPose(100, 100, new Rotation2d()); // Take it off the screen
+  };
+  private final BiFunction<Pose2d, Pose2d, Boolean> m_isVisionPoseInTolerance = (currentPose, visionPose) -> {
+    return Math.abs(currentPose.getX() - visionPose.getX()) < VisionConstants.MAX_X_DEVIATION
+        && Math.abs(currentPose.getY() - visionPose.getY()) < VisionConstants.MAX_Y_DEVIATION;
   };
 
   private Supplier<Pose2d> m_poseSupplier = () -> m_pose;
@@ -131,6 +139,9 @@ public class Drivetrain extends SubsystemBase {
     m_poseEstimator = new SwerveDrivePoseEstimator(m_kinematics, getGyroYaw(), getSwerveModulePositions(), m_pose,
         new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.1, 0.1, 0.1),
         new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.9, 0.9, 0.9));
+    m_useVisionChooser.setDefaultOption("Include Vision", true);
+    m_useVisionChooser.addOption("Exclude Vision", false);
+    SmartDashboard.putData(m_useVisionChooser);
     SmartDashboard.putData(m_field);
   }
 
@@ -167,17 +178,17 @@ public class Drivetrain extends SubsystemBase {
       SmartDashboard.putNumber("Drivetrain/Module Set Time", end2 - start2);
     }
 
-    double start = Timer.getFPGATimestamp();
     m_pose = m_poseEstimator.update(getGyroYaw(), getSwerveModulePositions());
     Pair<Pose2d, Double> visionReading = m_vision.getAllianceRelativePose();
-    double end = Timer.getFPGATimestamp();
-    SmartDashboard.putNumber("Drivetrain/Pose Estimator Update Time", end - start);
-    if (visionReading.getFirst() != null && visionReading != null) {
-      m_poseEstimator.addVisionMeasurement(
-          m_vision.getAllianceRelativePose().getFirst(),
-          m_vision.getAllianceRelativePose().getSecond());
-      m_fieldPoseConsumer.accept("FrontLimelightEstimate",
-          visionReading.getFirst());
+    if (visionReading.getFirst() != null && visionReading.getSecond() != null) {
+      if (m_useVisionChooser.getSelected() && m_isVisionPoseInTolerance.apply(m_pose, visionReading.getFirst())) {
+        m_poseEstimator.addVisionMeasurement(
+            visionReading.getFirst(),
+            visionReading.getSecond());
+      }
+      m_fieldPoseConsumer.accept("FrontLimelightEstimate", visionReading.getFirst());
+    } else {
+      m_fieldPoseConsumer.accept("FrontLimelightEstimate", new Pose2d());
     }
 
     SmartDashboard.putString("Drivetrain/State", m_state.toString());
@@ -384,24 +395,17 @@ public class Drivetrain extends SubsystemBase {
   }
 
   private Command AutoBalance() {
-    // All values tuned by hand, works well enough - do not touch
     final PIDController balanceController = new PIDController(0.008, 0.0, 0.0);
     final double feedForward = 0.1; // m/s
     balanceController.setTolerance(8.0);
-    balanceController.setIntegratorRange(0.01, 0.03);
     return new PIDCommand(
         balanceController,
         () -> m_pigeon.getRoll(), // "Roll" is actually our pitch for the default pigeon configuration
-        () -> 0,
+        () -> 0.0,
         (output) -> {
-          var multiplier = balanceController.atSetpoint() ? 0 : 1;
-          drive(ChassisSpeeds.fromFieldRelativeSpeeds(output + (Math.copySign(feedForward, output) * multiplier), 0d,
-              0d, getGyroYaw()));
-
-          SmartDashboard.putNumber("Drivetrain/AutoBalance/Pitch PID Output", output);
-          SmartDashboard.putNumber("Drivetrain/AutoBalance/Pitch", m_pigeon.getRoll());
-          SmartDashboard.putNumber("Drivetrain/AutoBalance/Pitch PID Error", balanceController.getPositionError());
-          SmartDashboard.putBoolean("Drivetrain/AutoBalance/Is Balanced", balanceController.atSetpoint());
+          int useFF = balanceController.atSetpoint() ? 0 : 1;
+          drive(ChassisSpeeds.fromFieldRelativeSpeeds(output + (Math.copySign(feedForward, output) * useFF), 0.0, 0.0,
+              getGyroYaw()));
         },
         this);
   }
