@@ -139,9 +139,7 @@ public class RobotContainer {
 						m_wrist.setState(WristStates.HALF_DUNK)));
 
 		// m_operatorController.start().onTrue(substationToggle());
-		// Handoff Cone Sequence
 		m_operatorController.a().onTrue(m_routines.HANDOFF());
-		// m_operatorController.back().onTrue(m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));weDSX
 		// #endregion
 
 		m_testController.leftBumper()
