@@ -83,7 +83,9 @@ public class RobotContainer {
 		m_driverController.start().onTrue(Commands.runOnce(() -> m_drivetrain.reseedModules()));
 		m_driverController.povDown().onTrue(m_intake.setState(IntakeStates.RETRACTED));
 
-		m_driverController.povLeft().onTrue(m_cubeShooter.setState(CubeShooterStates.INTAKE));
+		m_driverController.povLeft().onTrue(m_cubeShooter.setState(CubeShooterStates.CALIBRATE));
+		m_driverController.povRight().onTrue(m_cubeShooter.setState(CubeShooterStates.SPIT))
+				.onFalse(m_cubeShooter.setState(CubeShooterStates.RETRACTED));
 		m_driverController.povUp().onTrue(m_cubeShooter.setState(CubeShooterStates.RETRACTED));
 		m_driverController.b()
 				.onTrue(m_cubeShooter.setState(CubeShooterStates.SCORE))
@@ -91,9 +93,12 @@ public class RobotContainer {
 		m_driverController.leftTrigger()
 				.onTrue(m_cubeShooter.setState(CubeShooterStates.INTAKE))
 				.onFalse(m_cubeShooter.setState(CubeShooterStates.RETRACTED));
-		m_driverController.x().onTrue(m_cubeShooter.setState(CubeShooterStates.SPIT))
-				.onFalse(m_cubeShooter.setState(CubeShooterStates.RETRACTED));
-		m_driverController.y().onTrue(m_cubeShooter.setState(CubeShooterStates.CALIBRATE));
+		m_driverController.x().onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+				new HashMap<>(Map.of("Angle", 180.0))))
+				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+		m_driverController.y().onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+				new HashMap<>(Map.of("Angle", 0.0))))
+				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
 
 		// Drop Game Piece
 		m_driverController.a().onTrue(m_wrist.setState(WristStates.DROPPING)
@@ -172,6 +177,7 @@ public class RobotContainer {
 		m_chooser.addOption("High Cone/Mobility/Balance", m_routines.ONE_CONE_CHARGE_STATION);
 		m_chooser.addOption("2.5 Piece CLean Side", m_routines.ONE_CONE_ONE_CUBE);
 		m_chooser.addOption("2 Bump Side", m_routines.ONE_CONE_ONE_CUBE_BUMP);
+		m_chooser.addOption("2 Bump Side (Low)", m_routines.ONE_CONE_ONE_CUBE_LOW_BUMP);
 		m_chooser.addOption("1.5 Bump Side", m_routines.ONE_CONE_PICKUP_CUBE_BUMP);
 		m_chooser.addOption("High Cone Bump Side/Mobility", m_routines.ONE_CONE_BUMP);
 		m_chooser.addOption("Two Cone Balance", m_routines.TWO_CONE_CHARGE_STATION);

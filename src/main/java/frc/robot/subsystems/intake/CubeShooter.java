@@ -5,21 +5,26 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.bioniclib.SparkManager;
 import frc.robot.Constants.CubeShooterConstants;
+import frc.robot.subsystems.leds.LEDs;
 
 public class CubeShooter extends SubsystemBase {
   private static CubeShooter m_instance;
   private CubeShooterStates m_state, m_lastState;
-
   private final CANSparkMax m_cubePivot, m_topRoller, m_bottomRoller;
   private double m_pivotSetpoint, m_frontRollerSetpoint, m_backRollerSetpoint;
 
+  public boolean isCubePresent;
+
   public enum ShooterLevels {
+    LOW(CubeShooterConstants.RETRACTED_SETPOINT, 0.1, 0.1),
     MID(CubeShooterConstants.CUBE_MID, 0.45, 0.45),
     HIGH(CubeShooterConstants.RETRACTED_SETPOINT, 0.75, 0.75);
 
@@ -100,7 +105,7 @@ public class CubeShooter extends SubsystemBase {
           break;
         case INTAKE:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, -0.7, -0.7,
-              true);
+              true).alongWith(CheckCubePresence());
           break;
         case RETRACTED:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.RETRACTED_SETPOINT, 0.0, 0.0,
@@ -161,6 +166,25 @@ public class CubeShooter extends SubsystemBase {
     Command pivot = Pivot(position);
     return spinFirst ? Commands.sequence(rollers, pivot)
         : Commands.sequence(pivot.andThen(Commands.waitSeconds(0.5)), rollers);
+  }
+
+  private Command CheckCubePresence() {
+    Timer stallTimer = new Timer();
+    stallTimer.start();
+    return Commands.run(() -> {
+      if (m_bottomRoller.getOutputCurrent() >= 30)
+        stallTimer.start();
+      else
+        stallTimer.stop();
+      if (stallTimer.get() >= 0.75) {
+        LEDs.getInstance().setLedColor(Color.kGreenYellow).asProxy().schedule();
+        isCubePresent = true;
+      }
+
+    }).finallyDo(i -> {
+      stallTimer.reset();
+      isCubePresent = false;
+    });
   }
 
   public Command Configure(ShooterLevels shooterLevel) {

@@ -99,6 +99,8 @@ public class Drivetrain extends SubsystemBase {
       m_field.getObject(poseName).setPose(100, 100, new Rotation2d()); // Take it off the screen
   };
   private final BiFunction<Pose2d, Pose2d, Boolean> m_isVisionPoseInTolerance = (currentPose, visionPose) -> {
+    if (DriverStation.isDisabled())
+      return true;
     return Math.abs(currentPose.getX() - visionPose.getX()) < VisionConstants.MAX_X_DEVIATION
         && Math.abs(currentPose.getY() - visionPose.getY()) < VisionConstants.MAX_Y_DEVIATION;
   };

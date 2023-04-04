@@ -58,7 +58,7 @@ public class AutoRoutines {
           loadTrajectory(new DriveTrajectory("TopNodeToTopCube", true)),
           INTAKE_CUBE()),
       loadTrajectory(new DriveTrajectory("TopCubeToTopCubeNode", false)),
-      SCORE_CUBE_HIGH(),
+      SCORE_CUBE(ShooterLevels.HIGH),
       Commands.parallel(
           loadTrajectory(new DriveTrajectory("TopCubeNodeToSecondPiece", false)),
           INTAKE_CONE().beforeStarting(Commands.waitSeconds(2.2))),
@@ -70,7 +70,16 @@ public class AutoRoutines {
           loadTrajectory(new DriveTrajectory("BottomPieceBumpSide", true, 1.5)),
           INTAKE_CUBE().beforeStarting(Commands.waitSeconds(2))),
       loadTrajectory(new DriveTrajectory("BottomPieceToBottomNode", false, 1.5)),
-      SCORE_CUBE_HIGH(),
+      SCORE_CUBE(ShooterLevels.HIGH),
+      loadTrajectory(new DriveTrajectory("BottomNodeToOutside", false, 1.5)));
+
+  public final Auto ONE_CONE_ONE_CUBE_LOW_BUMP = new Auto(
+      SCORE_CONE(ElevatorStates.TOP),
+      Commands.parallel(
+          loadTrajectory(new DriveTrajectory("BottomPieceBumpSide", true, 1.5)),
+          INTAKE_CUBE().beforeStarting(Commands.waitSeconds(2))),
+      loadTrajectory(new DriveTrajectory("BottomPieceToBottomNode", false, 1.5)),
+      SCORE_CUBE(ShooterLevels.LOW),
       loadTrajectory(new DriveTrajectory("BottomNodeToOutside", false, 1.5)));
 
   public final Auto ONE_CONE_PICKUP_CUBE_BUMP = new Auto(
@@ -134,9 +143,9 @@ public class AutoRoutines {
         m_cubeShooter.setState(CubeShooterStates.RETRACTED));
   }
 
-  private final Command SCORE_CUBE_HIGH() {
+  private final Command SCORE_CUBE(ShooterLevels shooterLevel) {
     return Commands.sequence(
-        m_cubeShooter.Configure(ShooterLevels.HIGH),
+        m_cubeShooter.Configure(shooterLevel),
         m_cubeShooter.setState(CubeShooterStates.SCORE),
         Commands.waitSeconds(0.5),
         m_cubeShooter.setState(CubeShooterStates.RETRACTED));

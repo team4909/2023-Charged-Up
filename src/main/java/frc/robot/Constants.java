@@ -52,15 +52,15 @@ public final class Constants {
     public static final double BACK_LEFT_MODULE_STEER_OFFSET = 251.2;
     public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 91.8;
 
-    public static final double DRIVE_kP = 0.07;
+    public static final double DRIVE_kP = 0.06;
     public static final double DRIVE_kS = 0.26015 / 12d;
     public static final double DRIVE_kV = 2.5039 / 12d;
     public static final double DRIVE_kA = 0.99695 / 12d;
 
     public static final double TURN_kP = 0.3;
 
-    public static final double X_FOLLOWING_kP = 1.5;
-    public static final double Y_FOLLOWING_kP = 1.5;
+    public static final double X_FOLLOWING_kP = 1.8;
+    public static final double Y_FOLLOWING_kP = 1.8;
     public static final double THETA_FOLLOWING_kP = 3;
 
     // CAN IDS

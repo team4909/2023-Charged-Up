@@ -27,11 +27,12 @@ public class Intake extends SubsystemBase {
 
   private static Intake m_instance;
   private IntakeStates m_state, m_lastState;
-
   private final CANSparkMax m_pivot, m_frontRoller, m_backRoller;
   private double m_pivotSetpoint;
   private final SingleJointedArmSim m_pivotSim;
   private final PIDController m_simPivotPID;
+
+  public boolean isConePresent;
 
   public enum IntakeStates {
     IDLE("Idle"),
@@ -200,10 +201,14 @@ public class Intake extends SubsystemBase {
         stallTimer.start();
       else
         stallTimer.stop();
-
-      if (stallTimer.get() >= 0.75)
-        LEDs.getInstance().setLedColor(Color.kGreenYellow).asProxy();
-    }).finallyDo(i -> stallTimer.reset());
+      if (stallTimer.get() >= 0.75) {
+        LEDs.getInstance().setLedColor(Color.kLightPink).asProxy().schedule();
+        isConePresent = true;
+      }
+    }).finallyDo(i -> {
+      stallTimer.reset();
+      isConePresent = false;
+    });
   }
 
   // #endregion
