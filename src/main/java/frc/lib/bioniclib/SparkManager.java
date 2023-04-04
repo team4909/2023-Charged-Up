@@ -3,7 +3,9 @@ package frc.lib.bioniclib;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVLibError;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -53,5 +55,13 @@ public class SparkManager {
 
   public void setConfigRunnable(Runnable config) {
     m_config = config;
+  }
+
+  public void configDefaultFramePeriods(CANSparkMax spark, boolean isFollower) {
+    statusTracker.accept(spark.setPeriodicFramePeriod(PeriodicFrame.kStatus0, isFollower ? 100 : 10));
+    statusTracker.accept(spark.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535));
+    statusTracker.accept(spark.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 65535));
+    statusTracker.accept(spark.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535));
+    statusTracker.accept(spark.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 65535));
   }
 }
