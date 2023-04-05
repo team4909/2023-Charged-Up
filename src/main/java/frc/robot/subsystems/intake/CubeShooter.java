@@ -24,7 +24,7 @@ public class CubeShooter extends SubsystemBase {
   public boolean isCubePresent;
 
   public enum ShooterLevels {
-    LOW(CubeShooterConstants.RETRACTED_SETPOINT, 0.1, 0.1),
+    LOW(CubeShooterConstants.RETRACTED_SETPOINT, 0.2, 0.2),
     MID(CubeShooterConstants.CUBE_MID, 0.45, 0.45),
     HIGH(CubeShooterConstants.RETRACTED_SETPOINT, 0.75, 0.75);
 
@@ -93,6 +93,7 @@ public class CubeShooter extends SubsystemBase {
     SmartDashboard.putNumber("Cube Shooter/Pivot Encoder Position", m_cubePivot.getEncoder().getPosition());
     SmartDashboard.putNumber("Cube Shooter/Pivot Output", m_cubePivot.getAppliedOutput());
     SmartDashboard.putNumber("Cube Shooter/Pivot Current", m_cubePivot.getOutputCurrent());
+    SmartDashboard.putNumber("Cube Shooter/Top Roller Current", m_topRoller.getOutputCurrent());
     SmartDashboard.putString("Cube Shooter/State", m_state.toString());
   }
 
@@ -172,17 +173,17 @@ public class CubeShooter extends SubsystemBase {
     Timer stallTimer = new Timer();
     stallTimer.start();
     return Commands.run(() -> {
-      if (m_bottomRoller.getOutputCurrent() >= 30)
+      if (m_topRoller.getOutputCurrent() >= 15)
         stallTimer.start();
       else
         stallTimer.stop();
-      if (stallTimer.get() >= 0.75) {
-        LEDs.getInstance().setLedColor(Color.kGreenYellow).asProxy().schedule();
+      if (stallTimer.get() >= 0.15) {
+        LEDs.getInstance().setLedColor(Color.kLightPink).schedule();
         isCubePresent = true;
       }
-
     }).finallyDo(i -> {
       stallTimer.reset();
+      LEDs.getInstance().getCurrentCommand().cancel();
       isCubePresent = false;
     });
   }

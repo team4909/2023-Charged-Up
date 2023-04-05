@@ -52,7 +52,7 @@ public final class Constants {
     public static final double BACK_LEFT_MODULE_STEER_OFFSET = 251.2;
     public static final double BACK_RIGHT_MODULE_STEER_OFFSET = 91.8;
 
-    public static final double DRIVE_kP = 0.06;
+    public static final double DRIVE_kP = 0.07;
     public static final double DRIVE_kS = 0.26015 / 12d;
     public static final double DRIVE_kV = 2.5039 / 12d;
     public static final double DRIVE_kA = 0.99695 / 12d;
@@ -82,7 +82,7 @@ public final class Constants {
 
   public static final class ClawConstants {
 
-    public static final double kP = 6.5;
+    public static final double kP = 7.5;
 
     public static final double OUTPUT_LIMIT = 0.5;
   }

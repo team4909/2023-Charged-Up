@@ -104,7 +104,7 @@ public class Wrist extends SubsystemBase {
           currentWristCommand = SetWristPosition(110);
           break;
         case HANDOFF_CONE:
-          currentWristCommand = SetWristPosition(-51.0);
+          currentWristCommand = SetWristPosition(-48.0);
           break;
         case HALF_DUNK:
           currentWristCommand = SetWristPosition(40.0);

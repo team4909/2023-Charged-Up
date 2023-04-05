@@ -30,7 +30,8 @@ public class RobotContainer {
 
 	private final CommandXboxController m_driverController = new CommandXboxController(0);
 	private final CommandXboxController m_operatorController = new CommandXboxController(1);
-	private final CommandXboxController m_testController = new CommandXboxController(2);
+	// private final CommandXboxController m_testController = new
+	// CommandXboxController(2);
 	private final SendableChooser<Command> m_chooser = new SendableChooser<>();
 	private final AutoRoutines m_routines = new AutoRoutines();
 	private final Elevator m_elevator = Elevator.getInstance();
@@ -103,7 +104,7 @@ public class RobotContainer {
 		// Drop Game Piece
 		m_driverController.a().onTrue(m_wrist.setState(WristStates.DROPPING)
 				.andThen(new WaitCommand(0.15))
-				.andThen(m_claw.setState(ClawStates.OPEN))
+				.andThen(m_claw.setState(ClawStates.SCORE))
 				.andThen(new WaitCommand(0.2))
 				.andThen(m_elevator.setState(ElevatorStates.RETRACT))
 				.andThen(m_wrist.setState(WristStates.RETRACTED)));
@@ -147,26 +148,36 @@ public class RobotContainer {
 		m_operatorController.a().onTrue(m_routines.HANDOFF());
 		// #endregion
 
-		m_testController.leftBumper()
-				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 1))));
-		m_testController.a()
-				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 2))));
-		m_testController.b()
-				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 3))));
-		m_testController.x()
-				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 4))));
-		m_testController.y()
-				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 5))));
-		m_testController.povRight()
-				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 6))));
-		m_testController.povLeft()
-				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 7))));
-		m_testController.povDown()
-				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 8))));
-		m_testController.povUp()
-				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 9))));
-		m_testController.rightBumper()
-				.onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new HashMap<>(Map.of("Waypoint", 10))));
+		// m_testController.leftBumper()
+		// .onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new
+		// HashMap<>(Map.of("Waypoint", 1))));
+		// m_testController.a()
+		// .onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new
+		// HashMap<>(Map.of("Waypoint", 2))));
+		// m_testController.b()
+		// .onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new
+		// HashMap<>(Map.of("Waypoint", 3))));
+		// m_testController.x()
+		// .onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new
+		// HashMap<>(Map.of("Waypoint", 4))));
+		// m_testController.y()
+		// .onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new
+		// HashMap<>(Map.of("Waypoint", 5))));
+		// m_testController.povRight()
+		// .onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new
+		// HashMap<>(Map.of("Waypoint", 6))));
+		// m_testController.povLeft()
+		// .onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new
+		// HashMap<>(Map.of("Waypoint", 7))));
+		// m_testController.povDown()
+		// .onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new
+		// HashMap<>(Map.of("Waypoint", 8))));
+		// m_testController.povUp()
+		// .onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new
+		// HashMap<>(Map.of("Waypoint", 9))));
+		// m_testController.rightBumper()
+		// .onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new
+		// HashMap<>(Map.of("Waypoint", 10))));
 
 	}
 

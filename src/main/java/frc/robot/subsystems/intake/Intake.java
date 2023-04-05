@@ -201,12 +201,13 @@ public class Intake extends SubsystemBase {
         stallTimer.start();
       else
         stallTimer.stop();
-      if (stallTimer.get() >= 0.75) {
-        LEDs.getInstance().setLedColor(Color.kLightPink).asProxy().schedule();
+      if (stallTimer.get() >= 0.15) {
+        LEDs.getInstance().setLedColor(Color.kLightPink).schedule();
         isConePresent = true;
       }
     }).finallyDo(i -> {
       stallTimer.reset();
+      LEDs.getInstance().getCurrentCommand().cancel();
       isConePresent = false;
     });
   }

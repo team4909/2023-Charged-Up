@@ -23,7 +23,9 @@ public class Claw extends SubsystemBase {
   public enum ClawStates {
     IDLE("Idle"),
     CLOSED("Closed"),
-    OPEN("Open");
+    OPEN("Open"),
+    HANDOFF("Handoff"),
+    SCORE("Score");
 
     String stateName;
 
@@ -70,6 +72,12 @@ public class Claw extends SubsystemBase {
           break;
         case OPEN:
           currentClawCommand = SetClawPos(0.15);
+          break;
+        case HANDOFF:
+          currentClawCommand = SetClawPos(0.2);
+          break;
+        case SCORE:
+          currentClawCommand = SetClawPos(0.08);
           break;
         default:
           m_state = ClawStates.IDLE;

@@ -252,7 +252,7 @@ public class Drivetrain extends SubsystemBase {
               });
           break;
         case JOYSTICK_DRIVE:
-          currentDrivetrainCommand = JoystickDrive(1d, 1d, DrivetrainConstants.DEADBAND)
+          currentDrivetrainCommand = JoystickDrive(1d, 1d, DrivetrainConstants.DEADBAND, false, null)
               .until(() -> !isJoystickInputPresent())
               .finallyDo((interrupted) -> {
                 if (!interrupted)
@@ -274,7 +274,7 @@ public class Drivetrain extends SubsystemBase {
           break;
         case PRECISE:
           currentDrivetrainCommand = JoystickDrive(DrivetrainConstants.PRECISE_SPEED_SCALE,
-              DrivetrainConstants.PRECISE_SPEED_SCALE, DrivetrainConstants.DEADBAND / 2d);
+              DrivetrainConstants.PRECISE_SPEED_SCALE, DrivetrainConstants.DEADBAND / 2d, false, null);
           break;
         case SNAP_TO_ANGLE:
           currentDrivetrainCommand = SnapToAngle((double) m_stateArgs.get("Angle"));
@@ -309,7 +309,8 @@ public class Drivetrain extends SubsystemBase {
   }
 
   // #region State Commands
-  private Command JoystickDrive(double linearSpeedScale, double angularSpeedScale, double deadband) {
+  private Command JoystickDrive(double linearSpeedScale, double angularSpeedScale, double deadband,
+      boolean useOmegaOverride, DoubleSupplier omegaOverride) {
     return new RunCommand(
         () -> {
           final double x = -m_joystickTranslationX.getAsDouble();
@@ -335,7 +336,7 @@ public class Drivetrain extends SubsystemBase {
                   * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
               (isJoystickInputPresent() ? linearVelocity.getY() : 0)
                   * DrivetrainConstants.MAX_DRIVETRAIN_SPEED,
-              omega * MAX_ANGULAR_SPEED,
+              useOmegaOverride ? omegaOverride.getAsDouble() : omega * MAX_ANGULAR_SPEED,
               getGyroYaw()));
         },
         this);
@@ -374,26 +375,22 @@ public class Drivetrain extends SubsystemBase {
   }
 
   private Command SnapToAngle(double angle) {
-    PIDController snapPID = new PIDController(0.012, 0.0, 0.0);
+    PIDController snapPID = new PIDController(0.019, 0.0, 0.0);
     snapPID.enableContinuousInput(-180, 180);
     snapPID.setTolerance(1.5); // degrees
+    var obj = new Object() {
+      double output = 0;
+    };
     return new PIDCommand(
         snapPID,
         () -> MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180),
         () -> angle,
         (omega) -> {
-          drive(ChassisSpeeds.fromFieldRelativeSpeeds(
-              isJoystickInputPresent()
-                  ? -m_joystickTranslationX.getAsDouble() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED
-                  : 0,
-              isJoystickInputPresent()
-                  ? -m_joystickTranslationY.getAsDouble() * DrivetrainConstants.MAX_DRIVETRAIN_SPEED
-                  : 0,
-              (m_joystickRotationOmega.getAsDouble() + omega) * MAX_ANGULAR_SPEED, getGyroYaw()));
-        },
-        this)
+          obj.output = omega;
+        })
         .until(() -> snapPID.atSetpoint())
-        .andThen(setState(DrivetrainStates.IDLE));
+        .andThen(setState(DrivetrainStates.IDLE))
+        .alongWith(JoystickDrive(1d, 1d, DrivetrainConstants.DEADBAND, true, () -> obj.output));
   }
 
   private Command AutoBalance() {

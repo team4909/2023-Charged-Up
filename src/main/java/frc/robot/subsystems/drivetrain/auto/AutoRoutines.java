@@ -153,7 +153,7 @@ public class AutoRoutines {
 
   public final Command HANDOFF() {
     return Commands.sequence(
-        m_claw.setState(ClawStates.OPEN),
+        m_claw.setState(ClawStates.HANDOFF),
         m_wrist.setState(WristStates.HANDOFF_CONE),
         Commands.waitSeconds(0.5),
         m_claw.setState(ClawStates.CLOSED),
