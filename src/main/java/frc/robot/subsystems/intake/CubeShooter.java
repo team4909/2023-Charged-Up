@@ -178,13 +178,13 @@ public class CubeShooter extends SubsystemBase {
         stallTimer.start();
       else
         stallTimer.stop();
-      if (stallTimer.get() >= 0.15 || Constants.SIM) {
+      if (stallTimer.get() >= 0.15) {
         LEDs.getInstance().setColor(Color.kLightPink).schedule();
         isCubePresent = true;
       }
-    }).finallyDo(i -> {
+    }).andThen(() -> {
       stallTimer.reset();
-      LEDs.getInstance().getCurrentCommand().cancel();
+      LEDs.getInstance().setColor(Color.kBlack).schedule();
       isCubePresent = false;
     });
   }

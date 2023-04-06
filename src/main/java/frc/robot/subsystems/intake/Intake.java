@@ -140,7 +140,7 @@ public class Intake extends SubsystemBase {
           break;
         case INTAKE_CONE:
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CONE_SETPOINT, 0.75, 0.75)
-              .deadlineWith(CheckConePresence());
+              .alongWith(CheckConePresence());
           break;
         case SPIT_CONE:
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.SPIT_CONE_SETPOINT, 0.3d, -0.3d);
@@ -201,13 +201,13 @@ public class Intake extends SubsystemBase {
         stallTimer.start();
       else
         stallTimer.stop();
-      if (stallTimer.get() >= 0.15 || Constants.SIM) {
+      if (stallTimer.get() >= 0.15) {
         LEDs.getInstance().setColor(Color.kLightPink).schedule();
         isConePresent = true;
       }
-    }).finallyDo(i -> {
+    }).andThen(() -> {
       stallTimer.reset();
-      LEDs.getInstance().getCurrentCommand().cancel();
+      LEDs.getInstance().setColor(Color.kBlack).schedule();
       isConePresent = false;
     });
   }

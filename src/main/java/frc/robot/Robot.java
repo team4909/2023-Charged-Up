@@ -54,7 +54,6 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledExit() {
     LEDs.getInstance().setDefaultCommand(LEDs.getInstance().setColor(new Color(0, 0, 0)));
-    // LEDs.getInstance().getCurrentCommand().cancel();
   }
 
   @Override
