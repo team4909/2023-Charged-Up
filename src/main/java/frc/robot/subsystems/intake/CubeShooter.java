@@ -184,7 +184,7 @@ public class CubeShooter extends SubsystemBase {
       }
     }).andThen(() -> {
       stallTimer.reset();
-      LEDs.getInstance().setColor(Color.kBlack).schedule();
+      // LEDs.getInstance().getDefaultCommand().schedule();
       isCubePresent = false;
     });
   }

@@ -2,6 +2,7 @@ package frc.robot.subsystems.leds;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -13,6 +14,7 @@ public class LEDs extends SubsystemBase {
   private AddressableLED m_leds;
   private AddressableLEDBuffer m_ledBuffer;
   private final int kledLength = 123;
+  private Color m_currentColor = Color.kWhite;
 
   private LEDs() {
     m_leds = new AddressableLED(0);
@@ -28,6 +30,7 @@ public class LEDs extends SubsystemBase {
       boolean hitBrightnessLimit;
     };
     return Commands.run(() -> {
+      m_currentColor = initialColor;
       currentColor.r = (currentColor.a / 256.0) * initialColor.red;
       currentColor.g = (currentColor.a / 256.0) * initialColor.green;
       currentColor.b = (currentColor.a / 256.0) * initialColor.blue;
@@ -52,6 +55,7 @@ public class LEDs extends SubsystemBase {
 
   public Command setColor(Color color) {
     return Commands.runOnce(() -> {
+      m_currentColor = color;
       for (int i = 0; i < kledLength; i++) {
         m_ledBuffer.setLED(i, color);
       }
@@ -59,6 +63,10 @@ public class LEDs extends SubsystemBase {
     }, this)
         .andThen(Commands.none().repeatedly())
         .ignoringDisable(true);
+  }
+
+  public void periodic() {
+    SmartDashboard.putString("Current Color", m_currentColor.toString());
   }
 
   public static LEDs getInstance() {

@@ -134,7 +134,7 @@ public class AutoRoutines {
   private final Command INTAKE_CONE() {
     return Commands.sequence(
         m_intake.setState(IntakeStates.INTAKE_CONE),
-        Commands.waitSeconds(1.5d),
+        Commands.waitSeconds(1.5),
         m_intake.setState(IntakeStates.HANDOFF));
   }
 
@@ -153,6 +153,18 @@ public class AutoRoutines {
         m_cubeShooter.setState(CubeShooterStates.RETRACTED));
   }
 
+  // public final Command HANDOFF() {
+  // return Commands.sequence(
+  // m_claw.setState(ClawStates.HANDOFF),
+  // m_wrist.setState(WristStates.HANDOFF_CONE),
+  // Commands.waitSeconds(0.5),
+  // m_claw.setState(ClawStates.CLOSED),
+  // Commands.waitSeconds(0.35),
+  // m_intake.setState(IntakeStates.SPIT_CONE),
+  // Commands.waitSeconds(0.1),
+  // m_wrist.setState(WristStates.RETRACTED),
+  // m_intake.setState(IntakeStates.RETRACTED));
+  // }
   public final Command HANDOFF() {
     return Commands.sequence(
         Commands.deadline(

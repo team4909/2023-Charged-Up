@@ -207,7 +207,7 @@ public class Intake extends SubsystemBase {
       }
     }).andThen(() -> {
       stallTimer.reset();
-      LEDs.getInstance().setColor(Color.kBlack).schedule();
+      // LEDs.getInstance().getDefaultCommand().schedule();
       isConePresent = false;
     });
   }
