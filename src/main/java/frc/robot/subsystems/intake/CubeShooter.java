@@ -107,7 +107,7 @@ public class CubeShooter extends SubsystemBase {
           break;
         case INTAKE:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, -0.7, -0.7,
-              true);// .deadlineWith(CheckCubePresence());
+              true).deadlineWith(CheckCubePresence());
           break;
         case RETRACTED:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.RETRACTED_SETPOINT, 0.0, 0.0,

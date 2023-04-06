@@ -49,7 +49,6 @@ public final class Module {
             m_module.setDrive(
                     optimizedDesiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, 0d);
         } else {
-
             optimizedDesiredState = CTREModuleState.optimize(desiredstate, getModuleState().angle);
             var angleError = optimizedDesiredState.angle.getRadians()
                     - MathUtil.angleModulus(Math.toRadians(m_module.turnPosition));
