@@ -201,7 +201,7 @@ public class Intake extends SubsystemBase {
         stallTimer.start();
       else
         stallTimer.stop();
-      if (stallTimer.get() >= 0.15) {
+      if (stallTimer.get() >= 0.15 || Constants.SIM) {
         LEDs.getInstance().setColor(Color.kLightPink).schedule();
         isConePresent = true;
       }

@@ -49,11 +49,16 @@ public final class Module {
             m_module.setDrive(
                     optimizedDesiredState.speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, 0d);
         } else {
+
             optimizedDesiredState = CTREModuleState.optimize(desiredstate, getModuleState().angle);
+            var angleError = optimizedDesiredState.angle.getRadians()
+                    - MathUtil.angleModulus(Math.toRadians(m_module.turnPosition));
+            optimizedDesiredState.speedMetersPerSecond *= Math.cos(angleError);
             m_module.setTurn(convertDegreesToTicks(optimizedDesiredState.angle.getDegrees()));
             double speedTicks = convertMPStoTicks(optimizedDesiredState.speedMetersPerSecond);
             double ff = m_driveFeedforward.calculate(optimizedDesiredState.speedMetersPerSecond);
             SmartDashboard.putNumber("Drivetrain/Drive FF", ff);
+            SmartDashboard.putNumber("Drivetrain/Angle Error Rad", angleError);
             m_module.setDrive(speedTicks, ff);
         }
     }

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.bioniclib.SparkManager;
+import frc.robot.Constants;
 import frc.robot.Constants.CubeShooterConstants;
 import frc.robot.subsystems.leds.LEDs;
 
@@ -106,7 +107,7 @@ public class CubeShooter extends SubsystemBase {
           break;
         case INTAKE:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, -0.7, -0.7,
-              true).alongWith(CheckCubePresence());
+              true);// .deadlineWith(CheckCubePresence());
           break;
         case RETRACTED:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.RETRACTED_SETPOINT, 0.0, 0.0,
@@ -177,7 +178,7 @@ public class CubeShooter extends SubsystemBase {
         stallTimer.start();
       else
         stallTimer.stop();
-      if (stallTimer.get() >= 0.15) {
+      if (stallTimer.get() >= 0.15 || Constants.SIM) {
         LEDs.getInstance().setColor(Color.kLightPink).schedule();
         isCubePresent = true;
       }

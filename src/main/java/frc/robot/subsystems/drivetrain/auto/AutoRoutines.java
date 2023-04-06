@@ -3,6 +3,7 @@ package frc.robot.subsystems.drivetrain.auto;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -19,6 +20,7 @@ import frc.robot.subsystems.intake.CubeShooter.CubeShooterStates;
 import frc.robot.subsystems.intake.CubeShooter.ShooterLevels;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.Intake.IntakeStates;
+import frc.robot.subsystems.leds.LEDs;
 
 public class AutoRoutines {
 
@@ -28,7 +30,7 @@ public class AutoRoutines {
   private final Intake m_intake = Intake.getInstance();
   private final Claw m_claw = Claw.getInstance();
   private final CubeShooter m_cubeShooter = CubeShooter.getInstance();
-
+  private final LEDs m_leds = LEDs.getInstance();
   public final Auto TEST = new Auto(
       loadTrajectory(new DriveTrajectory("Test2", true)));
 
@@ -153,11 +155,14 @@ public class AutoRoutines {
 
   public final Command HANDOFF() {
     return Commands.sequence(
-        m_claw.setState(ClawStates.HANDOFF),
-        m_wrist.setState(WristStates.HANDOFF_CONE),
-        Commands.waitSeconds(0.5),
-        m_claw.setState(ClawStates.CLOSED),
-        Commands.waitSeconds(0.35),
+        Commands.deadline(
+            Commands.sequence(
+                m_claw.setState(ClawStates.HANDOFF),
+                m_wrist.setState(WristStates.HANDOFF_CONE),
+                Commands.waitSeconds(0.5),
+                m_claw.setState(ClawStates.CLOSED),
+                Commands.waitSeconds(0.35)),
+            m_leds.setColor(Color.kFirebrick)),
         m_intake.setState(IntakeStates.SPIT_CONE),
         Commands.waitSeconds(0.1),
         m_wrist.setState(WristStates.RETRACTED),

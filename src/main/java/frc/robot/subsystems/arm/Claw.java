@@ -50,12 +50,13 @@ public class Claw extends SubsystemBase {
       sparkManager.statusTracker.accept(m_clawMotor.getPIDController().setFeedbackDevice(m_clawEncoder));
       sparkManager.statusTracker.accept(m_clawMotor.getPIDController().setP(ClawConstants.kP));
       sparkManager.statusTracker.accept(
-          m_clawMotor.getPIDController().setOutputRange(-ClawConstants.OUTPUT_LIMIT, ClawConstants.OUTPUT_LIMIT));
+          m_clawMotor.getPIDController().setOutputRange(-ClawConstants.OUTPUT_LIMIT,
+              ClawConstants.OUTPUT_LIMIT));
       sparkManager.statusTracker.accept(m_clawMotor.setIdleMode(IdleMode.kCoast));
       sparkManager.statusTracker.accept(m_clawMotor.setSmartCurrentLimit(10));
       m_clawMotor.setInverted(false);
 
-      m_clawEncoder.setZeroOffset(0.39);
+      sparkManager.statusTracker.accept(m_clawEncoder.setZeroOffset(0.39));
     };
 
     sparkManager.setConfigRunnable(config);

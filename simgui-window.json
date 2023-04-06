@@ -1,7 +1,7 @@
 {
   "Docking": {
     "Data": [
-      "DockNode    ID=0x00000001 Pos=1969,477 Size=1712,1279 Split=X",
+      "DockNode    ID=0x00000001 Pos=1901,477 Size=1712,1279 Split=X",
       "DockNode  ID=0x00000002 Parent=0x00000001 SizeRef=702,283 Selected=0x2D9B9756",
       "DockNode  ID=0x00000003 Parent=0x00000001 SizeRef=616,283 Selected=0xB804B83F",
       "DockNode    ID=0x00000004 Pos=541,781 Size=862,197 Split=X",
@@ -16,11 +16,11 @@
   "MainWindow": {
     "GLOBAL": {
       "fps": "120",
-      "height": "2004",
+      "height": "1106",
       "maximized": "1",
       "style": "1",
       "userScale": "2",
-      "width": "3840",
+      "width": "1920",
       "xpos": "-1920",
       "ypos": "23"
     }
@@ -53,17 +53,17 @@
     "###/SmartDashboard/SendableChooser[0]": {
       "Collapsed": "0",
       "Pos": "1583,75",
-      "Size": "576,90"
+      "Size": "361,66"
     },
     "###/SmartDashboard/SendableChooser[1]": {
       "Collapsed": "0",
       "Pos": "1580,135",
-      "Size": "576,90"
+      "Size": "361,66"
     },
     "###Addressable LEDs": {
       "Collapsed": "0",
-      "Pos": "67,857",
-      "Size": "311,841"
+      "Pos": "61,607",
+      "Size": "199,547"
     },
     "###FMS": {
       "Collapsed": "0",
@@ -80,7 +80,7 @@
     "###NetworkTables": {
       "Collapsed": "0",
       "DockId": "0x00000002,0",
-      "Pos": "1969,477",
+      "Pos": "1901,477",
       "Size": "911,1279"
     },
     "###Other Devices": {
@@ -96,25 +96,25 @@
     "###Plot <0>": {
       "Collapsed": "0",
       "DockId": "0x00000003,0",
-      "Pos": "2882,477",
+      "Pos": "2814,477",
       "Size": "799,1279"
     },
     "###Plot <1>": {
       "Collapsed": "0",
       "DockId": "0x00000003,1",
-      "Pos": "2882,477",
+      "Pos": "2814,477",
       "Size": "799,1279"
     },
     "###Plot <2>": {
       "Collapsed": "0",
       "DockId": "0x00000003,2",
-      "Pos": "2882,477",
+      "Pos": "2814,477",
       "Size": "799,1279"
     },
     "###Plot <3>": {
       "Collapsed": "0",
       "DockId": "0x00000003,3",
-      "Pos": "2882,477",
+      "Pos": "2814,477",
       "Size": "799,1279"
     },
     "###RoboRIO": {
@@ -142,7 +142,7 @@
     "Robot State": {
       "Collapsed": "0",
       "Pos": "11,28",
-      "Size": "196,189"
+      "Size": "126,129"
     }
   }
 }
