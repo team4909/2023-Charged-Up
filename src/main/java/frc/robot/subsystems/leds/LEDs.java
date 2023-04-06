@@ -31,7 +31,7 @@ public class LEDs extends SubsystemBase {
       currentColor.r = (currentColor.a / 256.0) * initialColor.red;
       currentColor.g = (currentColor.a / 256.0) * initialColor.green;
       currentColor.b = (currentColor.a / 256.0) * initialColor.blue;
-      final Color c = new Color(currentColor.r, currentColor.g - 70, currentColor.b);
+      final Color c = new Color(currentColor.r, currentColor.g, currentColor.b);
       for (int i = 0; i < m_ledBuffer.getLength(); i++) {
         m_ledBuffer.setLED(i, c);
       }
@@ -50,7 +50,7 @@ public class LEDs extends SubsystemBase {
         .ignoringDisable(true);
   }
 
-  public Command setLedColor(Color color) {
+  public Command setColor(Color color) {
     return Commands.runOnce(() -> {
       for (int i = 0; i < kledLength; i++) {
         m_ledBuffer.setLED(i, color);

@@ -158,6 +158,7 @@ public class Wrist extends SubsystemBase {
     m_wristMotor.restoreFactoryDefaults();
     m_wristMotor.setInverted(true);
     m_wristMotor.getPIDController().setP(WristConstants.kP);
+    m_wristMotor.getPIDController().setD(WristConstants.kD);
 
     m_wristMotor.getPIDController().setOutputRange(-WristConstants.OUTPUT_LIMIT, WristConstants.OUTPUT_LIMIT);
     m_wristMotor.setIdleMode(IdleMode.kBrake);

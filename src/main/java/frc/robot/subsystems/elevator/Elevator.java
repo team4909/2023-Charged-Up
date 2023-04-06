@@ -167,6 +167,8 @@ public class Elevator extends SubsystemBase {
     m_leftExtensionMotor.setSelectedSensorPosition(0);
     m_leftExtensionMotor.config_kP(0, ElevatorConstants.kP);
     m_leftExtensionMotor.configClosedLoopPeakOutput(0, ElevatorConstants.OUTPUT_LIMIT);
+    m_leftExtensionMotor.configVoltageCompSaturation(12);
+    m_leftExtensionMotor.enableVoltageCompensation(true);
     m_leftExtensionMotor.setInverted(false);
     m_leftExtensionMotor
         .configMotionCruiseVelocity(ElevatorConstants.MOTION_CRUISE_VELOCITY / ElevatorConstants.METERS_PER_TICK / 10);

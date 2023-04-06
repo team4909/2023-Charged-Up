@@ -157,7 +157,7 @@ public class AutoRoutines {
         m_wrist.setState(WristStates.HANDOFF_CONE),
         Commands.waitSeconds(0.5),
         m_claw.setState(ClawStates.CLOSED),
-        Commands.waitSeconds(0.2),
+        Commands.waitSeconds(0.35),
         m_intake.setState(IntakeStates.SPIT_CONE),
         Commands.waitSeconds(0.1),
         m_wrist.setState(WristStates.RETRACTED),

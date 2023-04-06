@@ -82,7 +82,7 @@ public final class Constants {
 
   public static final class ClawConstants {
 
-    public static final double kP = 7.5;
+    public static final double kP = 6.5;
 
     public static final double OUTPUT_LIMIT = 0.5;
   }
@@ -120,7 +120,8 @@ public final class Constants {
 
   public static final class WristConstants {
 
-    public static final double kP = 0.035;
+    public static final double kP = 0.01;
+    public static final double kD = 0.005;
     public static final double kG = 0.85;
 
     public static final double OUTPUT_LIMIT = 0.25;
@@ -163,7 +164,7 @@ public final class Constants {
     public static final int LEFT_MOTOR = 9;
     public static final int RIGHT_MOTOR = 10;
 
-    public static final double kP = 0.022;
+    public static final double kP = 0.04;
     // Gains were recalced
     public static final double kS = 0.40921;
     public static final double kG = 0.12654;

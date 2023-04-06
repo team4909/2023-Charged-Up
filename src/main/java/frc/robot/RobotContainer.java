@@ -46,7 +46,6 @@ public class RobotContainer {
 	public RobotContainer() {
 		configureBindings();
 		configureSendableChooser();
-		m_leds.setDefaultCommand(m_leds.setBreatheColor(new Color(0, 255, 0)));
 	}
 
 	private void configureBindings() {
@@ -112,18 +111,18 @@ public class RobotContainer {
 
 		// #region Operator Controls
 
-		m_operatorController.back().whileTrue(m_leds.setLedColor(Color.kYellow));
-		m_operatorController.start().whileTrue(m_leds.setLedColor(Color.kPurple));
+		m_operatorController.back().whileTrue(m_leds.setColor(Color.kYellow));
+		m_operatorController.start().whileTrue(m_leds.setColor(Color.kPurple));
 
 		m_operatorController.povUp().onTrue(m_wrist.setState(WristStates.RETRACTED));
 		m_operatorController.povDown().onTrue(m_wrist.setState(WristStates.DROPPING));
 
 		m_operatorController.povRight()
 				.onTrue(m_cubeShooter.Configure(ShooterLevels.MID))
-				.whileTrue(m_leds.setLedColor(Color.kBlue));
+				.whileTrue(m_leds.setColor(Color.kBlue));
 		m_operatorController.povLeft()
 				.onTrue(m_cubeShooter.Configure(ShooterLevels.HIGH))
-				.whileTrue(m_leds.setLedColor(Color.kRed));
+				.whileTrue(m_leds.setColor(Color.kRed));
 
 		m_operatorController.leftBumper().onTrue(
 				Commands.sequence(

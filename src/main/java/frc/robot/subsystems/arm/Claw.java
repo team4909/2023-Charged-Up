@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.bioniclib.SparkManager;
 import frc.robot.Constants.ClawConstants;
 
 public class Claw extends SubsystemBase {
@@ -43,14 +44,22 @@ public class Claw extends SubsystemBase {
     m_clawMotor = new CANSparkMax(5, MotorType.kBrushless);
     m_clawEncoder = m_clawMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
-    m_clawMotor.restoreFactoryDefaults();
-    m_clawMotor.getPIDController().setFeedbackDevice(m_clawEncoder);
-    m_clawMotor.getPIDController().setP(ClawConstants.kP);
-    m_clawMotor.getPIDController().setOutputRange(-ClawConstants.OUTPUT_LIMIT, ClawConstants.OUTPUT_LIMIT);
-    m_clawMotor.setIdleMode(IdleMode.kCoast);
-    m_clawMotor.setInverted(false);
-    m_clawMotor.setSmartCurrentLimit(10);
-    m_clawEncoder.setZeroOffset(0.39);
+    SparkManager sparkManager = new SparkManager("Clamp with Absolute Encoder");
+    Runnable config = () -> {
+      sparkManager.statusTracker.accept(m_clawMotor.restoreFactoryDefaults());
+      sparkManager.statusTracker.accept(m_clawMotor.getPIDController().setFeedbackDevice(m_clawEncoder));
+      sparkManager.statusTracker.accept(m_clawMotor.getPIDController().setP(ClawConstants.kP));
+      sparkManager.statusTracker.accept(
+          m_clawMotor.getPIDController().setOutputRange(-ClawConstants.OUTPUT_LIMIT, ClawConstants.OUTPUT_LIMIT));
+      sparkManager.statusTracker.accept(m_clawMotor.setIdleMode(IdleMode.kCoast));
+      sparkManager.statusTracker.accept(m_clawMotor.setSmartCurrentLimit(10));
+      m_clawMotor.setInverted(false);
+
+      m_clawEncoder.setZeroOffset(0.39);
+    };
+
+    sparkManager.setConfigRunnable(config);
+    sparkManager.forceConfig();
   }
 
   @Override
