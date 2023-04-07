@@ -1,5 +1,7 @@
 package frc.robot.subsystems.intake;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -10,7 +12,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -32,7 +33,7 @@ public class Intake extends SubsystemBase {
   private final SingleJointedArmSim m_pivotSim;
   private final PIDController m_simPivotPID;
 
-  public boolean isConePresent;
+  public DoubleSupplier backRollerOutputCurrent;
 
   public enum IntakeStates {
     IDLE("Idle"),
@@ -82,6 +83,7 @@ public class Intake extends SubsystemBase {
     sparkManager.forceConfig();
 
     m_state = IntakeStates.IDLE;
+    backRollerOutputCurrent = () -> m_backRoller.getOutputCurrent();
 
     if (Constants.SIM) {
       m_pivotSim = new SingleJointedArmSim(
@@ -139,8 +141,10 @@ public class Intake extends SubsystemBase {
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.RETRACTED_SETPOINT, 0d, 0d);
           break;
         case INTAKE_CONE:
-          currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CONE_SETPOINT, 0.75, 0.75)
-              .alongWith(CheckConePresence());
+          currentIntakeCommand =
+
+              SetPivotPositionAndRollerSpeed(IntakeConstants.CONE_SETPOINT, 0.75, 0.75);
+
           break;
         case SPIT_CONE:
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.SPIT_CONE_SETPOINT, 0.3d, -0.3d);
@@ -176,6 +180,7 @@ public class Intake extends SubsystemBase {
 
   private Command SetPivotPositionAndRollerSpeed(double position, double frontSpeed, double backSpeed) {
     m_pivotSetpoint = position; // variable exists for telemetry purposes
+    LEDs.getInstance().getDefaultCommand().schedule();
     return Commands.sequence(
         Commands.runOnce(() -> {
           m_frontRoller.set(frontSpeed);
@@ -190,26 +195,7 @@ public class Intake extends SubsystemBase {
           } else {
             m_pivot.getPIDController().setReference(m_pivotSetpoint, ControlType.kPosition, 0, arbFF);
           }
-        }, this));
-  }
-
-  private Command CheckConePresence() {
-    Timer stallTimer = new Timer();
-    stallTimer.start();
-    return Commands.run(() -> {
-      if (m_backRoller.getOutputCurrent() >= 40)
-        stallTimer.start();
-      else
-        stallTimer.stop();
-      if (stallTimer.get() >= 0.15) {
-        LEDs.getInstance().setColor(Color.kLightPink).schedule();
-        isConePresent = true;
-      }
-    }).andThen(() -> {
-      stallTimer.reset();
-      // LEDs.getInstance().getDefaultCommand().schedule();
-      isConePresent = false;
-    });
+        }, this));// .andThen(LEDs.getInstance().setStaticColor(Color.kBlack));
   }
 
   // #endregion

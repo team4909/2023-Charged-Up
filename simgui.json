@@ -113,9 +113,6 @@
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
-        "Config Errors": {
-          "open": true
-        },
         "Elevator": {
           "open": true
         },
@@ -138,7 +135,7 @@
               "autoFit": true
             }
           ],
-          "height": 1205,
+          "height": 1181,
           "series": [
             {
               "color": [
@@ -186,7 +183,7 @@
     "Plot <1>": {
       "plots": [
         {
-          "height": 1205,
+          "height": 1181,
           "series": [
             {
               "color": [
@@ -243,7 +240,7 @@
     "Plot <2>": {
       "plots": [
         {
-          "height": 1205,
+          "height": 1181,
           "series": [
             {
               "color": [
@@ -291,7 +288,7 @@
     "Plot <3>": {
       "plots": [
         {
-          "height": 1205,
+          "height": 1181,
           "series": [
             {
               "color": [

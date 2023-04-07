@@ -1,18 +1,17 @@
 package frc.robot.subsystems.intake;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.bioniclib.SparkManager;
-import frc.robot.Constants;
 import frc.robot.Constants.CubeShooterConstants;
 import frc.robot.subsystems.leds.LEDs;
 
@@ -22,7 +21,7 @@ public class CubeShooter extends SubsystemBase {
   private final CANSparkMax m_cubePivot, m_topRoller, m_bottomRoller;
   private double m_pivotSetpoint, m_frontRollerSetpoint, m_backRollerSetpoint;
 
-  public boolean isCubePresent;
+  public DoubleSupplier topRollerOutputCurrent;
 
   public enum ShooterLevels {
     LOW(CubeShooterConstants.RETRACTED_SETPOINT, 0.2, 0.2),
@@ -83,6 +82,7 @@ public class CubeShooter extends SubsystemBase {
     sparkManager.setConfigRunnable(config);
     sparkManager.forceConfig();
     m_state = CubeShooterStates.IDLE;
+    topRollerOutputCurrent = () -> m_topRoller.getOutputCurrent();
   }
 
   @Override
@@ -107,7 +107,7 @@ public class CubeShooter extends SubsystemBase {
           break;
         case INTAKE:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, -0.7, -0.7,
-              true).deadlineWith(CheckCubePresence());
+              true).finallyDo((i) -> LEDs.getInstance().getCurrentCommand().cancel());
           break;
         case RETRACTED:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.RETRACTED_SETPOINT, 0.0, 0.0,
@@ -168,25 +168,6 @@ public class CubeShooter extends SubsystemBase {
     Command pivot = Pivot(position);
     return spinFirst ? Commands.sequence(rollers, pivot)
         : Commands.sequence(pivot.andThen(Commands.waitSeconds(0.5)), rollers);
-  }
-
-  private Command CheckCubePresence() {
-    Timer stallTimer = new Timer();
-    stallTimer.start();
-    return Commands.run(() -> {
-      if (m_topRoller.getOutputCurrent() >= 15)
-        stallTimer.start();
-      else
-        stallTimer.stop();
-      if (stallTimer.get() >= 0.15) {
-        LEDs.getInstance().setColor(Color.kLightPink).schedule();
-        isCubePresent = true;
-      }
-    }).andThen(() -> {
-      stallTimer.reset();
-      // LEDs.getInstance().getDefaultCommand().schedule();
-      isCubePresent = false;
-    });
   }
 
   public Command Configure(ShooterLevels shooterLevel) {

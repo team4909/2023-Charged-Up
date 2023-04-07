@@ -1,7 +1,10 @@
 package frc.robot.subsystems.leds;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -53,16 +56,46 @@ public class LEDs extends SubsystemBase {
         .ignoringDisable(true);
   }
 
-  public Command setColor(Color color) {
-    return Commands.runOnce(() -> {
-      m_currentColor = color;
-      for (int i = 0; i < kledLength; i++) {
-        m_ledBuffer.setLED(i, color);
+  public void setColor(Color color) {
+    if (m_currentColor.equals(color))
+      return;
+    m_currentColor = color;
+    for (int i = 0; i < kledLength; i++) {
+      m_ledBuffer.setLED(i, color);
+    }
+    m_leds.setData(m_ledBuffer);
+  }
+
+  public Command setStaticColor(Color color) {
+    return Commands.run(() -> setColor(color), this)
+        .finallyDo((i) -> setColor(Color.kBlack));
+  }
+
+  public Command GamePieceIndicator(DoubleSupplier coneCurrent, DoubleSupplier cubeCurrent) {
+    Timer coneStallTimer = new Timer();
+    Timer cubeStallTimer = new Timer();
+    SmartDashboard.putNumber("cone current", 1);
+    SmartDashboard.putNumber("cube current", 1);
+    final double kTriggerTime = 0.15;
+    return Commands.run(() -> {
+      if (SmartDashboard.getNumber("cone current", 0.0) >= 40)
+        coneStallTimer.start();
+      else
+        coneStallTimer.stop();
+
+      if (SmartDashboard.getNumber("cube current", 0.0) >= 15)
+        cubeStallTimer.start();
+      else
+        cubeStallTimer.stop();
+
+      if (coneStallTimer.get() >= kTriggerTime || cubeStallTimer.get() >= kTriggerTime) {
+        setColor(Color.kAqua);
+        coneStallTimer.reset();
+        cubeStallTimer.reset();
       }
-      m_leds.setData(m_ledBuffer);
-    }, this)
-        .andThen(Commands.none().repeatedly())
-        .ignoringDisable(true);
+    }, this).finallyDo((interrupted) -> {
+      setColor(Color.kBlack);
+    });
   }
 
   public void periodic() {
