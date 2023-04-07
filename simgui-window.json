@@ -16,11 +16,11 @@
   "MainWindow": {
     "GLOBAL": {
       "fps": "120",
-      "height": "1106",
+      "height": "2004",
       "maximized": "1",
       "style": "1",
       "userScale": "2",
-      "width": "1920",
+      "width": "3840",
       "xpos": "-1920",
       "ypos": "23"
     }
@@ -53,17 +53,17 @@
     "###/SmartDashboard/SendableChooser[0]": {
       "Collapsed": "0",
       "Pos": "1583,75",
-      "Size": "361,66"
+      "Size": "576,90"
     },
     "###/SmartDashboard/SendableChooser[1]": {
       "Collapsed": "0",
       "Pos": "1580,135",
-      "Size": "361,66"
+      "Size": "576,90"
     },
     "###Addressable LEDs": {
       "Collapsed": "0",
       "Pos": "61,607",
-      "Size": "199,547"
+      "Size": "311,841"
     },
     "###FMS": {
       "Collapsed": "0",
@@ -142,7 +142,7 @@
     "Robot State": {
       "Collapsed": "0",
       "Pos": "11,28",
-      "Size": "126,129"
+      "Size": "196,189"
     }
   }
 }

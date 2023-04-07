@@ -14,18 +14,20 @@ import frc.robot.subsystems.arm.Wrist;
 import frc.robot.subsystems.arm.Wrist.WristStates;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Drivetrain.DrivetrainStates;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.CubeShooter;
+import frc.robot.subsystems.intake.CubeShooter.CubeShooterStates;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.Intake.IntakeStates;
 import frc.robot.subsystems.leds.LEDs;
-import frc.robot.subsystems.intake.CubeShooter.CubeShooterStates;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
+  private PDH m_pdh;
 
   public Robot() {
     m_robotContainer = new RobotContainer();
+    m_pdh = new PDH();
     addPeriodic(m_robotContainer.controlLoop(), 0.01, 0.005);
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
@@ -38,6 +40,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
+    m_pdh.periodic();
     CommandScheduler.getInstance().run();
   }
 

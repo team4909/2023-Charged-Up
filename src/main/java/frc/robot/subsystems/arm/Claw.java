@@ -56,7 +56,7 @@ public class Claw extends SubsystemBase {
       sparkManager.statusTracker.accept(m_clawMotor.setSmartCurrentLimit(10));
       m_clawMotor.setInverted(false);
 
-      sparkManager.statusTracker.accept(m_clawEncoder.setZeroOffset(0.39));
+      sparkManager.statusTracker.accept(m_clawEncoder.setZeroOffset(0.4));
     };
 
     sparkManager.setConfigRunnable(config);

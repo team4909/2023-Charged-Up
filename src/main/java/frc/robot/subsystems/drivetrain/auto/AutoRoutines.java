@@ -62,9 +62,9 @@ public class AutoRoutines {
       loadTrajectory(new DriveTrajectory("TopCubeToTopCubeNode", false)),
       SCORE_CUBE(ShooterLevels.HIGH),
       Commands.parallel(
-          loadTrajectory(new DriveTrajectory("TopCubeNodeToSecondPiece", false)),
-          INTAKE_CONE().beforeStarting(Commands.waitSeconds(2.2))),
-      HANDOFF());
+          loadTrajectory(new DriveTrajectory("TopCubeNodeToSecondPiece", false))));
+  // INTAKE_CONE().beforeStarting(Commands.waitSeconds(2.2))),
+  // HANDOFF());
 
   public final Auto ONE_CONE_ONE_CUBE_BUMP = new Auto(
       SCORE_CONE(ElevatorStates.TOP),
