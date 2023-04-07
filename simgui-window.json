@@ -1,16 +1,16 @@
 {
   "Docking": {
     "Data": [
-      "DockNode    ID=0x00000001 Pos=1901,477 Size=1712,1279 Split=X",
+      "DockNode    ID=0x00000001 Pos=2060,453 Size=1712,1279 Split=X",
       "DockNode  ID=0x00000002 Parent=0x00000001 SizeRef=702,283 Selected=0x2D9B9756",
       "DockNode  ID=0x00000003 Parent=0x00000001 SizeRef=616,283 Selected=0xB804B83F",
-      "DockNode    ID=0x00000004 Pos=541,781 Size=862,197 Split=X",
+      "DockNode    ID=0x00000004 Pos=457,169 Size=937,306 Split=X",
       "DockNode  ID=0x00000005 Parent=0x00000004 SizeRef=191,73 Selected=0x6AE6D891",
       "DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=603,73 Selected=0x138219D4",
-      "DockNode    ID=0x00000008 Pos=289,328 Size=1205,437 Split=X",
+      "DockNode    ID=0x00000008 Pos=411,1054 Size=1601,1171 Split=X",
       "DockNode  ID=0x00000009 Parent=0x00000008 SizeRef=423,832 Selected=0x63F8E93F",
       "DockNode  ID=0x0000000B Parent=0x00000008 SizeRef=780,832 Selected=0xB5CBE9F0",
-      "DockNode    ID=0x0000000A Pos=4,349 Size=287,146 Selected=0xC8493FD8"
+      "DockNode    ID=0x0000000A Pos=3,353 Size=324,257 Selected=0xC8493FD8"
     ]
   },
   "MainWindow": {
@@ -36,8 +36,8 @@
     "###/SmartDashboard/Field": {
       "Collapsed": "0",
       "DockId": "0x0000000B,0",
-      "Pos": "714,328",
-      "Size": "780,437"
+      "Pos": "975,1054",
+      "Size": "1037,1171"
     },
     "###/SmartDashboard/Mech2d": {
       "Collapsed": "0",
@@ -47,8 +47,8 @@
     "###/SmartDashboard/Robot Mechanism Simulation": {
       "Collapsed": "0",
       "DockId": "0x00000009,0",
-      "Pos": "289,328",
-      "Size": "423,437"
+      "Pos": "411,1054",
+      "Size": "562,1171"
     },
     "###/SmartDashboard/SendableChooser[0]": {
       "Collapsed": "0",
@@ -68,25 +68,25 @@
     "###FMS": {
       "Collapsed": "0",
       "DockId": "0x0000000A,0",
-      "Pos": "4,349",
-      "Size": "287,146"
+      "Pos": "3,353",
+      "Size": "324,257"
     },
     "###Joysticks": {
       "Collapsed": "0",
       "DockId": "0x00000006,0",
-      "Pos": "750,781",
-      "Size": "653,197"
+      "Pos": "684,169",
+      "Size": "710,306"
     },
     "###NetworkTables": {
       "Collapsed": "0",
       "DockId": "0x00000002,0",
-      "Pos": "1901,477",
+      "Pos": "2060,453",
       "Size": "911,1279"
     },
     "###Other Devices": {
       "Collapsed": "0",
-      "Pos": "1509,320",
-      "Size": "389,635"
+      "Pos": "1509,94",
+      "Size": "389,861"
     },
     "###PWM Outputs": {
       "Collapsed": "0",
@@ -96,25 +96,25 @@
     "###Plot <0>": {
       "Collapsed": "0",
       "DockId": "0x00000003,0",
-      "Pos": "2814,477",
+      "Pos": "2973,453",
       "Size": "799,1279"
     },
     "###Plot <1>": {
       "Collapsed": "0",
       "DockId": "0x00000003,1",
-      "Pos": "2814,477",
+      "Pos": "2973,453",
       "Size": "799,1279"
     },
     "###Plot <2>": {
       "Collapsed": "0",
       "DockId": "0x00000003,2",
-      "Pos": "2814,477",
+      "Pos": "2973,453",
       "Size": "799,1279"
     },
     "###Plot <3>": {
       "Collapsed": "0",
       "DockId": "0x00000003,3",
-      "Pos": "2814,477",
+      "Pos": "2973,453",
       "Size": "799,1279"
     },
     "###RoboRIO": {
@@ -125,14 +125,14 @@
     "###System Joysticks": {
       "Collapsed": "0",
       "DockId": "0x00000005,0",
-      "Pos": "541,781",
-      "Size": "207,197"
+      "Pos": "457,169",
+      "Size": "225,306"
     },
     "###Timing": {
       "Collapsed": "0",
       "DockId": "0x0000000A,1",
-      "Pos": "4,349",
-      "Size": "287,146"
+      "Pos": "3,353",
+      "Size": "324,257"
     },
     "Debug##Default": {
       "Collapsed": "0",

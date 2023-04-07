@@ -1,10 +1,14 @@
 package frc.robot.subsystems.leds;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -29,7 +33,7 @@ public class LEDs extends SubsystemBase {
       double r, g, b, a;
       boolean hitBrightnessLimit;
     };
-    return Commands.run(() -> {
+    return this.run(() -> {
       m_currentColor = initialColor;
       currentColor.r = (currentColor.a / 256.0) * initialColor.red;
       currentColor.g = (currentColor.a / 256.0) * initialColor.green;
@@ -49,24 +53,68 @@ public class LEDs extends SubsystemBase {
         currentColor.a += 5;
       }
       m_leds.setData(m_ledBuffer);
-    }, this)
+    })
         .ignoringDisable(true);
   }
 
-  public Command setColor(Color color) {
-    return Commands.runOnce(() -> {
-      m_currentColor = color;
-      for (int i = 0; i < kledLength; i++) {
-        m_ledBuffer.setLED(i, color);
+  public void setColor(Color color) {
+    if (m_currentColor.equals(color))
+      return;
+    m_currentColor = color;
+    for (int i = 0; i < kledLength; i++) {
+      m_ledBuffer.setLED(i, color);
+    }
+    m_leds.setData(m_ledBuffer);
+  }
+
+  public Command setStaticColor(Color color) {
+    return this.run(() -> setColor(color))
+        .finallyDo((i) -> setColor(Color.kBlack)).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+  }
+
+  public Command GamePieceIndicator(DoubleSupplier coneCurrent, DoubleSupplier cubeCurrent) {
+    Timer coneStallTimer = new Timer();
+    Timer cubeStallTimer = new Timer();
+    SmartDashboard.putNumber("cone current", 1);
+    SmartDashboard.putNumber("cube current", 1);
+    final double kTriggerTime = 0.15;
+    return Commands.run(() -> {
+      if (SmartDashboard.getNumber("cone current", 0.0) >= 40)
+        coneStallTimer.start();
+      else
+        coneStallTimer.stop();
+
+      if (SmartDashboard.getNumber("cube current", 0.0) >= 15)
+        cubeStallTimer.start();
+      else
+        cubeStallTimer.stop();
+
+      if (coneStallTimer.get() >= kTriggerTime || cubeStallTimer.get() >= kTriggerTime) {
+        setColor(Color.kAqua);
+      } else {
+        setColor(Color.kBlack);
       }
-      m_leds.setData(m_ledBuffer);
-    }, this)
-        .andThen(Commands.none().repeatedly())
-        .ignoringDisable(true);
+    }).beforeStarting(() -> {
+      coneStallTimer.reset();
+      cubeStallTimer.reset();
+    });
   }
 
   public void periodic() {
     SmartDashboard.putString("Current Color", m_currentColor.toString());
+
+    // if (CubeShooter.getInstance().hasCube() &&
+    // CubeShooter.getInstance().getState() == CubeShooterStates.INTAKE) {
+    // setColor(Color.kAqua);
+    // } else {
+    // setColor(Color.kBlack);
+    // }
+
+  }
+
+  public void scheduleDefault() {
+    if (this.getDefaultCommand() != null)
+      this.getDefaultCommand().schedule();
   }
 
   public static LEDs getInstance() {

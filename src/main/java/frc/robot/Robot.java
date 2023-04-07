@@ -56,8 +56,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledExit() {
-    LEDs.getInstance().setDefaultCommand(LEDs.getInstance().setColor(new Color(0, 0, 0)));
-    LEDs.getInstance().getDefaultCommand().schedule();
+    m_robotContainer.initLEDS();
   }
 
   @Override
@@ -113,7 +112,6 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationInit() {
     DriverStation.silenceJoystickConnectionWarning(true);
-    LEDs.getInstance().setBreatheColor(new Color(0, 255, 0));
     SimVisualizer.getInstance();
 
   }
