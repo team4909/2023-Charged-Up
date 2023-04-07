@@ -14,11 +14,11 @@ import frc.robot.subsystems.arm.Wrist;
 import frc.robot.subsystems.arm.Wrist.WristStates;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.Drivetrain.DrivetrainStates;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.CubeShooter;
+import frc.robot.subsystems.intake.CubeShooter.CubeShooterStates;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.Intake.IntakeStates;
 import frc.robot.subsystems.leds.LEDs;
-import frc.robot.subsystems.intake.CubeShooter.CubeShooterStates;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
@@ -109,7 +109,6 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationInit() {
     DriverStation.silenceJoystickConnectionWarning(true);
-    LEDs.getInstance().setBreatheColor(new Color(0, 255, 0));
     SimVisualizer.getInstance();
 
   }

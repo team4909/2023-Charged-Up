@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -32,7 +33,7 @@ public class LEDs extends SubsystemBase {
       double r, g, b, a;
       boolean hitBrightnessLimit;
     };
-    return Commands.run(() -> {
+    return this.run(() -> {
       m_currentColor = initialColor;
       currentColor.r = (currentColor.a / 256.0) * initialColor.red;
       currentColor.g = (currentColor.a / 256.0) * initialColor.green;
@@ -52,7 +53,7 @@ public class LEDs extends SubsystemBase {
         currentColor.a += 5;
       }
       m_leds.setData(m_ledBuffer);
-    }, this)
+    })
         .ignoringDisable(true);
   }
 
@@ -67,8 +68,8 @@ public class LEDs extends SubsystemBase {
   }
 
   public Command setStaticColor(Color color) {
-    return Commands.run(() -> setColor(color), this)
-        .finallyDo((i) -> setColor(Color.kBlack));
+    return this.run(() -> setColor(color))
+        .finallyDo((i) -> setColor(Color.kBlack)).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
   }
 
   public Command GamePieceIndicator(DoubleSupplier coneCurrent, DoubleSupplier cubeCurrent) {
@@ -90,16 +91,30 @@ public class LEDs extends SubsystemBase {
 
       if (coneStallTimer.get() >= kTriggerTime || cubeStallTimer.get() >= kTriggerTime) {
         setColor(Color.kAqua);
-        coneStallTimer.reset();
-        cubeStallTimer.reset();
+      } else {
+        setColor(Color.kBlack);
       }
-    }, this).finallyDo((interrupted) -> {
-      setColor(Color.kBlack);
+    }).beforeStarting(() -> {
+      coneStallTimer.reset();
+      cubeStallTimer.reset();
     });
   }
 
   public void periodic() {
     SmartDashboard.putString("Current Color", m_currentColor.toString());
+
+    // if (CubeShooter.getInstance().hasCube() &&
+    // CubeShooter.getInstance().getState() == CubeShooterStates.INTAKE) {
+    // setColor(Color.kAqua);
+    // } else {
+    // setColor(Color.kBlack);
+    // }
+
+  }
+
+  public void scheduleDefault() {
+    if (this.getDefaultCommand() != null)
+      this.getDefaultCommand().schedule();
   }
 
   public static LEDs getInstance() {

@@ -12,9 +12,9 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,7 +22,6 @@ import frc.lib.bioniclib.SparkManager;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.SimVisualizer;
-import frc.robot.subsystems.leds.LEDs;
 
 public class Intake extends SubsystemBase {
 
@@ -34,6 +33,7 @@ public class Intake extends SubsystemBase {
   private final PIDController m_simPivotPID;
 
   public DoubleSupplier backRollerOutputCurrent;
+  public boolean isIntaking;
 
   public enum IntakeStates {
     IDLE("Idle"),
@@ -141,10 +141,9 @@ public class Intake extends SubsystemBase {
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.RETRACTED_SETPOINT, 0d, 0d);
           break;
         case INTAKE_CONE:
-          currentIntakeCommand =
-
-              SetPivotPositionAndRollerSpeed(IntakeConstants.CONE_SETPOINT, 0.75, 0.75);
-
+          isIntaking = true;
+          currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CONE_SETPOINT, 0.75, 0.75)
+              .finallyDo((i) -> isIntaking = false);
           break;
         case SPIT_CONE:
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.SPIT_CONE_SETPOINT, 0.3d, -0.3d);
@@ -180,7 +179,6 @@ public class Intake extends SubsystemBase {
 
   private Command SetPivotPositionAndRollerSpeed(double position, double frontSpeed, double backSpeed) {
     m_pivotSetpoint = position; // variable exists for telemetry purposes
-    LEDs.getInstance().getDefaultCommand().schedule();
     return Commands.sequence(
         Commands.runOnce(() -> {
           m_frontRoller.set(frontSpeed);
@@ -195,7 +193,7 @@ public class Intake extends SubsystemBase {
           } else {
             m_pivot.getPIDController().setReference(m_pivotSetpoint, ControlType.kPosition, 0, arbFF);
           }
-        }, this));// .andThen(LEDs.getInstance().setStaticColor(Color.kBlack));
+        }, this));
   }
 
   // #endregion
@@ -216,5 +214,13 @@ public class Intake extends SubsystemBase {
 
   public static Intake getInstance() {
     return m_instance = (m_instance == null) ? new Intake() : m_instance;
+  }
+
+  Timer cubeStallTimer = new Timer();
+  final double kTriggerTime = 0.15;
+  private boolean m_hasCone = false;
+
+  public boolean hasCone() {
+    return m_hasCone;
   }
 }

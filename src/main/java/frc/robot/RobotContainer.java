@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.arm.Claw;
 import frc.robot.subsystems.arm.Claw.ClawStates;
 import frc.robot.subsystems.arm.Wrist;
@@ -178,6 +179,9 @@ public class RobotContainer {
 		// .onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new
 		// HashMap<>(Map.of("Waypoint", 10))));
 
+		Trigger t = new Trigger(() -> m_cubeShooter.isIntaking).or(() -> m_intake.isIntaking);
+		t.whileTrue(m_leds.GamePieceIndicator(m_intake.backRollerOutputCurrent, m_cubeShooter.topRollerOutputCurrent));
+
 	}
 
 	private void configureSendableChooser() {
@@ -208,8 +212,7 @@ public class RobotContainer {
 	}
 
 	public void initLEDS() {
-		m_leds.setDefaultCommand(
-				m_leds.GamePieceIndicator(m_intake.backRollerOutputCurrent, m_cubeShooter.topRollerOutputCurrent));
+		m_leds.setDefaultCommand(m_leds.setStaticColor(Color.kBlack));
 		m_leds.getDefaultCommand().schedule();
 	}
 

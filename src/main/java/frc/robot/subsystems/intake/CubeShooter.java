@@ -7,13 +7,13 @@ import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.bioniclib.SparkManager;
 import frc.robot.Constants.CubeShooterConstants;
-import frc.robot.subsystems.leds.LEDs;
 
 public class CubeShooter extends SubsystemBase {
   private static CubeShooter m_instance;
@@ -22,6 +22,7 @@ public class CubeShooter extends SubsystemBase {
   private double m_pivotSetpoint, m_frontRollerSetpoint, m_backRollerSetpoint;
 
   public DoubleSupplier topRollerOutputCurrent;
+  public boolean isIntaking = false;
 
   public enum ShooterLevels {
     LOW(CubeShooterConstants.RETRACTED_SETPOINT, 0.2, 0.2),
@@ -85,6 +86,14 @@ public class CubeShooter extends SubsystemBase {
     topRollerOutputCurrent = () -> m_topRoller.getOutputCurrent();
   }
 
+  Timer cubeStallTimer = new Timer();
+  final double kTriggerTime = 0.15;
+  private boolean m_hasCube = false;
+
+  public boolean hasCube() {
+    return m_hasCube;
+  }
+
   @Override
   public void periodic() {
     stateMachine();
@@ -96,6 +105,13 @@ public class CubeShooter extends SubsystemBase {
     SmartDashboard.putNumber("Cube Shooter/Pivot Current", m_cubePivot.getOutputCurrent());
     SmartDashboard.putNumber("Cube Shooter/Top Roller Current", m_topRoller.getOutputCurrent());
     SmartDashboard.putString("Cube Shooter/State", m_state.toString());
+
+    // if (SmartDashboard.getNumber("cube current", 0.0) >= 40)
+    // cubeStallTimer.start();
+    // else
+    // cubeStallTimer.stop();
+
+    // m_hasCube = cubeStallTimer.get() >= kTriggerTime; // @todo needs a reset
   }
 
   private void stateMachine() {
@@ -106,8 +122,9 @@ public class CubeShooter extends SubsystemBase {
           currentCubeShooterCommand = Idle();
           break;
         case INTAKE:
+          isIntaking = true;
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, -0.7, -0.7,
-              true).finallyDo((i) -> LEDs.getInstance().getCurrentCommand().cancel());
+              true).finallyDo((i) -> isIntaking = false);
           break;
         case RETRACTED:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.RETRACTED_SETPOINT, 0.0, 0.0,

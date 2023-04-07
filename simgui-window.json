@@ -1,10 +1,10 @@
 {
   "Docking": {
     "Data": [
-      "DockNode    ID=0x00000001 Pos=1901,477 Size=1712,1279 Split=X",
+      "DockNode    ID=0x00000001 Pos=2060,453 Size=1712,1279 Split=X",
       "DockNode  ID=0x00000002 Parent=0x00000001 SizeRef=702,283 Selected=0x2D9B9756",
       "DockNode  ID=0x00000003 Parent=0x00000001 SizeRef=616,283 Selected=0xB804B83F",
-      "DockNode    ID=0x00000004 Pos=541,781 Size=862,197 Split=X",
+      "DockNode    ID=0x00000004 Pos=457,169 Size=937,306 Split=X",
       "DockNode  ID=0x00000005 Parent=0x00000004 SizeRef=191,73 Selected=0x6AE6D891",
       "DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=603,73 Selected=0x138219D4",
       "DockNode    ID=0x00000008 Pos=411,1054 Size=1601,1171 Split=X",
@@ -52,17 +52,17 @@
     },
     "###/SmartDashboard/SendableChooser[0]": {
       "Collapsed": "0",
-      "Pos": "1583,73",
+      "Pos": "1908,68",
       "Size": "576,90"
     },
     "###/SmartDashboard/SendableChooser[1]": {
       "Collapsed": "0",
-      "Pos": "1580,135",
+      "Pos": "1907,162",
       "Size": "576,90"
     },
     "###Addressable LEDs": {
       "Collapsed": "0",
-      "Pos": "61,607",
+      "Pos": "39,688",
       "Size": "311,841"
     },
     "###FMS": {
@@ -74,13 +74,13 @@
     "###Joysticks": {
       "Collapsed": "0",
       "DockId": "0x00000006,0",
-      "Pos": "750,781",
-      "Size": "653,197"
+      "Pos": "684,169",
+      "Size": "710,306"
     },
     "###NetworkTables": {
       "Collapsed": "0",
       "DockId": "0x00000002,0",
-      "Pos": "1901,477",
+      "Pos": "2060,453",
       "Size": "911,1279"
     },
     "###Other Devices": {
@@ -96,25 +96,25 @@
     "###Plot <0>": {
       "Collapsed": "0",
       "DockId": "0x00000003,0",
-      "Pos": "2814,477",
+      "Pos": "2973,453",
       "Size": "799,1279"
     },
     "###Plot <1>": {
       "Collapsed": "0",
       "DockId": "0x00000003,1",
-      "Pos": "2814,477",
+      "Pos": "2973,453",
       "Size": "799,1279"
     },
     "###Plot <2>": {
       "Collapsed": "0",
       "DockId": "0x00000003,2",
-      "Pos": "2814,477",
+      "Pos": "2973,453",
       "Size": "799,1279"
     },
     "###Plot <3>": {
       "Collapsed": "0",
       "DockId": "0x00000003,3",
-      "Pos": "2814,477",
+      "Pos": "2973,453",
       "Size": "799,1279"
     },
     "###RoboRIO": {
@@ -125,8 +125,8 @@
     "###System Joysticks": {
       "Collapsed": "0",
       "DockId": "0x00000005,0",
-      "Pos": "541,781",
-      "Size": "207,197"
+      "Pos": "457,169",
+      "Size": "225,306"
     },
     "###Timing": {
       "Collapsed": "0",
@@ -141,7 +141,7 @@
     },
     "Robot State": {
       "Collapsed": "0",
-      "Pos": "11,28",
+      "Pos": "14,26",
       "Size": "196,189"
     }
   }
