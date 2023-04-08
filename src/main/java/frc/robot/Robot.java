@@ -27,7 +27,7 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     m_robotContainer = new RobotContainer();
-    m_pdh = new PDH();
+    // m_pdh = new PDH();
     addPeriodic(m_robotContainer.controlLoop(), 0.01, 0.005);
     DataLogManager.start();
     DriverStation.startDataLog(DataLogManager.getLog());
@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    m_pdh.periodic();
+    // m_pdh.periodic();
     CommandScheduler.getInstance().run();
   }
 

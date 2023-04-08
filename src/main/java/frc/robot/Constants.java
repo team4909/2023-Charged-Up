@@ -106,7 +106,7 @@ public final class Constants {
     public static final double RETRACTED_SETPOINT = 110d;
     public static final double CUBE_SETPOINT = 16d;
     public static final double CONE_SETPOINT = 11d;
-    public static final double HANDOFF_SETPOINT = 73d;
+    public static final double HANDOFF_SETPOINT = 73; // 73
     public static final double SPIT_CONE_SETPOINT = 60d;
 
     public static final class SIM {
@@ -120,8 +120,8 @@ public final class Constants {
 
   public static final class WristConstants {
 
-    public static final double kP = 0.01;
-    public static final double kD = 0.005;
+    public static final double kP = 0.004;
+    public static final double kD = 0.05;
     public static final double kG = 0.85;
 
     public static final double OUTPUT_LIMIT = 0.25;

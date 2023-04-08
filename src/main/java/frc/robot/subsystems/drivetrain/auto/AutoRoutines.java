@@ -175,8 +175,9 @@ public class AutoRoutines {
                 m_claw.setState(ClawStates.CLOSED),
                 Commands.waitSeconds(0.35)),
             m_leds.setStaticColor(Color.kFirebrick)),
+        Commands.waitSeconds(0.2),
         m_intake.setState(IntakeStates.SPIT_CONE),
-        Commands.waitSeconds(0.1),
+        Commands.waitSeconds(0.2),
         m_wrist.setState(WristStates.RETRACTED),
         m_intake.setState(IntakeStates.RETRACTED));
   }

@@ -81,7 +81,7 @@ public class RobotContainer {
 		m_driverController.rightTrigger().onTrue(m_intake.setState(IntakeStates.INTAKE_CONE))
 				.onFalse(m_intake.setState(IntakeStates.HANDOFF));
 		m_driverController.leftBumper().onTrue(m_intake.setState(IntakeStates.SPIT_CONE));
-		m_driverController.start().onTrue(Commands.runOnce(() -> m_drivetrain.reseedModules()));
+		m_driverController.x().onTrue(Commands.runOnce(() -> m_drivetrain.reseedModules()));
 		m_driverController.povDown().onTrue(m_intake.setState(IntakeStates.RETRACTED));
 
 		m_driverController.povLeft().onTrue(m_cubeShooter.setState(CubeShooterStates.CALIBRATE));
@@ -94,9 +94,9 @@ public class RobotContainer {
 		m_driverController.leftTrigger()
 				.onTrue(m_cubeShooter.setState(CubeShooterStates.INTAKE))
 				.onFalse(m_cubeShooter.setState(CubeShooterStates.RETRACTED));
-		m_driverController.x().onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
-				new HashMap<>(Map.of("Angle", 180.0))))
-				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
+		// m_driverController.x().onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+		// new HashMap<>(Map.of("Angle", 180.0))))
+		// .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
 		m_driverController.y().onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
 				new HashMap<>(Map.of("Angle", 0.0))))
 				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
@@ -107,6 +107,7 @@ public class RobotContainer {
 				.andThen(m_claw.setState(ClawStates.SCORE))
 				.andThen(new WaitCommand(0.2))
 				.andThen(m_elevator.setState(ElevatorStates.RETRACT))
+				.andThen(new WaitCommand(0.5))
 				.andThen(m_wrist.setState(WristStates.RETRACTED)));
 		// #endregion
 
@@ -144,8 +145,8 @@ public class RobotContainer {
 						Commands.waitSeconds(0.75),
 						m_wrist.setState(WristStates.HALF_DUNK)));
 
-		// m_operatorController.start().onTrue(substationToggle());
 		m_operatorController.a().onTrue(m_routines.HANDOFF());
+		m_operatorController.b().onTrue(m_wrist.setState(WristStates.HALF_DUNK_HIGH));
 		// #endregion
 
 		// m_testController.leftBumper()

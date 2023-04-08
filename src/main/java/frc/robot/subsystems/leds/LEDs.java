@@ -79,12 +79,12 @@ public class LEDs extends SubsystemBase {
     SmartDashboard.putNumber("cube current", 1);
     final double kTriggerTime = 0.15;
     return Commands.run(() -> {
-      if (SmartDashboard.getNumber("cone current", 0.0) >= 40)
+      if (coneCurrent.getAsDouble() >= 40)
         coneStallTimer.start();
       else
         coneStallTimer.stop();
 
-      if (SmartDashboard.getNumber("cube current", 0.0) >= 15)
+      if (cubeCurrent.getAsDouble() >= 15)
         cubeStallTimer.start();
       else
         cubeStallTimer.stop();

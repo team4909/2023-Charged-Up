@@ -87,7 +87,7 @@ public class Claw extends SubsystemBase {
           currentClawCommand = SetClawPos(0.2);
           break;
         case SCORE:
-          currentClawCommand = SetClawPos(0.08);
+          currentClawCommand = SetClawPos(0.1);
           break;
         default:
           m_state = ClawStates.IDLE;
