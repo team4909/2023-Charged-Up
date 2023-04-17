@@ -78,9 +78,9 @@ public class RobotContainer {
 		// new HashMap<>(Map.of("Angle", 90d))))
 		// .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
 
-		m_driverController.rightTrigger().onTrue(m_intake.setState(IntakeStates.INTAKE_CONE))
-				.onFalse(m_intake.setState(IntakeStates.HANDOFF));
-		m_driverController.leftBumper().onTrue(m_intake.setState(IntakeStates.SPIT_CONE));
+		m_driverController.rightTrigger().onTrue(m_intake.setState(IntakeStates.INTAKE))
+				.onFalse(m_intake.setState(IntakeStates.HOLDING));
+		m_driverController.leftBumper().onTrue(m_intake.setState(IntakeStates.SPIT));
 		m_driverController.x().onTrue(Commands.runOnce(() -> m_drivetrain.reseedModules()));
 		m_driverController.povDown().onTrue(m_intake.setState(IntakeStates.RETRACTED));
 

@@ -12,7 +12,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,9 +37,10 @@ public class Intake extends SubsystemBase {
   public enum IntakeStates {
     IDLE("Idle"),
     RETRACTED("Retracted"),
-    INTAKE_CONE("Intake Cone"),
-    SPIT_CONE("Spit Cone"),
-    HANDOFF("Handoff");
+    INTAKE("Intake"),
+    SPIT("Spit"),
+    HANDOFF("Transfer"),
+    HOLDING("Handoff");
 
     String stateName;
 
@@ -140,18 +140,21 @@ public class Intake extends SubsystemBase {
         case RETRACTED:
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.RETRACTED_SETPOINT, 0d, 0d);
           break;
-        case INTAKE_CONE:
+        case INTAKE:
           isIntaking = true;
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.CONE_SETPOINT, 0.75, 0.75)
               .finallyDo((i) -> isIntaking = false);
           break;
-        case SPIT_CONE:
+        case SPIT:
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.SPIT_CONE_SETPOINT, 0.3d, -0.3d);
           break;
         case HANDOFF:
-          if (m_lastState.was(IntakeStates.INTAKE_CONE)) {
-            IntakeStates.HANDOFF.stateName = "Handoff Cone";
-            currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.HANDOFF_SETPOINT, 0.2d, 0.15d);
+          currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.HANDOFF_SETPOINT, 0.2, 0.15);
+          break;
+        case HOLDING:
+          if (m_lastState.was(IntakeStates.INTAKE)) {
+            IntakeStates.HOLDING.stateName = "Handoff Cone";
+            currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.HANDOFF_SETPOINT, 0.2, 0.15);
           }
           break;
         default:
@@ -214,13 +217,5 @@ public class Intake extends SubsystemBase {
 
   public static Intake getInstance() {
     return m_instance = (m_instance == null) ? new Intake() : m_instance;
-  }
-
-  Timer cubeStallTimer = new Timer();
-  final double kTriggerTime = 0.15;
-  private boolean m_hasCone = false;
-
-  public boolean hasCone() {
-    return m_hasCone;
   }
 }

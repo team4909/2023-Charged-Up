@@ -105,13 +105,6 @@ public class CubeShooter extends SubsystemBase {
     SmartDashboard.putNumber("Cube Shooter/Pivot Current", m_cubePivot.getOutputCurrent());
     SmartDashboard.putNumber("Cube Shooter/Top Roller Current", m_topRoller.getOutputCurrent());
     SmartDashboard.putString("Cube Shooter/State", m_state.toString());
-
-    // if (SmartDashboard.getNumber("cube current", 0.0) >= 40)
-    // cubeStallTimer.start();
-    // else
-    // cubeStallTimer.stop();
-
-    // m_hasCube = cubeStallTimer.get() >= kTriggerTime; // @todo needs a reset
   }
 
   private void stateMachine() {
