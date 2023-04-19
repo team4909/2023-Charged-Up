@@ -40,17 +40,13 @@ public class Intake extends SubsystemBase {
     RETRACTED("Retracted"),
     INTAKE("Intake"),
     SPIT("Spit"),
-    HANDOFF("Transfer"),
-    HOLDING("Handoff");
+    HANDOFF("Handoff"),
+    HOLDING("Holding");
 
     String stateName;
 
     private IntakeStates(String name) {
       this.stateName = name;
-    }
-
-    public boolean was(IntakeStates state) {
-      return this.equals(state);
     }
 
     public String toString() {
@@ -153,10 +149,7 @@ public class Intake extends SubsystemBase {
           currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.HANDOFF_SETPOINT, 0.2, 0.15);
           break;
         case HOLDING:
-          if (m_lastState.was(IntakeStates.INTAKE)) {
-            IntakeStates.HOLDING.stateName = "Handoff Cone";
-            currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.HANDOFF_SETPOINT, 0.2, 0.15);
-          }
+          currentIntakeCommand = SetPivotPositionAndRollerSpeed(IntakeConstants.HANDOFF_SETPOINT, 0.2, 0.15);
           break;
         default:
           m_state = IntakeStates.IDLE;
@@ -199,7 +192,6 @@ public class Intake extends SubsystemBase {
           }
         }, this));
   }
-
   // #endregion
 
   private double calcFF(double thetaDegrees) {

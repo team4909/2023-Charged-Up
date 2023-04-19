@@ -102,28 +102,34 @@ public final class PhysicalModule extends ModuleBase {
     private void configHardware() {
         CANConfigurator<ErrorCode> moduleManager = new CANConfigurator<>(
                 "Module: " + Module.matchModuleName(m_index), ErrorCode.class);
-        m_driveMotor.configFactoryDefault();
-        m_driveMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 1));
-        m_driveMotor.configVoltageCompSaturation(12);
+        moduleManager.actionConsumer.accept(() -> m_driveMotor.configFactoryDefault());
+        moduleManager.actionConsumer.accept(
+                () -> m_driveMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 1)));
+        moduleManager.actionConsumer.accept(() -> m_driveMotor.configVoltageCompSaturation(12));
+        moduleManager.actionConsumer.accept(() -> m_driveMotor.setSelectedSensorPosition(0));
+        moduleManager.actionConsumer.accept(() -> m_driveMotor.config_kP(0, DrivetrainConstants.DRIVE_kP));
         m_driveMotor.enableVoltageCompensation(true);
         m_driveMotor.setInverted(false);
         m_driveMotor.setNeutralMode(NeutralMode.Brake);
-        m_driveMotor.setSelectedSensorPosition(0);
-        m_driveMotor.config_kP(0, DrivetrainConstants.DRIVE_kP);
 
-        m_turnMotor.configFactoryDefault();
-        m_turnMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 1));
-        m_turnMotor.configVoltageCompSaturation(12);
+        moduleManager.actionConsumer.accept(() -> m_turnMotor.configFactoryDefault());
+        moduleManager.actionConsumer.accept(
+                () -> m_turnMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 1)));
+        moduleManager.actionConsumer.accept(() -> m_turnMotor.configVoltageCompSaturation(12));
+        moduleManager.actionConsumer
+                .accept(() -> m_turnMotor.setSelectedSensorPosition(Module.convertDegreesToTicks(getWheelHeading())));
+        moduleManager.actionConsumer
+                .accept(() -> m_turnMotor.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Unsigned_0_to_360));
+        moduleManager.actionConsumer.accept(() -> m_turnMotor.config_kP(0, DrivetrainConstants.TURN_kP));
         m_turnMotor.enableVoltageCompensation(true);
         m_turnMotor.setInverted(true);
         m_turnMotor.setNeutralMode(NeutralMode.Brake);
-        m_turnMotor.setSelectedSensorPosition(Module.convertDegreesToTicks(getWheelHeading()));
-        m_turnMotor.configIntegratedSensorAbsoluteRange(AbsoluteSensorRange.Unsigned_0_to_360);
-        m_turnMotor.config_kP(0, DrivetrainConstants.TURN_kP);
 
-        m_encoder.configFactoryDefault();
-        m_encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
-        m_encoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+        moduleManager.actionConsumer.accept(() -> m_encoder.configFactoryDefault());
+        moduleManager.actionConsumer.accept(() -> m_encoder
+                .configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition));
+        moduleManager.actionConsumer
+                .accept(() -> m_encoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360));
         moduleManager.forceConfig();
     }
 

@@ -116,7 +116,7 @@ public class Drivetrain extends SubsystemBase {
     TRAJECTORY_DRIVE("Trajectory Drive"),
     ON_THE_FLY_TRAJECTORY("On The Fly Trajectory"),
     PRECISE("Precise"),
-    SNAP_TO_ANGLE("Snapping To Angle"),
+    CONE_ALIGN("Cone Align"),
     AUTO_BALANCE("Auto Balance"),
     LOCKED("Locked");
 
@@ -276,8 +276,8 @@ public class Drivetrain extends SubsystemBase {
           currentDrivetrainCommand = JoystickDrive(DrivetrainConstants.PRECISE_SPEED_SCALE,
               DrivetrainConstants.PRECISE_SPEED_SCALE, DrivetrainConstants.DEADBAND / 2d, false, null);
           break;
-        case SNAP_TO_ANGLE:
-          currentDrivetrainCommand = SnapToAngle((double) m_stateArgs.get("Angle"));
+        case CONE_ALIGN:
+          currentDrivetrainCommand = ConeAlign();
           break;
         case AUTO_BALANCE:
           currentDrivetrainCommand = AutoBalance();
@@ -376,23 +376,29 @@ public class Drivetrain extends SubsystemBase {
 
   }
 
-  private Command SnapToAngle(double angle) {
+  private Command ConeAlign() {
     PIDController snapPID = new PIDController(0.019, 0.0, 0.0);
+    PIDController yPID = new PIDController(0.01, 0.0, 0.0);
     snapPID.enableContinuousInput(-180, 180);
-    snapPID.setTolerance(1.5); // degrees
-    var obj = new Object() {
-      double output = 0;
+    snapPID.setTolerance(1.0); // degrees
+    yPID.setTolerance(3.0); // degrees
+    var speeds = new Object() {
+      double x, y, omega;
     };
-    return new PIDCommand(
-        snapPID,
-        () -> MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180),
-        () -> angle,
-        (omega) -> {
-          obj.output = omega;
-        })
-        .until(() -> snapPID.atSetpoint())
-        .andThen(setState(DrivetrainStates.IDLE))
-        .alongWith(JoystickDrive(1d, 1d, DrivetrainConstants.DEADBAND, true, () -> obj.output));
+    return Commands.parallel(
+        new PIDCommand(
+            snapPID,
+            () -> MathUtil.inputModulus(getGyroYaw().getDegrees(), -180, 180),
+            () -> 180,
+            (omegaSpeed) -> speeds.omega = omegaSpeed),
+        new PIDCommand(
+            yPID,
+            m_vision::xOffsetDegrees,
+            () -> 0,
+            (ySpeed) -> speeds.y = ySpeed),
+        this.run(() -> {
+          drive(ChassisSpeeds.fromFieldRelativeSpeeds(speeds.x, speeds.y, speeds.omega, getGyroYaw()));
+        }));
   }
 
   private Command AutoBalance() {

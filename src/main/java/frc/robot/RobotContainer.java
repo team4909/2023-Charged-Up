@@ -99,7 +99,7 @@ public class RobotContainer {
 		// m_driverController.x().onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
 		// new HashMap<>(Map.of("Angle", 180.0))))
 		// .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
-		m_driverController.y().onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
+		m_driverController.y().onTrue(m_drivetrain.setState(DrivetrainStates.CONE_ALIGN,
 				new HashMap<>(Map.of("Angle", 0.0))))
 				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
 

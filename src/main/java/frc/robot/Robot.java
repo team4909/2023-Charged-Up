@@ -110,6 +110,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.getAutonomousCommand().schedule();
 
     Intake.getInstance().setState(IntakeStates.RETRACTED).schedule();
     Wrist.getInstance().setState(WristStates.RETRACTED).schedule();

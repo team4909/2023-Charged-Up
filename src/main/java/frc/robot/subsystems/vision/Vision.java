@@ -60,4 +60,7 @@ public class Vision extends SubsystemBase {
     return val;
   }
 
+  public double xOffsetDegrees() {
+    return LimelightHelpers.getTX(m_limelightName);
+  }
 }

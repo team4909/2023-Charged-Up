@@ -1,13 +1,13 @@
 {
   "Docking": {
     "Data": [
-      "DockNode    ID=0x00000002 Pos=162,19 Size=1342,266 Split=X Selected=0x2D9B9756",
+      "DockNode    ID=0x00000002 Pos=160,21 Size=1342,266 Split=X Selected=0x2D9B9756",
       "DockNode  ID=0x00000003 Parent=0x00000002 SizeRef=456,555 Selected=0x2D9B9756",
       "DockNode  ID=0x00000001 Parent=0x00000002 SizeRef=453,555 Selected=0xB804B83F",
       "DockNode    ID=0x00000004 Pos=502,786 Size=937,205 Split=X",
       "DockNode  ID=0x00000005 Parent=0x00000004 SizeRef=191,73 Selected=0x6AE6D891",
       "DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=603,73 Selected=0x138219D4",
-      "DockNode    ID=0x00000007 Pos=1511,23 Size=389,54 Split=X",
+      "DockNode    ID=0x00000007 Pos=1511,23 Size=392,64 Split=X",
       "DockNode  ID=0x0000000C Parent=0x00000007 SizeRef=127,54 Selected=0x82CCC910",
       "DockNode  ID=0x0000000D Parent=0x00000007 SizeRef=125,54 Selected=0x49901AB5",
       "DockNode    ID=0x00000008 Pos=373,290 Size=1100,472 Split=X",
@@ -19,7 +19,7 @@
   "MainWindow": {
     "GLOBAL": {
       "fps": "120",
-      "height": "1017",
+      "height": "1001",
       "maximized": "1",
       "style": "1",
       "userScale": "2",
@@ -30,9 +30,9 @@
   },
   "Table": {
     "0x542B5671,2": {
-      "Column 0  Width": "391",
-      "Column 1  Width": "470",
-      "RefScale": "13"
+      "Column 0  Width": "337",
+      "Column 1  Width": "578",
+      "RefScale": "16"
     }
   },
   "Window": {
@@ -57,18 +57,18 @@
       "Collapsed": "0",
       "DockId": "0x0000000C,0",
       "Pos": "1511,23",
-      "Size": "195,54"
+      "Size": "197,64"
     },
     "###/SmartDashboard/SendableChooser[1]": {
       "Collapsed": "0",
       "DockId": "0x0000000D,0",
-      "Pos": "1708,23",
-      "Size": "192,54"
+      "Pos": "1710,23",
+      "Size": "193,64"
     },
     "###Addressable LEDs": {
       "Collapsed": "0",
       "Pos": "61,607",
-      "Size": "142,400"
+      "Size": "170,474"
     },
     "###FMS": {
       "Collapsed": "0",
@@ -85,7 +85,7 @@
     "###NetworkTables": {
       "Collapsed": "0",
       "DockId": "0x00000003,0",
-      "Pos": "162,19",
+      "Pos": "160,21",
       "Size": "672,266"
     },
     "###Other Devices": {
@@ -101,25 +101,25 @@
     "###Plot <0>": {
       "Collapsed": "0",
       "DockId": "0x00000001,0",
-      "Pos": "836,19",
+      "Pos": "834,21",
       "Size": "668,266"
     },
     "###Plot <1>": {
       "Collapsed": "0",
       "DockId": "0x00000001,1",
-      "Pos": "836,19",
+      "Pos": "834,21",
       "Size": "668,266"
     },
     "###Plot <2>": {
       "Collapsed": "0",
       "DockId": "0x00000001,2",
-      "Pos": "836,19",
+      "Pos": "834,21",
       "Size": "668,266"
     },
     "###Plot <3>": {
       "Collapsed": "0",
       "DockId": "0x00000001,3",
-      "Pos": "836,19",
+      "Pos": "834,21",
       "Size": "668,266"
     },
     "###RoboRIO": {
@@ -147,7 +147,7 @@
     "Robot State": {
       "Collapsed": "0",
       "Pos": "11,28",
-      "Size": "92,99"
+      "Size": "109,114"
     }
   }
 }

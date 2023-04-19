@@ -6,6 +6,7 @@ import java.util.Map;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.subsystems.arm.Claw;
 import frc.robot.subsystems.arm.Claw.ClawStates;
 import frc.robot.subsystems.arm.Wrist;
@@ -97,13 +98,12 @@ public class AutoRoutines {
   private Command loadTrajectory(DriveTrajectory traj) {
     return Commands.waitUntil(m_drivetrain.isTrajectoryFinished)
         .deadlineWith(m_drivetrain.setState(DrivetrainStates.TRAJECTORY_DRIVE,
-            new HashMap<>(
-                Map.of("Trajectory", traj.trajectory(), "IsFirstPath",
-                    traj.isFirstPath()))));
+            new HashMap<>(Map.of("Trajectory", traj.trajectory(), "IsFirstPath", traj.isFirstPath()))));
   }
 
   private Command Auto(Command... events) {
     return Commands.sequence(events)
+        // .withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         .finallyDo((i) -> System.out.println("Auto Routine Ended, Interrupted: " + i));
   }
 
@@ -152,18 +152,6 @@ public class AutoRoutines {
         m_cubeShooter.setState(CubeShooterStates.RETRACTED));
   }
 
-  // public final Command HANDOFF() {
-  // return Commands.sequence(
-  // m_claw.setState(ClawStates.HANDOFF),
-  // m_wrist.setState(WristStates.HANDOFF_CONE),
-  // Commands.waitSeconds(0.5),
-  // m_claw.setState(ClawStates.CLOSED),
-  // Commands.waitSeconds(0.35),
-  // m_intake.setState(IntakeStates.SPIT_CONE),
-  // Commands.waitSeconds(0.1),
-  // m_wrist.setState(WristStates.RETRACTED),
-  // m_intake.setState(IntakeStates.RETRACTED));
-  // }
   public final Command HANDOFF() {
     return Commands.sequence(
         Commands.deadline(

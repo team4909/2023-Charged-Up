@@ -131,9 +131,6 @@ public class CubeShooter extends SubsystemBase {
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, 0.2, 0.2,
               false);
           break;
-        case CALIBRATE:
-          currentCubeShooterCommand = Calibrate();
-          break;
         default:
           currentCubeShooterCommand = Idle();
           break;
@@ -158,17 +155,6 @@ public class CubeShooter extends SubsystemBase {
       m_topRoller.set(0d);
       m_bottomRoller.set(0d);
     }, this);
-  }
-
-  private Command Calibrate() {
-    return Commands.run(() -> {
-      m_cubePivot.setSmartCurrentLimit(5, 40);
-      m_cubePivot.set(0.5);
-    }, this).withTimeout(0.5)
-        .andThen(() -> {
-          m_cubePivot.getEncoder().setPosition(CubeShooterConstants.DEGREE_RANGE - 7.0);
-          m_state = CubeShooterStates.RETRACTED;
-        }, this).finallyDo((i) -> m_cubePivot.setSmartCurrentLimit(40, 40));
   }
 
   private Command SetPivotPositionAndRollerSpeed(double position, double frontSpeed, double backSpeed,

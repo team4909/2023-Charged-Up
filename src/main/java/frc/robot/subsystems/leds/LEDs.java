@@ -13,10 +13,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LEDs extends SubsystemBase {
   // Elevator: 14 x 6, IntaKe: 13 x 3
+  private final int kledLength = 123;
   private static LEDs m_instance;
   private AddressableLED m_leds;
   private AddressableLEDBuffer m_ledBuffer;
-  private final int kledLength = 123;
   private Color m_currentColor = Color.kWhite;
 
   private LEDs() {
@@ -107,19 +107,6 @@ public class LEDs extends SubsystemBase {
     SmartDashboard.putString("Current Color", m_currentColor.toString());
     SmartDashboard.putString("Current Command",
         this.getCurrentCommand() == null ? "Null" : this.getCurrentCommand().getName());
-
-    // if (CubeShooter.getInstance().hasCube() &&
-    // CubeShooter.getInstance().getState() == CubeShooterStates.INTAKE) {
-    // setColor(Color.kAqua);
-    // } else {
-    // setColor(Color.kBlack);
-    // }
-
-  }
-
-  public void scheduleDefault() {
-    if (this.getDefaultCommand() != null)
-      this.getDefaultCommand().schedule();
   }
 
   public static LEDs getInstance() {

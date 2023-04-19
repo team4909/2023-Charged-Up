@@ -11,6 +11,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.REVLibError;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -80,17 +83,17 @@ public class CANConfigurator<T> {
     forceConfig();
   }
 
-  // public void configDefaultFramePeriods(CANSparkMax spark, boolean isFollower)
-  // {
-  // statusTracker.accept(spark.setPeriodicFramePeriod(PeriodicFrame.kStatus0,
-  // isFollower ? 100 : 10));
-  // statusTracker.accept(spark.setPeriodicFramePeriod(PeriodicFrame.kStatus3,
-  // 65535));
-  // statusTracker.accept(spark.setPeriodicFramePeriod(PeriodicFrame.kStatus4,
-  // 65535));
-  // statusTracker.accept(spark.setPeriodicFramePeriod(PeriodicFrame.kStatus5,
-  // 65535));
-  // statusTracker.accept(spark.setPeriodicFramePeriod(PeriodicFrame.kStatus6,
-  // 65535));
-  // }
+  public static void configDefaultFramePeriods(CANConfigurator<REVLibError> configurator, CANSparkMax spark,
+      boolean isFollower) {
+    configurator.actionConsumer
+        .accept(() -> spark.setPeriodicFramePeriod(PeriodicFrame.kStatus0, isFollower ? 100 : 10));
+    configurator.actionConsumer.accept(() -> spark.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 65535));
+    configurator.actionConsumer.accept(() -> spark.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 65535));
+    configurator.actionConsumer.accept(() -> spark.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 65535));
+    configurator.actionConsumer.accept(() -> spark.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 65535));
+  }
+
+  public static void configDefaultFramePeriods(CANConfigurator<ErrorCode> configurator, TalonFX talon,
+      boolean isFollower) {
+  }
 }
