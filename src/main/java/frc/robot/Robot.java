@@ -75,7 +75,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-    LEDs.getInstance().setDefaultCommand(LEDs.getInstance().setBreatheColor(new Color(0, 255, 0)));
+    LEDs.getInstance().setDefaultCommand(LEDs.getInstance().SetBreatheColor(new Color(0, 255, 0)));
   }
 
   @Override

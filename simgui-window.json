@@ -7,7 +7,7 @@
       "DockNode    ID=0x00000004 Pos=502,786 Size=937,205 Split=X",
       "DockNode  ID=0x00000005 Parent=0x00000004 SizeRef=191,73 Selected=0x6AE6D891",
       "DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=603,73 Selected=0x138219D4",
-      "DockNode    ID=0x00000007 Pos=1512,24 Size=389,54 Split=X",
+      "DockNode    ID=0x00000007 Pos=1511,23 Size=389,54 Split=X",
       "DockNode  ID=0x0000000C Parent=0x00000007 SizeRef=127,54 Selected=0x82CCC910",
       "DockNode  ID=0x0000000D Parent=0x00000007 SizeRef=125,54 Selected=0x49901AB5",
       "DockNode    ID=0x00000008 Pos=373,290 Size=1100,472 Split=X",
@@ -24,7 +24,7 @@
       "style": "1",
       "userScale": "2",
       "width": "1920",
-      "xpos": "0",
+      "xpos": "-1920",
       "ypos": "23"
     }
   },
@@ -56,13 +56,13 @@
     "###/SmartDashboard/SendableChooser[0]": {
       "Collapsed": "0",
       "DockId": "0x0000000C,0",
-      "Pos": "1512,24",
+      "Pos": "1511,23",
       "Size": "195,54"
     },
     "###/SmartDashboard/SendableChooser[1]": {
       "Collapsed": "0",
       "DockId": "0x0000000D,0",
-      "Pos": "1709,24",
+      "Pos": "1708,23",
       "Size": "192,54"
     },
     "###Addressable LEDs": {

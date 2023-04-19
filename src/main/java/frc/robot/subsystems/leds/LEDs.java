@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LEDs extends SubsystemBase {
@@ -27,7 +26,7 @@ public class LEDs extends SubsystemBase {
     m_leds.start();
   }
 
-  public Command setBreatheColor(Color initialColor) {
+  public Command SetBreatheColor(Color initialColor) {
     final int kStep = 3;
     var currentColor = new Object() {
       double r, g, b, a;
@@ -54,7 +53,8 @@ public class LEDs extends SubsystemBase {
       }
       m_leds.setData(m_ledBuffer);
     })
-        .ignoringDisable(true);
+        .ignoringDisable(true)
+        .withName("Set Breathe Color");
   }
 
   public void setColor(Color color) {
@@ -67,9 +67,11 @@ public class LEDs extends SubsystemBase {
     m_leds.setData(m_ledBuffer);
   }
 
-  public Command setStaticColor(Color color) {
+  public Command SetStaticColor(Color color) {
     return this.run(() -> setColor(color))
-        .finallyDo((i) -> setColor(Color.kBlack)).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+        .finallyDo((i) -> setColor(Color.kBlack))
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+        .withName("Set Static Color");
   }
 
   public Command GamePieceIndicator(DoubleSupplier coneCurrent, DoubleSupplier cubeCurrent) {
@@ -78,13 +80,13 @@ public class LEDs extends SubsystemBase {
     SmartDashboard.putNumber("cone current", 1);
     SmartDashboard.putNumber("cube current", 1);
     final double kTriggerTime = 0.15;
-    return Commands.run(() -> {
-      if (coneCurrent.getAsDouble() >= 40)
+    return this.run(() -> {
+      if (SmartDashboard.getNumber("cone current", 0) >= 40)
         coneStallTimer.start();
       else
         coneStallTimer.stop();
 
-      if (cubeCurrent.getAsDouble() >= 15)
+      if (SmartDashboard.getNumber("cube current", 0) >= 15)
         cubeStallTimer.start();
       else
         cubeStallTimer.stop();
@@ -92,16 +94,19 @@ public class LEDs extends SubsystemBase {
       if (coneStallTimer.get() >= kTriggerTime || cubeStallTimer.get() >= kTriggerTime) {
         setColor(Color.kAqua);
       } else {
-        setColor(Color.kBlack);
+        // setColor(Color.kBlack);
       }
     }).beforeStarting(() -> {
       coneStallTimer.reset();
       cubeStallTimer.reset();
-    });
+    })
+        .withName("Game Piece Indicator");
   }
 
   public void periodic() {
     SmartDashboard.putString("Current Color", m_currentColor.toString());
+    SmartDashboard.putString("Current Command",
+        this.getCurrentCommand() == null ? "Null" : this.getCurrentCommand().getName());
 
     // if (CubeShooter.getInstance().hasCube() &&
     // CubeShooter.getInstance().getState() == CubeShooterStates.INTAKE) {

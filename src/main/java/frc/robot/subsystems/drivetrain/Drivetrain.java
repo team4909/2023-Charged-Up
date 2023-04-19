@@ -349,16 +349,17 @@ public class Drivetrain extends SubsystemBase {
   }
 
   private Command TrajectoryDrive(PathPlannerTrajectory trajectory, boolean isFirstPath, boolean onTheFly) {
-    return new InstantCommand(() -> {
-      final PathPlannerTrajectory transformedTrajectory = PathPlannerTrajectory
-          .transformTrajectoryForAlliance(trajectory, DriverStation.getAlliance());
-      if (isFirstPath) {
-        resetGyro(trajectory.getInitialHolonomicPose().getRotation());
-        Timer.delay(0.04); // For gyro reset, CAN is not instant
-        resetPose(transformedTrajectory.getInitialHolonomicPose());
-      }
-      setFieldTrajectory(onTheFly ? trajectory : transformedTrajectory);
-    }).andThen(
+    return Commands.sequence(
+        this.runOnce(() -> {
+          final PathPlannerTrajectory transformedTrajectory = PathPlannerTrajectory
+              .transformTrajectoryForAlliance(trajectory, DriverStation.getAlliance());
+          if (isFirstPath) {
+            resetGyro(trajectory.getInitialHolonomicPose().getRotation());
+            Timer.delay(0.04); // For gyro reset, CAN is not instant
+            resetPose(transformedTrajectory.getInitialHolonomicPose());
+          }
+          setFieldTrajectory(onTheFly ? trajectory : transformedTrajectory);
+        }),
         // PathPlanner only flips the trajectory when its from the gui, so for on the
         // fly we return an already flipped one.
         new PPSwerveControllerCommand(
@@ -370,8 +371,9 @@ public class Drivetrain extends SubsystemBase {
             new PIDController(DrivetrainConstants.THETA_FOLLOWING_kP, 0, 0),
             m_swerveModuleConsumer,
             true,
-            this))
-        .andThen(setState(DrivetrainStates.IDLE));
+            this),
+        setState(DrivetrainStates.IDLE));
+
   }
 
   private Command SnapToAngle(double angle) {

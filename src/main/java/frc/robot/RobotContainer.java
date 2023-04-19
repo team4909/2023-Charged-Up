@@ -47,6 +47,8 @@ public class RobotContainer {
 	public RobotContainer() {
 		configureBindings();
 		configureSendableChooser();
+		m_leds.setDefaultCommand(m_leds.SetBreatheColor(new Color(0, 255, 0)));
+		m_leds.getDefaultCommand().schedule();
 	}
 
 	private void configureBindings() {
@@ -113,18 +115,18 @@ public class RobotContainer {
 
 		// #region Operator Controls
 
-		m_operatorController.back().whileTrue(m_leds.setStaticColor(Color.kYellow));
-		m_operatorController.start().whileTrue(m_leds.setStaticColor(Color.kPurple));
+		m_operatorController.back().whileTrue(m_leds.SetStaticColor(Color.kYellow));
+		m_operatorController.start().whileTrue(m_leds.SetStaticColor(Color.kPurple));
 
 		m_operatorController.povUp().onTrue(m_wrist.setState(WristStates.RETRACTED));
 		m_operatorController.povDown().onTrue(m_wrist.setState(WristStates.DROPPING));
 
 		m_operatorController.povRight()
 				.onTrue(m_cubeShooter.Configure(ShooterLevels.MID))
-				.whileTrue(m_leds.setStaticColor(Color.kBlue));
+				.whileTrue(m_leds.SetStaticColor(Color.kBlue));
 		m_operatorController.povLeft()
 				.onTrue(m_cubeShooter.Configure(ShooterLevels.HIGH))
-				.whileTrue(m_leds.setStaticColor(Color.kRed));
+				.whileTrue(m_leds.SetStaticColor(Color.kRed));
 
 		m_operatorController.leftBumper().onTrue(
 				Commands.sequence(
@@ -180,8 +182,8 @@ public class RobotContainer {
 		// .onTrue(m_drivetrain.setState(DrivetrainStates.ON_THE_FLY_TRAJECTORY, new
 		// HashMap<>(Map.of("Waypoint", 10))));
 
-		Trigger t = new Trigger(() -> m_cubeShooter.isIntaking).or(() -> m_intake.isIntaking);
-		t.whileTrue(m_leds.GamePieceIndicator(m_intake.backRollerOutputCurrent, m_cubeShooter.topRollerOutputCurrent));
+		new Trigger(() -> m_cubeShooter.isIntaking).or(() -> m_intake.isIntaking)
+				.whileTrue(m_leds.GamePieceIndicator(m_intake.backRollerOutputCurrent, m_cubeShooter.topRollerOutputCurrent));
 
 	}
 
@@ -213,7 +215,7 @@ public class RobotContainer {
 	}
 
 	public void initLEDS() {
-		m_leds.setDefaultCommand(m_leds.setStaticColor(Color.kBlack));
+		m_leds.setDefaultCommand(m_leds.SetStaticColor(Color.kBlack));
 		m_leds.getDefaultCommand().schedule();
 	}
 

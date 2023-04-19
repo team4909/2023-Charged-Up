@@ -6,7 +6,6 @@ import java.util.Map;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.arm.Claw;
 import frc.robot.subsystems.arm.Claw.ClawStates;
 import frc.robot.subsystems.arm.Wrist;
@@ -31,18 +30,18 @@ public class AutoRoutines {
   private final Claw m_claw = Claw.getInstance();
   private final CubeShooter m_cubeShooter = CubeShooter.getInstance();
   private final LEDs m_leds = LEDs.getInstance();
-  public final Auto TEST = new Auto(
+  public final Command TEST = Auto(
       loadTrajectory(new DriveTrajectory("Test2", true)));
 
-  public final Auto BLANK_AUTO = new Auto();
+  public final Command BLANK_AUTO = Auto();
 
-  public final Auto ONE_CONE_CHARGE_STATION = new Auto(
+  public final Command ONE_CONE_CHARGE_STATION = Auto(
       SCORE_CONE(ElevatorStates.TOP),
       loadTrajectory(new DriveTrajectory("ChargeStationStraight", true, 1.5)),
       loadTrajectory(new DriveTrajectory("BackChargeStation", false, 1.5)),
       m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
 
-  public final Auto TWO_CONE_CHARGE_STATION = new Auto(
+  public final Command TWO_CONE_CHARGE_STATION = Auto(
       SCORE_CONE(ElevatorStates.TOP),
       Commands.parallel(
           loadTrajectory(new DriveTrajectory("TopNodeToTopPiece", true)),
@@ -54,7 +53,7 @@ public class AutoRoutines {
           HANDOFF()),
       SCORE_CONE(ElevatorStates.TOP));
 
-  public final Auto ONE_CONE_ONE_CUBE = new Auto(
+  public final Command ONE_CONE_ONE_CUBE = Auto(
       SCORE_CONE(ElevatorStates.TOP),
       Commands.parallel(
           loadTrajectory(new DriveTrajectory("TopNodeToTopCube", true)),
@@ -66,7 +65,7 @@ public class AutoRoutines {
   // INTAKE_CONE().beforeStarting(Commands.waitSeconds(2.2))),
   // HANDOFF());
 
-  public final Auto ONE_CONE_ONE_CUBE_BUMP = new Auto(
+  public final Command ONE_CONE_ONE_CUBE_BUMP = Auto(
       SCORE_CONE(ElevatorStates.TOP),
       Commands.parallel(
           loadTrajectory(new DriveTrajectory("BottomPieceBumpSide", true, 1.5)),
@@ -75,7 +74,7 @@ public class AutoRoutines {
       SCORE_CUBE(ShooterLevels.HIGH),
       loadTrajectory(new DriveTrajectory("BottomNodeToOutside", false, 1.5)));
 
-  public final Auto ONE_CONE_ONE_CUBE_LOW_BUMP = new Auto(
+  public final Command ONE_CONE_ONE_CUBE_LOW_BUMP = Auto(
       SCORE_CONE(ElevatorStates.TOP),
       Commands.parallel(
           loadTrajectory(new DriveTrajectory("BottomPieceBumpSide", true, 1.5)),
@@ -84,14 +83,14 @@ public class AutoRoutines {
       SCORE_CUBE(ShooterLevels.LOW),
       loadTrajectory(new DriveTrajectory("BottomNodeToOutside", false, 1.5)));
 
-  public final Auto ONE_CONE_PICKUP_CUBE_BUMP = new Auto(
+  public final Command ONE_CONE_PICKUP_CUBE_BUMP = Auto(
       SCORE_CONE(ElevatorStates.TOP),
       Commands.parallel(
           loadTrajectory(new DriveTrajectory("BottomPieceBumpSide", true, 1.5)),
           INTAKE_CUBE().beforeStarting(Commands.waitSeconds(2))),
       loadTrajectory(new DriveTrajectory("BottomPieceToBottomNode", false, 1.5)));
 
-  public final Auto ONE_CONE_BUMP = new Auto(
+  public final Command ONE_CONE_BUMP = Auto(
       SCORE_CONE(ElevatorStates.TOP),
       loadTrajectory(new DriveTrajectory("BottomPieceBumpSide", true, 1.5)));
 
@@ -103,10 +102,9 @@ public class AutoRoutines {
                     traj.isFirstPath()))));
   }
 
-  private class Auto extends SequentialCommandGroup {
-    public Auto(Command... events) {
-      super.addCommands(events);
-    }
+  private Command Auto(Command... events) {
+    return Commands.sequence(events)
+        .finallyDo((i) -> System.out.println("Auto Routine Ended, Interrupted: " + i));
   }
 
   private final Command INIT() {
@@ -176,7 +174,7 @@ public class AutoRoutines {
                 Commands.waitSeconds(0.5),
                 m_claw.setState(ClawStates.CLOSED),
                 Commands.waitSeconds(0.35)),
-            m_leds.setStaticColor(Color.kFirebrick)),
+            m_leds.SetStaticColor(Color.kFirebrick)),
         m_intake.setState(IntakeStates.SPIT),
         Commands.waitSeconds(0.1),
         m_wrist.setState(WristStates.RETRACTED),
