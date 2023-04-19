@@ -1,5 +1,6 @@
 package frc.robot.subsystems.drivetrain.module;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
@@ -10,21 +11,22 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import edu.wpi.first.math.util.Units;
+import frc.lib.bioniclib.CANConfigurator;
 import frc.robot.Constants;
 import frc.robot.Constants.DrivetrainConstants;
 
 public final class PhysicalModule extends ModuleBase {
 
+    private final int m_index;
     private final TalonFX m_driveMotor;
     private final TalonFX m_turnMotor;
     private final CANCoder m_encoder;
     private final double m_encoderOffset;
 
     private final double TICKS_PER_ROTATION = 2048d;
-    final double i;
 
     public PhysicalModule(int index) {
-        i = index;
+        m_index = index;
         switch (index) {
             case 0:
                 m_driveMotor = new TalonFX(DrivetrainConstants.FRONT_LEFT_DRIVE_MOTOR, Constants.CANFD_BUS);
@@ -98,6 +100,8 @@ public final class PhysicalModule extends ModuleBase {
     }
 
     private void configHardware() {
+        CANConfigurator<ErrorCode> moduleManager = new CANConfigurator<>(
+                "Module: " + Module.matchModuleName(m_index), ErrorCode.class);
         m_driveMotor.configFactoryDefault();
         m_driveMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 40, 40, 1));
         m_driveMotor.configVoltageCompSaturation(12);
@@ -120,7 +124,7 @@ public final class PhysicalModule extends ModuleBase {
         m_encoder.configFactoryDefault();
         m_encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
         m_encoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
-
+        moduleManager.forceConfig();
     }
 
     private double getWheelHeading() {

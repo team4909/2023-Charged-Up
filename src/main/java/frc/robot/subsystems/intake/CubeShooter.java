@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import java.util.function.DoubleSupplier;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -12,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.bioniclib.SparkManager;
+import frc.lib.bioniclib.CANConfigurator;
 import frc.robot.Constants.CubeShooterConstants;
 
 public class CubeShooter extends SubsystemBase {
@@ -62,25 +63,24 @@ public class CubeShooter extends SubsystemBase {
     m_topRoller = new CANSparkMax(CubeShooterConstants.TOP_ROLLER_MOTOR, MotorType.kBrushless);
     m_bottomRoller = new CANSparkMax(CubeShooterConstants.BOTTOM_ROLLER_MOTOR, MotorType.kBrushless);
 
-    SparkManager sparkManager = new SparkManager("Cube Shooter Pivot & Rollers");
-    Runnable config = () -> {
-      sparkManager.statusTracker.accept(m_cubePivot.restoreFactoryDefaults());
-      sparkManager.statusTracker.accept(m_topRoller.restoreFactoryDefaults());
-      sparkManager.statusTracker.accept(m_bottomRoller.restoreFactoryDefaults());
+    CANConfigurator<REVLibError> sparkManager = new CANConfigurator<>("Cube Shooter Pivot & Rollers",
+        REVLibError.class);
+    sparkManager.actionConsumer.accept(() -> m_cubePivot.restoreFactoryDefaults());
+    sparkManager.actionConsumer.accept(() -> m_topRoller.restoreFactoryDefaults());
+    sparkManager.actionConsumer.accept(() -> m_bottomRoller.restoreFactoryDefaults());
 
-      sparkManager.statusTracker.accept(m_cubePivot.getPIDController().setP(CubeShooterConstants.kP));
-      sparkManager.statusTracker.accept(m_cubePivot.getPIDController().setD(CubeShooterConstants.kD));
-      sparkManager.statusTracker
-          .accept(m_cubePivot.getPIDController().setOutputRange(-CubeShooterConstants.OUTPUT_LIMIT,
-              CubeShooterConstants.OUTPUT_LIMIT));
+    sparkManager.actionConsumer.accept(() -> m_cubePivot.getPIDController().setP(CubeShooterConstants.kP));
+    sparkManager.actionConsumer.accept(() -> m_cubePivot.getPIDController().setD(CubeShooterConstants.kD));
+    sparkManager.actionConsumer
+        .accept(() -> m_cubePivot.getPIDController().setOutputRange(-CubeShooterConstants.OUTPUT_LIMIT,
+            CubeShooterConstants.OUTPUT_LIMIT));
 
-      sparkManager.statusTracker.accept(m_cubePivot.setSmartCurrentLimit(40, 40));
-      sparkManager.statusTracker
-          .accept(m_cubePivot.getEncoder().setPositionConversionFactor(CubeShooterConstants.DEGREES_PER_TICK));
-      sparkManager.statusTracker.accept(m_cubePivot.getEncoder().setPosition(CubeShooterConstants.DEGREE_RANGE - 7.0));
-      m_cubePivot.setInverted(false);
-    };
-    sparkManager.setConfigRunnable(config);
+    sparkManager.actionConsumer.accept(() -> m_cubePivot.setSmartCurrentLimit(40, 40));
+    sparkManager.actionConsumer
+        .accept(() -> m_cubePivot.getEncoder().setPositionConversionFactor(CubeShooterConstants.DEGREES_PER_TICK));
+    sparkManager.actionConsumer
+        .accept(() -> m_cubePivot.getEncoder().setPosition(CubeShooterConstants.DEGREE_RANGE - 7.0));
+    m_cubePivot.setInverted(false);
     sparkManager.forceConfig();
     m_state = CubeShooterStates.IDLE;
     topRollerOutputCurrent = () -> m_topRoller.getOutputCurrent();

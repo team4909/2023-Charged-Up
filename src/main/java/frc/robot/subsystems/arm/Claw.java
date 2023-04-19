@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.REVLibError;
 import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
@@ -12,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.bioniclib.SparkManager;
+import frc.lib.bioniclib.CANConfigurator;
 import frc.robot.Constants.ClawConstants;
 
 public class Claw extends SubsystemBase {
@@ -43,23 +44,16 @@ public class Claw extends SubsystemBase {
     m_state = ClawStates.IDLE;
     m_clawMotor = new CANSparkMax(5, MotorType.kBrushless);
     m_clawEncoder = m_clawMotor.getAbsoluteEncoder(Type.kDutyCycle);
-
-    SparkManager sparkManager = new SparkManager("Clamp with Absolute Encoder");
-    Runnable config = () -> {
-      sparkManager.statusTracker.accept(m_clawMotor.restoreFactoryDefaults());
-      sparkManager.statusTracker.accept(m_clawMotor.getPIDController().setFeedbackDevice(m_clawEncoder));
-      sparkManager.statusTracker.accept(m_clawMotor.getPIDController().setP(ClawConstants.kP));
-      sparkManager.statusTracker.accept(
-          m_clawMotor.getPIDController().setOutputRange(-ClawConstants.OUTPUT_LIMIT,
-              ClawConstants.OUTPUT_LIMIT));
-      sparkManager.statusTracker.accept(m_clawMotor.setIdleMode(IdleMode.kCoast));
-      sparkManager.statusTracker.accept(m_clawMotor.setSmartCurrentLimit(10));
-      m_clawMotor.setInverted(false);
-
-      sparkManager.statusTracker.accept(m_clawEncoder.setZeroOffset(0.4));
-    };
-
-    sparkManager.setConfigRunnable(config);
+    CANConfigurator<REVLibError> sparkManager = new CANConfigurator<>("Claw", REVLibError.class);
+    sparkManager.actionConsumer.accept(() -> m_clawMotor.restoreFactoryDefaults());
+    sparkManager.actionConsumer.accept(() -> m_clawMotor.getPIDController().setFeedbackDevice(m_clawEncoder));
+    sparkManager.actionConsumer.accept(() -> m_clawMotor.getPIDController().setP(ClawConstants.kP));
+    sparkManager.actionConsumer.accept(
+        () -> m_clawMotor.getPIDController().setOutputRange(-ClawConstants.OUTPUT_LIMIT, ClawConstants.OUTPUT_LIMIT));
+    sparkManager.actionConsumer.accept(() -> m_clawMotor.setIdleMode(IdleMode.kCoast));
+    sparkManager.actionConsumer.accept(() -> m_clawMotor.setSmartCurrentLimit(10));
+    sparkManager.actionConsumer.accept(() -> m_clawEncoder.setZeroOffset(0.4));
+    m_clawMotor.setInverted(false);
     sparkManager.forceConfig();
   }
 

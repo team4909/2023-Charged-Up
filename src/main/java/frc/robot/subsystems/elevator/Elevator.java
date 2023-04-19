@@ -1,12 +1,12 @@
 package frc.robot.subsystems.elevator;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.bioniclib.CANConfigurator;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.SimVisualizer;
@@ -163,27 +164,28 @@ public class Elevator extends SubsystemBase {
   }
 
   private void configHardware() {
-    m_leftExtensionMotor.configFactoryDefault();
-    m_leftExtensionMotor.setSelectedSensorPosition(0);
-    m_leftExtensionMotor.config_kP(0, ElevatorConstants.kP);
-    m_leftExtensionMotor.configClosedLoopPeakOutput(0, ElevatorConstants.OUTPUT_LIMIT);
-    m_leftExtensionMotor.configVoltageCompSaturation(12);
-    m_leftExtensionMotor.enableVoltageCompensation(true);
-    m_leftExtensionMotor.setInverted(false);
-    m_leftExtensionMotor
-        .configMotionCruiseVelocity(ElevatorConstants.MOTION_CRUISE_VELOCITY / ElevatorConstants.METERS_PER_TICK / 10);
-    m_leftExtensionMotor
-        .configMotionAcceleration(ElevatorConstants.MOTION_ACCELERATION / ElevatorConstants.METERS_PER_TICK / 10);
-    m_leftExtensionMotor.configMotionSCurveStrength(7);
+    CANConfigurator<ErrorCode> talonManager = new CANConfigurator<>("Elevator", ErrorCode.class);
+    talonManager.actionConsumer.accept(() -> m_leftExtensionMotor.configFactoryDefault());
+    talonManager.actionConsumer.accept(() -> m_leftExtensionMotor.setSelectedSensorPosition(0));
+    talonManager.actionConsumer.accept(() -> m_leftExtensionMotor.config_kP(0, ElevatorConstants.kP));
+    talonManager.actionConsumer
+        .accept(() -> m_leftExtensionMotor.configClosedLoopPeakOutput(0, ElevatorConstants.OUTPUT_LIMIT));
+    talonManager.actionConsumer.accept(() -> m_leftExtensionMotor
+        .configMotionCruiseVelocity(ElevatorConstants.MOTION_CRUISE_VELOCITY / ElevatorConstants.METERS_PER_TICK / 10));
+    talonManager.actionConsumer.accept(() -> m_leftExtensionMotor
+        .configMotionAcceleration(ElevatorConstants.MOTION_ACCELERATION / ElevatorConstants.METERS_PER_TICK / 10));
+    talonManager.actionConsumer.accept(() -> m_leftExtensionMotor.configMotionSCurveStrength(7));
     m_leftExtensionMotor.set(TalonFXControlMode.MotionMagic, 0);
+    m_leftExtensionMotor.setInverted(false);
     // This stops stale frames in sim
     if (Constants.SIM) {
       m_leftExtensionMotor.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 10);
       m_leftExtensionMotor.setStatusFramePeriod(StatusFrame.Status_10_Targets, 50);
     }
-    m_rightExtensionMotor.configFactoryDefault();
+    talonManager.actionConsumer.accept(() -> m_rightExtensionMotor.configFactoryDefault());
     m_rightExtensionMotor.setInverted(TalonFXInvertType.OpposeMaster);
     m_rightExtensionMotor.follow(m_leftExtensionMotor);
+    talonManager.forceConfig();
   }
 
   public Command setState(ElevatorStates state) {

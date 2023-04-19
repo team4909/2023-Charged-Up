@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import java.util.function.DoubleSupplier;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -17,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.bioniclib.SparkManager;
+import frc.lib.bioniclib.CANConfigurator;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.SimVisualizer;
@@ -62,24 +63,24 @@ public class Intake extends SubsystemBase {
     m_frontRoller = new CANSparkMax(IntakeConstants.FRONT_ROLLER_MOTOR, MotorType.kBrushless);
     m_backRoller = new CANSparkMax(IntakeConstants.BACK_ROLLER_MOTOR, MotorType.kBrushless);
 
-    SparkManager sparkManager = new SparkManager("Intake Pivot & Rollers");
-    Runnable config = () -> {
-      sparkManager.statusTracker.accept(m_pivot.restoreFactoryDefaults());
-      sparkManager.statusTracker.accept(m_frontRoller.restoreFactoryDefaults());
-      sparkManager.statusTracker.accept(m_backRoller.restoreFactoryDefaults());
+    CANConfigurator<REVLibError> sparkManager = new CANConfigurator<>("Intake Pivot & Rollers",
+        REVLibError.class);
+    sparkManager.actionConsumer.accept(() -> m_pivot.restoreFactoryDefaults());
+    sparkManager.actionConsumer.accept(() -> m_pivot.restoreFactoryDefaults());
+    sparkManager.actionConsumer.accept(() -> m_frontRoller.restoreFactoryDefaults());
+    sparkManager.actionConsumer.accept(() -> m_backRoller.restoreFactoryDefaults());
 
-      sparkManager.statusTracker.accept(m_pivot.getPIDController().setP(IntakeConstants.kP));
-      sparkManager.statusTracker
-          .accept(
-              m_pivot.getPIDController().setOutputRange(-IntakeConstants.OUTPUT_LIMIT, IntakeConstants.OUTPUT_LIMIT));
+    sparkManager.actionConsumer.accept(() -> m_pivot.getPIDController().setP(IntakeConstants.kP));
+    sparkManager.actionConsumer
+        .accept(() -> m_pivot.getPIDController().setOutputRange(-IntakeConstants.OUTPUT_LIMIT,
+            IntakeConstants.OUTPUT_LIMIT));
 
-      sparkManager.statusTracker.accept(m_pivot.setSmartCurrentLimit(40, 40));
-      sparkManager.statusTracker
-          .accept(m_pivot.getEncoder().setPositionConversionFactor(IntakeConstants.DEGREES_PER_TICK));
-      sparkManager.statusTracker.accept(m_pivot.getEncoder().setPosition(110d));
-      m_pivot.setInverted(false);
-    };
-    sparkManager.setConfigRunnable(config);
+    sparkManager.actionConsumer.accept(() -> m_pivot.setSmartCurrentLimit(40, 40));
+    sparkManager.actionConsumer
+        .accept(() -> m_pivot.getEncoder().setPositionConversionFactor(IntakeConstants.DEGREES_PER_TICK));
+    sparkManager.actionConsumer.accept(() -> m_pivot.getEncoder().setPosition(110d));
+    m_pivot.setInverted(false);
+
     sparkManager.forceConfig();
 
     m_state = IntakeStates.IDLE;
