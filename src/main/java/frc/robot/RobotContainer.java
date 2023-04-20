@@ -1,8 +1,5 @@
 package frc.robot;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -63,23 +60,6 @@ public class RobotContainer {
 				.onTrue(m_drivetrain.setState(DrivetrainStates.PRECISE))
 				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
 
-		// m_driverController.povUp()
-		// .toggleOnTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
-		// new HashMap<>(Map.of("Angle", 0d))))
-		// .toggleOnFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
-		// m_driverController.povRight()
-		// .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
-		// new HashMap<>(Map.of("Angle", 270d))))
-		// .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
-		// m_driverController.povDown()
-		// .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
-		// new HashMap<>(Map.of("Angle", 180d))))
-		// .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
-		// m_driverController.povLeft()
-		// .onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
-		// new HashMap<>(Map.of("Angle", 90d))))
-		// .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
-
 		m_driverController.rightTrigger().onTrue(m_intake.setState(IntakeStates.INTAKE))
 				.onFalse(m_intake.setState(IntakeStates.HOLDING));
 		m_driverController.leftBumper().onTrue(m_intake.setState(IntakeStates.SPIT));
@@ -96,11 +76,7 @@ public class RobotContainer {
 		m_driverController.leftTrigger()
 				.onTrue(m_cubeShooter.setState(CubeShooterStates.INTAKE))
 				.onFalse(m_cubeShooter.setState(CubeShooterStates.RETRACTED));
-		// m_driverController.x().onTrue(m_drivetrain.setState(DrivetrainStates.SNAP_TO_ANGLE,
-		// new HashMap<>(Map.of("Angle", 180.0))))
-		// .onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
-		m_driverController.y().onTrue(m_drivetrain.setState(DrivetrainStates.CONE_ALIGN,
-				new HashMap<>(Map.of("Angle", 0.0))))
+		m_driverController.y().onTrue(m_drivetrain.setState(DrivetrainStates.CONE_ALIGN))
 				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
 
 		// Drop Game Piece
@@ -114,7 +90,6 @@ public class RobotContainer {
 		// #endregion
 
 		// #region Operator Controls
-
 		m_operatorController.back().whileTrue(m_leds.SetStaticColor(Color.kYellow));
 		m_operatorController.start().whileTrue(m_leds.SetStaticColor(Color.kPurple));
 

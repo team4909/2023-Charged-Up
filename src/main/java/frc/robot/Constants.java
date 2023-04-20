@@ -11,6 +11,7 @@ public final class Constants {
   public static final boolean SIM = RobotBase.isSimulation();
   public static final double PERIODIC_LOOP_DURATION = 0.02;
   public static final double NOMINAL_VOLTAGE = 12d;
+  public static final int kCANTimeoutMs = 100;
   public static final String CANFD_BUS = "CANivore1";
 
   public static final class VisionConstants {
@@ -57,7 +58,8 @@ public final class Constants {
     public static final double DRIVE_kV = 2.5039 / 12d;
     public static final double DRIVE_kA = 0.99695 / 12d;
 
-    public static final double TURN_kP = 0.3;
+    public static final double TURN_kP = 0.75;
+    public static final double TURN_kD = 15;
 
     public static final double X_FOLLOWING_kP = 1.8;
     public static final double Y_FOLLOWING_kP = 1.8;
