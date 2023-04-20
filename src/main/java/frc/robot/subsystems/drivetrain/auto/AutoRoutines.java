@@ -6,7 +6,6 @@ import java.util.Map;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.subsystems.arm.Claw;
 import frc.robot.subsystems.arm.Claw.ClawStates;
 import frc.robot.subsystems.arm.Wrist;
@@ -162,7 +161,7 @@ public class AutoRoutines {
                 Commands.waitSeconds(0.5),
                 m_claw.setState(ClawStates.CLOSED),
                 Commands.waitSeconds(0.35)),
-            m_leds.SetStaticColor(Color.kFirebrick)),
+            m_leds.SetStaticColor(Color.kFirebrick)).asProxy(),
         m_intake.setState(IntakeStates.SPIT),
         Commands.waitSeconds(0.1),
         m_wrist.setState(WristStates.RETRACTED),
