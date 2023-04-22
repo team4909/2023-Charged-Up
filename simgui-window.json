@@ -68,13 +68,13 @@
     "###Addressable LEDs": {
       "Collapsed": "0",
       "Pos": "61,607",
-      "Size": "170,474"
+      "Size": "163,54"
     },
     "###FMS": {
       "Collapsed": "0",
       "DockId": "0x0000000A,0",
       "Pos": "3,353",
-      "Size": "324,257"
+      "Size": "336,164"
     },
     "###Joysticks": {
       "Collapsed": "0",
@@ -137,7 +137,7 @@
       "Collapsed": "0",
       "DockId": "0x0000000A,1",
       "Pos": "3,353",
-      "Size": "324,257"
+      "Size": "162,142"
     },
     "Debug##Default": {
       "Collapsed": "0",

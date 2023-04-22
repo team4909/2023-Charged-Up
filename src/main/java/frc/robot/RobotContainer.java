@@ -165,7 +165,7 @@ public class RobotContainer {
 	private void configureSendableChooser() {
 		m_chooser.setDefaultOption("Blank Auto", m_routines.BLANK_AUTO);
 		m_chooser.addOption("Test", m_routines.TEST);
-		m_chooser.addOption("High Cube/Mobility/Balance", m_routines.ONE_CONE_CHARGE_STATION);
+		m_chooser.addOption("High Cube/Mobility/Balance", m_routines.ONE_CUBE_CHARGE_STATION);
 		m_chooser.addOption("High Cone/Mobility/Balance", m_routines.ONE_CONE_CHARGE_STATION);
 		m_chooser.addOption("2.5 Piece CLean Side", m_routines.ONE_CONE_ONE_CUBE);
 		m_chooser.addOption("2 Bump Side", m_routines.ONE_CONE_ONE_CUBE_BUMP);

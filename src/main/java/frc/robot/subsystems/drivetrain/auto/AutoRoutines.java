@@ -6,6 +6,7 @@ import java.util.Map;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.arm.Claw;
 import frc.robot.subsystems.arm.Claw.ClawStates;
 import frc.robot.subsystems.arm.Wrist;
@@ -37,6 +38,12 @@ public class AutoRoutines {
 
   public final Command ONE_CONE_CHARGE_STATION = Auto(
       SCORE_CONE(ElevatorStates.TOP),
+      loadTrajectory(new DriveTrajectory("ChargeStationStraight", true, 1.5)),
+      loadTrajectory(new DriveTrajectory("BackChargeStation", false, 1.5)),
+      m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
+
+  public final Command ONE_CUBE_CHARGE_STATION = Auto(
+      SCORE_CUBE(ElevatorStates.TOP),
       loadTrajectory(new DriveTrajectory("ChargeStationStraight", true, 1.5)),
       loadTrajectory(new DriveTrajectory("BackChargeStation", false, 1.5)),
       m_drivetrain.setState(DrivetrainStates.AUTO_BALANCE));
@@ -116,7 +123,7 @@ public class AutoRoutines {
         m_cubeShooter.setState(CubeShooterStates.RETRACTED));
   }
 
-  private final Command SCORE_CONE(ElevatorStates extensionLevel) {
+  private final Command SCORE_CUBE(ElevatorStates extensionLevel) {
     return Commands.sequence(
         m_elevator.setState(extensionLevel),
         Commands.waitSeconds(0.75),
@@ -126,6 +133,28 @@ public class AutoRoutines {
         Commands.waitSeconds(0.2),
         m_wrist.setState(WristStates.RETRACTED),
         m_elevator.setState(ElevatorStates.RETRACT))
+        .alongWith(INIT());
+  }
+
+  private final Command SCORE_CUBE(ShooterLevels shooterLevel) {
+    return Commands.sequence(
+        m_cubeShooter.Configure(shooterLevel),
+        m_cubeShooter.setState(CubeShooterStates.SCORE),
+        Commands.waitSeconds(0.5),
+        m_cubeShooter.setState(CubeShooterStates.RETRACTED));
+  }
+
+  private final Command SCORE_CONE(ElevatorStates extensionLevel) {
+    return Commands.sequence(
+        m_elevator.setState(extensionLevel),
+        Commands.waitSeconds(0.75),
+        m_wrist.setState(WristStates.DROPPING),
+        new WaitCommand(0.15),
+        m_claw.setState(ClawStates.SCORE),
+        new WaitCommand(0.2),
+        m_elevator.setState(ElevatorStates.RETRACT),
+        new WaitCommand(0.5),
+        m_wrist.setState(WristStates.RETRACTED))
         .alongWith(INIT());
   }
 
@@ -140,14 +169,6 @@ public class AutoRoutines {
     return Commands.sequence(
         m_cubeShooter.setState(CubeShooterStates.INTAKE),
         Commands.waitSeconds(2.75),
-        m_cubeShooter.setState(CubeShooterStates.RETRACTED));
-  }
-
-  private final Command SCORE_CUBE(ShooterLevels shooterLevel) {
-    return Commands.sequence(
-        m_cubeShooter.Configure(shooterLevel),
-        m_cubeShooter.setState(CubeShooterStates.SCORE),
-        Commands.waitSeconds(0.5),
         m_cubeShooter.setState(CubeShooterStates.RETRACTED));
   }
 

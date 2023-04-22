@@ -71,6 +71,7 @@ public class LEDs extends SubsystemBase {
     return this.run(() -> setColor(color))
         .finallyDo((i) -> setColor(Color.kBlack))
         .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+        .ignoringDisable(true)
         .withName("Set Static Color");
   }
 

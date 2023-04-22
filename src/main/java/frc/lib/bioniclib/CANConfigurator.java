@@ -75,7 +75,7 @@ public class CANConfigurator<T> {
       }
     };
     erroneousAttempts.forEach((k, v) -> {
-      m_dashboardOutput.accept(k, v.get().toString()); // Report Errors
+      m_dashboardOutput.accept(k, v.get().toString()); // Report Errors //FIXME do not call get() again
       m_retryConfigActions.set(k, v); // Create updated list w/ failed actions
     });
     m_attempt++;
