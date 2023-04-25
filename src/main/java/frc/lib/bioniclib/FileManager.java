@@ -10,7 +10,7 @@ import java.util.Comparator;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import frc.robot.Constants;
+import edu.wpi.first.wpilibj.RobotBase;
 
 public class FileManager {
 
@@ -23,7 +23,7 @@ public class FileManager {
   public void initDataLog() {
     if (m_dataLogsInitialized)
       return;
-    if (Constants.SIM) {
+    if (RobotBase.isSimulation()) {
       Path path = Path.of(kSimLogPath);
       try {
         Files.createDirectories(path);
