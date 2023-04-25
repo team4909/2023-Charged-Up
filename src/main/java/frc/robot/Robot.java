@@ -4,22 +4,15 @@
 
 package frc.robot;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Comparator;
-
 import com.pathplanner.lib.server.PathPlannerServer;
 
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.lib.bioniclib.FileManager;
+import frc.lib.bioniclib.PDH;
 import frc.robot.subsystems.arm.Wrist;
 import frc.robot.subsystems.arm.Wrist.WristStates;
 import frc.robot.subsystems.drivetrain.Drivetrain;
@@ -34,36 +27,14 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
   private PDH m_pdh;
-  private final String kSimLogPath = "./logs-simulation";
-  private final int kMaxOldLogFiles = 10;
 
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    // m_pdh = new PDH();
+    // m_pdh = new PDH(0);
     Drivetrain.getInstance().reseedModules();
+    FileManager.getInstance().initDataLog();
     addPeriodic(m_robotContainer.controlLoop(), 0.01, 0.005);
-    if (Constants.SIM) {
-      Path path = Path.of(kSimLogPath);
-      try {
-        Files.createDirectories(path);
-        // Delete old logs to prevent wasting storage
-        File[] logs = new File(path.toAbsolutePath().toString()).listFiles();
-        if (logs.length > kMaxOldLogFiles) {
-          Arrays.sort(logs, Comparator.comparingLong(File::lastModified).reversed());
-          for (int i = logs.length - 1; i >= kMaxOldLogFiles; i--)
-            Files.delete(logs[i].toPath());
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-      DataLogManager.start(path.toString());
-    } else {
-      DataLogManager.start();
-      System.out.println("DataLog output folder " + Filesystem.getOperatingDirectory().getAbsolutePath()
-          + " has " + Filesystem.getOperatingDirectory().getFreeSpace() / 1024 + " kB of free space.");
-    }
-    DriverStation.startDataLog(DataLogManager.getLog());
     PathPlannerServer.startServer(5811);
   }
 
