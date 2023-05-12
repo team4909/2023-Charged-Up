@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.lib.bioniclib;
 
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -6,12 +6,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class PDH {
 
-  private final int kCanID = 1;
   private final int kChannelCount = 24;
   private PowerDistribution m_pdh;
 
-  public PDH() {
-    m_pdh = new PowerDistribution(kCanID, ModuleType.kRev);
+  public PDH(int canID) {
+    m_pdh = new PowerDistribution(canID, ModuleType.kRev);
   }
 
   public void periodic() {
