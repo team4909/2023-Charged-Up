@@ -160,6 +160,7 @@ public class Wrist extends SubsystemBase {
   private void configureHardware() {
 
     m_wristMotor.restoreFactoryDefaults();
+    m_wristMotor.setSmartCurrentLimit(50, 60);
     m_wristMotor.setInverted(true);
     m_wristMotor.getPIDController().setP(WristConstants.kP);
     m_wristMotor.getPIDController().setD(WristConstants.kD);

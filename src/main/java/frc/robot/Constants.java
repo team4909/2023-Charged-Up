@@ -86,7 +86,7 @@ public final class Constants {
 
     public static final double kP = 6.5;
 
-    public static final double OUTPUT_LIMIT = 0.5;
+    public static final double OUTPUT_LIMIT = 1.0;
   }
 
   public static final class IntakeConstants {

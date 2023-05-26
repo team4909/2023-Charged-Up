@@ -82,7 +82,7 @@ public class RobotContainer {
 		// Drop Game Piece
 		m_driverController.a().onTrue(m_wrist.setState(WristStates.DROPPING)
 				.andThen(new WaitCommand(0.15))
-				.andThen(m_claw.setState(ClawStates.SCORE))
+				.andThen(m_claw.setState(ClawStates.SPITTING))
 				.andThen(new WaitCommand(0.2))
 				.andThen(m_elevator.setState(ElevatorStates.RETRACT))
 				.andThen(new WaitCommand(0.5))
@@ -105,11 +105,11 @@ public class RobotContainer {
 
 		m_operatorController.leftBumper().onTrue(
 				Commands.sequence(
-						m_claw.setState(ClawStates.OPEN),
+						m_claw.setState(ClawStates.SPITTING),
 						m_wrist.setState(WristStates.SUBSTATION)));
 
-		m_operatorController.x().onTrue(m_claw.setState(ClawStates.OPEN));
-		m_operatorController.y().onTrue(m_claw.setState(ClawStates.CLOSED));
+		m_operatorController.x().onTrue(m_claw.setState(ClawStates.SPITTING));
+		m_operatorController.y().onTrue(m_claw.setState(ClawStates.INTAKING));
 
 		m_operatorController.rightTrigger().onTrue(
 				Commands.sequence(

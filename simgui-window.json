@@ -30,9 +30,9 @@
   },
   "Table": {
     "0x542B5671,2": {
-      "Column 0  Width": "337",
-      "Column 1  Width": "578",
-      "RefScale": "16"
+      "Column 0  Width": "301",
+      "Column 1  Width": "470",
+      "RefScale": "13"
     }
   },
   "Window": {
