@@ -58,8 +58,8 @@ public final class Constants {
     public static final double DRIVE_kV = 2.5039 / 12d;
     public static final double DRIVE_kA = 0.99695 / 12d;
 
-    public static final double TURN_kP = 0.75;
-    public static final double TURN_kD = 15;
+    public static final double TURN_kP = 0.35;
+    public static final double TURN_kD = 0;
 
     public static final double X_FOLLOWING_kP = 1.8;
     public static final double Y_FOLLOWING_kP = 1.8;
@@ -108,7 +108,7 @@ public final class Constants {
     public static final double RETRACTED_SETPOINT = 110d;
     public static final double CUBE_SETPOINT = 16d;
     public static final double CONE_SETPOINT = 11d;
-    public static final double HANDOFF_SETPOINT = 73; // 73
+    public static final double HANDOFF_SETPOINT = 83; // 73
     public static final double SPIT_CONE_SETPOINT = 60d;
 
     public static final class SIM {
@@ -122,9 +122,9 @@ public final class Constants {
 
   public static final class WristConstants {
 
-    public static final double kP = 0.008;
-    public static final double kD = 0.0;
-    public static final double kG = 0.85;
+    public static final double kP = 0.005;
+    public static final double kD = 0.0025;
+    public static final double kG = 1.09;
 
     public static final double OUTPUT_LIMIT = 0.25;
     public static final double DEGREE_RANGE = 191d; // from cad
@@ -150,7 +150,7 @@ public final class Constants {
     public static final double DOWN_SETPOINT = 5.0;
     public static final double CUBE_MID = 75;
 
-    public static final double OUTPUT_LIMIT = 1.0;
+    public static final double OUTPUT_LIMIT = 0.4;
     public static final double DEGREE_RANGE = 111.0; // from cad
     public static final double TICK_RANGE = 16.545471; // emperically measured
     public static final double DEGREES_PER_TICK = DEGREE_RANGE / TICK_RANGE;
@@ -166,9 +166,10 @@ public final class Constants {
     public static final int LEFT_MOTOR = 9;
     public static final int RIGHT_MOTOR = 10;
 
-    public static final double kP = 0.04;
+    public static final double kP = 0.03;
+    public static final double kD = 0.003;
     // Gains were recalced
-    public static final double kS = 0.40921;
+    public static final double kS = 0.50921;
     public static final double kG = 0.12654;
     public static final double kV = 1.3374;
     public static final double kA = 0.031771;

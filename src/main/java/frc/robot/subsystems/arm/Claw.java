@@ -38,9 +38,10 @@ public class Claw extends SubsystemBase {
 
     m_clawMotor.restoreFactoryDefaults();
     m_clawMotor.getPIDController().setOutputRange(-ClawConstants.OUTPUT_LIMIT, ClawConstants.OUTPUT_LIMIT);
+    m_clawMotor.getPIDController().setP(1);
     m_clawMotor.setIdleMode(IdleMode.kCoast);
     m_clawMotor.setInverted(false);
-    m_clawMotor.setSmartCurrentLimit(40);
+    m_clawMotor.setSmartCurrentLimit(10);
   }
 
   @Override
@@ -49,6 +50,7 @@ public class Claw extends SubsystemBase {
     SmartDashboard.putString("Claw/State", m_state.toString());
     SmartDashboard.putNumber("Claw/Position", m_clawMotor.getEncoder().getPosition());
     SmartDashboard.putNumber("Claw/Velocity", m_clawMotor.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Claw/Current", m_clawMotor.getOutputCurrent());
   }
 
   private void stateMachine() {
@@ -59,7 +61,7 @@ public class Claw extends SubsystemBase {
           currentClawCommand = Idle();
           break;
         case INTAKING:
-          currentClawCommand = SetSpeed(0.5);
+          currentClawCommand = SetSpeed(1);
           break;
         case SPITTING:
           currentClawCommand = SetSpeed(-0.5);
@@ -84,7 +86,8 @@ public class Claw extends SubsystemBase {
   private Command SetSpeed(double speed) {
     return this.runOnce(() -> {
       SmartDashboard.putNumber("Claw/Setpoint Velocity", speed);
-      m_clawMotor.getPIDController().setReference(speed, ControlType.kVelocity);
+      m_clawMotor.set(speed);
+      // m_clawMotor.getPIDController().setReference(5, ControlType.kVoltage);
     });
   }
 
