@@ -166,6 +166,10 @@ public final class Constants {
     public static final int LEFT_MOTOR = 9;
     public static final int RIGHT_MOTOR = 10;
 
+    public static final double METER_RANGE = Units.inchesToMeters(42); // from cad
+    public static final double TICK_RANGE = 28500d; // emperically measured
+    public static final double METERS_PER_TICK = METER_RANGE / TICK_RANGE;
+
     public static final double kP = 0.03;
     public static final double kD = 0.003;
     // Gains were recalced
@@ -176,16 +180,13 @@ public final class Constants {
     public static final double OUTPUT_LIMIT = 0.25;
     public static final double MOTION_CRUISE_VELOCITY = 4.7; // m/s
     public static final double MOTION_ACCELERATION = 10.1; // m/s^2
-
-    public static final double METER_RANGE = Units.inchesToMeters(42); // from cad
-    public static final double TICK_RANGE = 28500d; // emperically measured
-    public static final double METERS_PER_TICK = METER_RANGE / TICK_RANGE;
+    public static final double CLOSED_LOOP_TOLERANCE = Units.inchesToMeters(1.5) / METERS_PER_TICK;
 
     public static final double BOTTOM_SETPOINT = 0d;
     public static final double MID_CONE_SETPOINT = 13_982d * METERS_PER_TICK;
     public static final double MID_CUBE_SETPOINT = 13_908d * METERS_PER_TICK;
     public static final double TOP_SETPOINT = 1.03;
-    public static final double DOUBLE_SUBSTATION_SETPOINT = 28_500d * METERS_PER_TICK;
+    public static final double DOUBLE_SUBSTATION_SETPOINT = 0.69;
     public static final double SUBSTATION_SETPOINT = 1234 * METERS_PER_TICK;
 
     public static final class SIM {

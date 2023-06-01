@@ -118,7 +118,7 @@ public class Wrist extends SubsystemBase {
           currentWristCommand = SetWristPosition(0);
           break;
         case SUBSTATION:
-          currentWristCommand = SetWristPosition(35);
+          currentWristCommand = SetWristPosition(72);
         default:
           m_state = WristStates.IDLE;
       }

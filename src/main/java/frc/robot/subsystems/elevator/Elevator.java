@@ -132,7 +132,7 @@ public class Elevator extends SubsystemBase {
           currentElevatorCommand = SetSetpoint(ElevatorConstants.SUBSTATION_SETPOINT);
           break;
         case DOUBLE_SUBSTATION:
-          currentElevatorCommand = SetSetpoint(ElevatorConstants.SUBSTATION_SETPOINT);
+          currentElevatorCommand = SetSetpoint(ElevatorConstants.DOUBLE_SUBSTATION_SETPOINT);
         default:
           m_state = ElevatorStates.IDLE;
           break;
@@ -176,6 +176,8 @@ public class Elevator extends SubsystemBase {
     talonManager.actionConsumer.accept(() -> m_leftExtensionMotor
         .configMotionAcceleration(ElevatorConstants.MOTION_ACCELERATION / ElevatorConstants.METERS_PER_TICK / 10));
     talonManager.actionConsumer.accept(() -> m_leftExtensionMotor.configMotionSCurveStrength(7));
+    talonManager.actionConsumer
+        .accept(() -> m_leftExtensionMotor.configAllowableClosedloopError(0, ElevatorConstants.CLOSED_LOOP_TOLERANCE));
     m_leftExtensionMotor.set(TalonFXControlMode.MotionMagic, 0);
     m_leftExtensionMotor.setInverted(false);
     // This stops stale frames in sim
