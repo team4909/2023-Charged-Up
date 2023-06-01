@@ -147,10 +147,10 @@ public final class Constants {
     public static final int BOTTOM_ROLLER_MOTOR = 16;
 
     public static final double RETRACTED_SETPOINT = 104;
-    public static final double DOWN_SETPOINT = 5.0;
+    public static final double DOWN_SETPOINT = 5.0; // 5.0
     public static final double CUBE_MID = 75;
 
-    public static final double OUTPUT_LIMIT = 1.0;
+    public static final double OUTPUT_LIMIT = 0.5;
     public static final double DEGREE_RANGE = 111.0; // from cad
     public static final double TICK_RANGE = 16.545471; // emperically measured
     public static final double DEGREES_PER_TICK = DEGREE_RANGE / TICK_RANGE;

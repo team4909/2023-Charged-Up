@@ -1,0 +1,93 @@
+{
+  "Docking": {
+    "Data": [
+      "DockSpace ID=0x8B93E3BD Window=0xA787BDB4 Pos=0,22 Size=1920,979 CentralNode=1"
+    ]
+  },
+  "MainWindow": {
+    "GLOBAL": {
+      "fps": "120",
+      "height": "1001",
+      "maximized": "1",
+      "style": "0",
+      "userScale": "2",
+      "width": "1920",
+      "xpos": "0",
+      "ypos": "29"
+    }
+  },
+  "Table": {
+    "0x542B5671,2": {
+      "Column 0  Width": "338",
+      "Column 1  Width": "1193",
+      "RefScale": "16"
+    }
+  },
+  "Window": {
+    "###/SmartDashboard/Field": {
+      "Collapsed": "0",
+      "Pos": "688,346",
+      "Size": "1222,532"
+    },
+    "###/SmartDashboard/SendableChooser[0]": {
+      "Collapsed": "0",
+      "Pos": "484,47",
+      "Size": "307,60"
+    },
+    "###/SmartDashboard/SendableChooser[1]": {
+      "Collapsed": "0",
+      "Pos": "486,149",
+      "Size": "307,60"
+    },
+    "###NetworkTables": {
+      "Collapsed": "0",
+      "Pos": "15,313",
+      "Size": "646,664"
+    },
+    "###NetworkTables Settings": {
+      "Collapsed": "0",
+      "Pos": "18,43",
+      "Size": "400,190"
+    },
+    "###Plot <0>": {
+      "Collapsed": "0",
+      "Pos": "-334,224",
+      "Size": "2022,1228"
+    },
+    "###Plot <1>": {
+      "Collapsed": "0",
+      "Pos": "55,180",
+      "Size": "1161,800"
+    },
+    "###Plot <2>": {
+      "Collapsed": "0",
+      "Pos": "577,192",
+      "Size": "2919,1398"
+    },
+    "###Plot <3>": {
+      "Collapsed": "0",
+      "Pos": "60,60",
+      "Size": "2489,910"
+    },
+    "###Plot <4>": {
+      "Collapsed": "0",
+      "Pos": "127,263",
+      "Size": "1180,598"
+    },
+    "###Plot <5>": {
+      "Collapsed": "0",
+      "Pos": "2260,807",
+      "Size": "1304,873"
+    },
+    "Debug##Default": {
+      "Collapsed": "0",
+      "Pos": "60,60",
+      "Size": "400,400"
+    },
+    "DockSpaceViewport_11111111": {
+      "Collapsed": "0",
+      "Pos": "0,22",
+      "Size": "1920,979"
+    }
+  }
+}

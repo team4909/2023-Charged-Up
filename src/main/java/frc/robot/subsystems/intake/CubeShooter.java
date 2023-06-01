@@ -45,7 +45,9 @@ public class CubeShooter extends SubsystemBase {
     RETRACTED("Retracted"),
     SPIT("Spit"),
     SCORE("Score"),
-    CALIBRATE("Calibrate");
+    CALIBRATE("Calibrate"),
+    PASS_IN("Pass In"),
+    PASS_OUT("Pass Out");
 
     String stateName;
 
@@ -121,7 +123,7 @@ public class CubeShooter extends SubsystemBase {
           break;
         case RETRACTED:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.RETRACTED_SETPOINT, 0.0, 0.0,
-              true);
+              true).finallyDo((i) -> this.setState(CubeShooterStates.RETRACTED));
           break;
         case SCORE:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(m_pivotSetpoint, m_frontRollerSetpoint,
@@ -130,6 +132,14 @@ public class CubeShooter extends SubsystemBase {
         case SPIT:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, 0.2, 0.2,
               false);
+          break;
+        case PASS_IN:
+          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.RETRACTED_SETPOINT, -0.5,
+              -0.5, true).finallyDo((i) -> this.setState(CubeShooterStates.RETRACTED));
+          break;
+        case PASS_OUT:
+          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.RETRACTED_SETPOINT, 1.0, 1.0,
+              true);
           break;
         default:
           currentCubeShooterCommand = Idle();
