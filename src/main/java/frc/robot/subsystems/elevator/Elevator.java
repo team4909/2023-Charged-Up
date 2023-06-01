@@ -168,6 +168,7 @@ public class Elevator extends SubsystemBase {
     talonManager.actionConsumer.accept(() -> m_leftExtensionMotor.configFactoryDefault());
     talonManager.actionConsumer.accept(() -> m_leftExtensionMotor.setSelectedSensorPosition(0));
     talonManager.actionConsumer.accept(() -> m_leftExtensionMotor.config_kP(0, ElevatorConstants.kP));
+    talonManager.actionConsumer.accept(() -> m_leftExtensionMotor.config_kD(0, ElevatorConstants.kD));
     talonManager.actionConsumer
         .accept(() -> m_leftExtensionMotor.configClosedLoopPeakOutput(0, ElevatorConstants.OUTPUT_LIMIT));
     talonManager.actionConsumer.accept(() -> m_leftExtensionMotor

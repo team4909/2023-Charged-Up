@@ -115,7 +115,7 @@ public class AutoRoutines {
 
   private final Command INIT() {
     return Commands.sequence(
-        m_claw.setState(ClawStates.CLOSED),
+        m_claw.setState(ClawStates.INTAKING),
         Intake.getInstance().setState(IntakeStates.RETRACTED),
         CubeShooter.getInstance().setState(CubeShooterStates.RETRACTED),
         Commands.waitSeconds(1),
@@ -129,7 +129,7 @@ public class AutoRoutines {
         Commands.waitSeconds(0.75),
         m_wrist.setState(WristStates.DROPPING),
         Commands.waitSeconds(0.5),
-        m_claw.setState(ClawStates.OPEN),
+        m_claw.setState(ClawStates.SPITTING),
         Commands.waitSeconds(0.2),
         m_wrist.setState(WristStates.RETRACTED),
         m_elevator.setState(ElevatorStates.RETRACT))
@@ -150,7 +150,7 @@ public class AutoRoutines {
         Commands.waitSeconds(0.75),
         m_wrist.setState(WristStates.DROPPING),
         new WaitCommand(0.15),
-        m_claw.setState(ClawStates.SCORE),
+        m_claw.setState(ClawStates.SPITTING),
         new WaitCommand(0.2),
         m_elevator.setState(ElevatorStates.RETRACT),
         new WaitCommand(0.5),
@@ -177,10 +177,8 @@ public class AutoRoutines {
         Commands.deadline(
             Commands.sequence(
                 m_intake.setState(IntakeStates.HANDOFF),
-                m_claw.setState(ClawStates.HANDOFF),
+                m_claw.setState(ClawStates.INTAKING),
                 m_wrist.setState(WristStates.HANDOFF_CONE),
-                Commands.waitSeconds(0.5),
-                m_claw.setState(ClawStates.CLOSED),
                 Commands.waitSeconds(0.35)),
             m_leds.SetStaticColor(Color.kFirebrick)).asProxy(),
         m_intake.setState(IntakeStates.SPIT),

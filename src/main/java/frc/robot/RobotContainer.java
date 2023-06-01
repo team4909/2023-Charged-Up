@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.arm.Claw;
@@ -87,13 +86,14 @@ public class RobotContainer {
 				.onFalse(m_drivetrain.setState(DrivetrainStates.IDLE));
 
 		// Drop Game Piece
-		m_driverController.a().onTrue(m_wrist.setState(WristStates.DROPPING)
-				.andThen(new WaitCommand(0.15))
-				.andThen(m_claw.setState(ClawStates.SCORE))
-				.andThen(new WaitCommand(0.2))
-				.andThen(m_elevator.setState(ElevatorStates.RETRACT))
-				.andThen(new WaitCommand(0.5))
-				.andThen(m_wrist.setState(WristStates.RETRACTED)));
+		m_driverController.a().onTrue(
+				m_claw.setState(ClawStates.SPITTING)
+						.andThen(Commands.waitSeconds(0.5))
+						.andThen(m_wrist.setState(WristStates.RETRACTED))
+						.andThen(Commands.waitSeconds(0.5))
+						.andThen(m_elevator.setState(ElevatorStates.RETRACT))
+						.andThen(m_claw.setState(ClawStates.IDLE)));
+
 		// #endregion
 
 		// #region Operator Controls
@@ -112,13 +112,12 @@ public class RobotContainer {
 
 		m_operatorController.leftBumper().onTrue(
 				Commands.sequence(
-						m_claw.setState(ClawStates.OPEN),
+						m_elevator.setState(ClawStates.SPITTING),
 						m_wrist.setState(WristStates.SUBSTATION)));
 
-		m_operatorController.leftTrigger().whileTrue(m_leds.SetStaticColor(Color.kPeru));
-
-		m_operatorController.x().onTrue(m_claw.setState(ClawStates.OPEN));
-		m_operatorController.y().onTrue(m_claw.setState(ClawStates.CLOSED));
+		m_operatorController.x().onTrue(m_claw.setState(ClawStates.SPITTING));
+		m_operatorController.y().onTrue(m_claw.setState(ClawStates.INTAKING));
+		m_operatorController.rightStick().onTrue(m_claw.setState(ClawStates.IDLE));
 
 		m_operatorController.rightTrigger().onTrue(
 				Commands.sequence(

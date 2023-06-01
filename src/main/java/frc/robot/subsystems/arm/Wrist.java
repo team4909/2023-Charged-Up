@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -75,7 +76,7 @@ public class Wrist extends SubsystemBase {
   public void periodic() {
     stateMachine();
     SmartDashboard.putString("Wrist/State", m_state.toString());
-    SmartDashboard.putNumber("Wrist/Encoder Position (Degrees)", getWristEncoderPos());
+    SmartDashboard.putNumber("Wrist/Encoder Position (Degrees)", m_wristMotor.getEncoder().getPosition());
     SmartDashboard.putNumber("Wrist/Motor Output", m_wristMotor.getAppliedOutput());
   }
 
@@ -108,10 +109,10 @@ public class Wrist extends SubsystemBase {
           currentWristCommand = SetWristPosition(-55.175472); // -48.0
           break;
         case HALF_DUNK:
-          currentWristCommand = SetWristPosition(40.0);
+          currentWristCommand = SetWristPosition(70.0);
           break;
         case HALF_DUNK_HIGH:
-          currentWristCommand = SetWristPosition(70.0);
+          currentWristCommand = SetWristPosition(90.0);
           break;
         case DROPPING:
           currentWristCommand = SetWristPosition(0);
@@ -150,7 +151,7 @@ public class Wrist extends SubsystemBase {
 
   private void setWristSetpoint(double setpoint) {
     m_wristMotor.getPIDController().setReference(setpoint, ControlType.kPosition, 0,
-        calcFF(Units.degreesToRadians(m_wristMotor.getEncoder().getPosition())));
+        calcFF(m_wristMotor.getEncoder().getPosition()), ArbFFUnits.kVoltage);
   }
 
   public Command setState(WristStates state) {
@@ -160,22 +161,15 @@ public class Wrist extends SubsystemBase {
   private void configureHardware() {
 
     m_wristMotor.restoreFactoryDefaults();
+    m_wristMotor.setSmartCurrentLimit(50, 60);
     m_wristMotor.setInverted(true);
+    m_wristMotor.getEncoder().setPositionConversionFactor(WristConstants.DEGREES_PER_TICK);
+    m_wristMotor.getEncoder().setPosition(121);
     m_wristMotor.getPIDController().setP(WristConstants.kP);
     m_wristMotor.getPIDController().setD(WristConstants.kD);
-
     m_wristMotor.getPIDController().setOutputRange(-WristConstants.OUTPUT_LIMIT, WristConstants.OUTPUT_LIMIT);
     m_wristMotor.setIdleMode(IdleMode.kBrake);
 
-    m_wristMotor.getPIDController().setSmartMotionAllowedClosedLoopError(200, 0);
-
-    m_wristMotor.getEncoder().setPositionConversionFactor(WristConstants.DEGREES_PER_TICK);
-    m_wristMotor.getEncoder().setPosition(121);
-
-  }
-
-  private double getWristEncoderPos() {
-    return m_wristMotor.getEncoder().getPosition();
   }
 
   private double calcFF(double thetaDegrees) {

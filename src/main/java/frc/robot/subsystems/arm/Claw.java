@@ -4,30 +4,22 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.REVLibError;
-import com.revrobotics.SparkMaxAbsoluteEncoder;
-import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.bioniclib.CANConfigurator;
 import frc.robot.Constants.ClawConstants;
 
 public class Claw extends SubsystemBase {
   private static Claw m_instance;
   private ClawStates m_state, m_lastState;
   private final CANSparkMax m_clawMotor;
-  private final SparkMaxAbsoluteEncoder m_clawEncoder;
 
   public enum ClawStates {
     IDLE("Idle"),
-    CLOSED("Closed"),
-    OPEN("Open"),
-    HANDOFF("Handoff"),
-    SCORE("Score");
+    INTAKING("Intaking"),
+    SPITTING("Spitting");
 
     String stateName;
 
@@ -43,25 +35,22 @@ public class Claw extends SubsystemBase {
   private Claw() {
     m_state = ClawStates.IDLE;
     m_clawMotor = new CANSparkMax(5, MotorType.kBrushless);
-    m_clawEncoder = m_clawMotor.getAbsoluteEncoder(Type.kDutyCycle);
-    CANConfigurator<REVLibError> sparkManager = new CANConfigurator<>("Claw", REVLibError.class);
-    sparkManager.actionConsumer.accept(() -> m_clawMotor.restoreFactoryDefaults());
-    sparkManager.actionConsumer.accept(() -> m_clawMotor.getPIDController().setFeedbackDevice(m_clawEncoder));
-    sparkManager.actionConsumer.accept(() -> m_clawMotor.getPIDController().setP(ClawConstants.kP));
-    sparkManager.actionConsumer.accept(
-        () -> m_clawMotor.getPIDController().setOutputRange(-ClawConstants.OUTPUT_LIMIT, ClawConstants.OUTPUT_LIMIT));
-    sparkManager.actionConsumer.accept(() -> m_clawMotor.setIdleMode(IdleMode.kCoast));
-    sparkManager.actionConsumer.accept(() -> m_clawMotor.setSmartCurrentLimit(15));
-    sparkManager.actionConsumer.accept(() -> m_clawEncoder.setZeroOffset(0.4));
+
+    m_clawMotor.restoreFactoryDefaults();
+    m_clawMotor.getPIDController().setOutputRange(-ClawConstants.OUTPUT_LIMIT, ClawConstants.OUTPUT_LIMIT);
+    m_clawMotor.getPIDController().setP(1);
+    m_clawMotor.setIdleMode(IdleMode.kCoast);
     m_clawMotor.setInverted(false);
-    sparkManager.forceConfig();
+    m_clawMotor.setSmartCurrentLimit(10);
   }
 
   @Override
   public void periodic() {
     stateMachine();
     SmartDashboard.putString("Claw/State", m_state.toString());
-    SmartDashboard.putNumber("Claw/Encoder Position", m_clawEncoder.getPosition());
+    SmartDashboard.putNumber("Claw/Position", m_clawMotor.getEncoder().getPosition());
+    SmartDashboard.putNumber("Claw/Velocity", m_clawMotor.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Claw/Current", m_clawMotor.getOutputCurrent());
   }
 
   private void stateMachine() {
@@ -71,17 +60,11 @@ public class Claw extends SubsystemBase {
         case IDLE:
           currentClawCommand = Idle();
           break;
-        case CLOSED:
-          currentClawCommand = SetClawPos(0);
+        case INTAKING:
+          currentClawCommand = SetSpeed(1);
           break;
-        case OPEN:
-          currentClawCommand = SetClawPos(0.15);
-          break;
-        case HANDOFF:
-          currentClawCommand = SetClawPos(0.2);
-          break;
-        case SCORE:
-          currentClawCommand = SetClawPos(0.13);
+        case SPITTING:
+          currentClawCommand = SetSpeed(-0.5);
           break;
         default:
           m_state = ClawStates.IDLE;
@@ -100,11 +83,12 @@ public class Claw extends SubsystemBase {
     return Commands.runOnce(() -> m_clawMotor.set(0.0), this);
   }
 
-  private Command SetClawPos(double setpoint) {
-    return new InstantCommand(() -> {
-      SmartDashboard.putNumber("Claw/Setpoint", setpoint);
-      m_clawMotor.getPIDController().setReference(setpoint, ControlType.kPosition);
-    }, this);
+  private Command SetSpeed(double speed) {
+    return this.runOnce(() -> {
+      SmartDashboard.putNumber("Claw/Setpoint Velocity", speed);
+      m_clawMotor.set(speed);
+      // m_clawMotor.getPIDController().setReference(5, ControlType.kVoltage);
+    });
   }
 
   public Command setState(ClawStates state) {
