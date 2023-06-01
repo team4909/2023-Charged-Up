@@ -113,8 +113,8 @@ public class RobotContainer {
 		m_operatorController.leftBumper().onTrue(
 				Commands.sequence(
 						m_elevator.setState(ElevatorStates.DOUBLE_SUBSTATION),
-						m_wrist.setState(WristStates.SUBSTATION))),
-						m_claw.setState(ClawStates.Intaking);
+						m_wrist.setState(WristStates.SUBSTATION),
+						m_claw.setState(ClawStates.INTAKING)));
 
 		m_operatorController.x().onTrue(m_claw.setState(ClawStates.SPITTING));
 		m_operatorController.y().onTrue(m_claw.setState(ClawStates.INTAKING));
