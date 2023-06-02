@@ -3,12 +3,11 @@ package frc.robot.subsystems.intake;
 import java.util.function.DoubleSupplier;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.REVLibError;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.REVLibError;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -45,9 +44,7 @@ public class CubeShooter extends SubsystemBase {
     RETRACTED("Retracted"),
     SPIT("Spit"),
     SCORE("Score"),
-    CALIBRATE("Calibrate"),
-    PASS_IN("Pass In"),
-    PASS_OUT("Pass Out");
+    CALIBRATE("Calibrate");
 
     String stateName;
 
@@ -88,14 +85,6 @@ public class CubeShooter extends SubsystemBase {
     topRollerOutputCurrent = () -> m_topRoller.getOutputCurrent();
   }
 
-  Timer cubeStallTimer = new Timer();
-  final double kTriggerTime = 0.15;
-  private boolean m_hasCube = false;
-
-  public boolean hasCube() {
-    return m_hasCube;
-  }
-
   @Override
   public void periodic() {
     stateMachine();
@@ -123,7 +112,7 @@ public class CubeShooter extends SubsystemBase {
           break;
         case RETRACTED:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.RETRACTED_SETPOINT, 0.0, 0.0,
-              true).finallyDo((i) -> this.setState(CubeShooterStates.RETRACTED));
+              true);
           break;
         case SCORE:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(m_pivotSetpoint, m_frontRollerSetpoint,
@@ -132,14 +121,6 @@ public class CubeShooter extends SubsystemBase {
         case SPIT:
           currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.DOWN_SETPOINT, 0.2, 0.2,
               false);
-          break;
-        case PASS_IN:
-          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.RETRACTED_SETPOINT, -0.5,
-              -0.5, true).finallyDo((i) -> this.setState(CubeShooterStates.RETRACTED));
-          break;
-        case PASS_OUT:
-          currentCubeShooterCommand = SetPivotPositionAndRollerSpeed(CubeShooterConstants.RETRACTED_SETPOINT, 1.0, 1.0,
-              true);
           break;
         default:
           currentCubeShooterCommand = Idle();
