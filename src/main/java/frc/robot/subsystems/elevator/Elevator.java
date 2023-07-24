@@ -1,46 +1,47 @@
 package frc.robot.subsystems.elevator;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-
+import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.WristConstants.ElevatorConstants;
-
+import frc.lib.bioniclib.CANConfigurator;
+import frc.robot.Constants;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.SimVisualizer;
 
 public class Elevator extends SubsystemBase {
 
   private static Elevator m_instance = null;
   private ElevatorStates m_state, m_lastState;
+  private final WPI_TalonFX m_leftExtensionMotor;
+  private final WPI_TalonFX m_rightExtensionMotor;
+  private final TalonFXSimCollection m_extensionMotorSim;
+  private final ElevatorSim m_elevatorSim;
+  private final ElevatorFeedforward m_elevatorFF;
 
-  private final TalonFX m_leftExtensionMotor;
-  private final TalonFX m_rightExtensionMotor;
-
-  private Timer m_motionProfileTimer;
-
-  public static final TrapezoidProfile.Constraints m_elevatorTrapezoidalConstraints = new TrapezoidProfile.Constraints(
-      3000.0 / 60.0, 6000.0 / 60.0);
-
-  private static final ElevatorFeedforward m_elevatorFF = new ElevatorFeedforward(
-      0.40921, 0.12654, 1.3374, 0.031771);
-
-  // final double sensorUnitsToMetersSecondsCoeff = (1d / 2048d) * (0.0889 / 1d) *
-  // (100d / 0.1) * (60d / 1d);
+  private double m_feedForwardVolts = 0d;
 
   public enum ElevatorStates {
     IDLE("Idle"),
     TOP("Top Node Extension"),
     MID_CUBE("Mid Cube"),
     MID_CONE("Mid Cone"),
-    RETRACT("Retracted");
+    RETRACT("Retracted"),
+    SUBSTATION("Substation"),
+    DOUBLE_SUBSTATION("Double Substation");
 
     String stateName;
 
@@ -54,19 +55,58 @@ public class Elevator extends SubsystemBase {
   }
 
   private Elevator() {
-    // TODO change this to CAN FD BUS constant
-    m_leftExtensionMotor = new TalonFX(ElevatorConstants.LEFT_MOTOR, "CANivore1");
-    m_rightExtensionMotor = new TalonFX(ElevatorConstants.RIGHT_MOTOR, "CANivore1");
+    m_leftExtensionMotor = new WPI_TalonFX(ElevatorConstants.LEFT_MOTOR, Constants.CANFD_BUS);
+    m_rightExtensionMotor = new WPI_TalonFX(ElevatorConstants.RIGHT_MOTOR, Constants.CANFD_BUS);
     configHardware();
-    m_rightExtensionMotor.setInverted(true);
+    m_elevatorFF = new ElevatorFeedforward(
+        ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
+
     m_state = ElevatorStates.IDLE;
+
+    if (Constants.SIM) {
+      m_extensionMotorSim = m_leftExtensionMotor.getSimCollection();
+      m_elevatorSim = new ElevatorSim(
+          DCMotor.getFalcon500(2),
+          ElevatorConstants.SIM.GEARING,
+          ElevatorConstants.SIM.CARRIAGE_MASS,
+          ElevatorConstants.SIM.DRUM_RADIUS,
+          0,
+          ElevatorConstants.METER_RANGE,
+          false);
+    } else {
+      m_extensionMotorSim = null;
+      m_elevatorSim = null;
+    }
   }
 
   @Override
   public void periodic() {
     stateMachine();
-    SmartDashboard.putNumber("elevatorError", m_leftExtensionMotor.getClosedLoopError());
-    SmartDashboard.putNumber("elevatorEncoder", m_leftExtensionMotor.getSelectedSensorPosition());
+    SmartDashboard.putNumber("Elevator/Closed Loop Error",
+        m_leftExtensionMotor.getClosedLoopError() * ElevatorConstants.METERS_PER_TICK);
+    SmartDashboard.putNumber("Elevator/Velocity",
+        m_leftExtensionMotor.getSelectedSensorVelocity() * ElevatorConstants.METERS_PER_TICK);
+    SmartDashboard.putNumber("Elevator/Position Meters",
+        m_leftExtensionMotor.getSelectedSensorPosition() * ElevatorConstants.METERS_PER_TICK);
+    SmartDashboard.putString("Elevator/State", m_state.toString());
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    m_extensionMotorSim.setBusVoltage(RobotController.getBatteryVoltage());
+    double input = m_extensionMotorSim.getMotorOutputLeadVoltage();
+    m_elevatorSim.setInput(input);
+    m_elevatorSim.update(Constants.PERIODIC_LOOP_DURATION);
+    int sensorPosition = (int) (m_elevatorSim.getPositionMeters() / ElevatorConstants.METERS_PER_TICK);
+    m_extensionMotorSim.setIntegratedSensorRawPosition(sensorPosition);
+    int sensorVelocity = (int) (m_elevatorSim.getVelocityMetersPerSecond() / 10 / ElevatorConstants.METERS_PER_TICK);
+    m_extensionMotorSim.setIntegratedSensorVelocity(sensorVelocity);
+
+    SmartDashboard.putNumber("Elevator/Sim Meters", m_elevatorSim.getPositionMeters());
+    SmartDashboard.putNumber("Elevator/Sim Input", input);
+    SmartDashboard.putNumber("Elevator/Sim I", m_elevatorSim.getCurrentDrawAmps());
+    SmartDashboard.putNumber("Elevator/Sim v", m_elevatorSim.getVelocityMetersPerSecond());
+    SimVisualizer.getInstance().elevatorExtension.accept(m_elevatorSim.getPositionMeters());
   }
 
   private void stateMachine() {
@@ -87,8 +127,15 @@ public class Elevator extends SubsystemBase {
           break;
         case RETRACT:
           currentElevatorCommand = SetSetpoint(ElevatorConstants.BOTTOM_SETPOINT);
+          break;
+        case SUBSTATION:
+          currentElevatorCommand = SetSetpoint(ElevatorConstants.SUBSTATION_SETPOINT);
+          break;
+        case DOUBLE_SUBSTATION:
+          currentElevatorCommand = SetSetpoint(ElevatorConstants.DOUBLE_SUBSTATION_SETPOINT);
         default:
           m_state = ElevatorStates.IDLE;
+          break;
       }
     }
 
@@ -103,63 +150,53 @@ public class Elevator extends SubsystemBase {
     return new InstantCommand(() -> m_leftExtensionMotor.set(TalonFXControlMode.PercentOutput, 0), this);
   }
 
-  private Command SetProfiledSetpoint() {
-    TrapezoidProfile.State targetState, beginLState, beginRState;
-    TrapezoidProfile profileL, profileR;
-    targetState = new TrapezoidProfile.State(ElevatorConstants.BOTTOM_SETPOINT, 0.0);
-
-    beginLState = new TrapezoidProfile.State(m_leftExtensionMotor.getSelectedSensorPosition(), 0.0);
-    beginRState = new TrapezoidProfile.State(m_rightExtensionMotor.getSelectedSensorPosition(), 0.0);
-
-    profileL = new TrapezoidProfile(m_elevatorTrapezoidalConstraints, targetState, beginLState);
-    profileR = new TrapezoidProfile(m_elevatorTrapezoidalConstraints, targetState, beginRState);
-    m_motionProfileTimer = new Timer();
-
-    m_motionProfileTimer.reset();
-    m_motionProfileTimer.start();
+  private Command SetSetpoint(double setpointMeters) {
+    SmartDashboard.putNumber("Elevator/Position Setpoint", setpointMeters);
     return new RunCommand(() -> {
-      double dt = m_motionProfileTimer.get();
-
-      TrapezoidProfile.State currentLState = profileL.calculate(dt);
-      double leftFF = m_elevatorFF.calculate(currentLState.velocity);
-      TrapezoidProfile.State currentRState = profileR.calculate(dt);
-      double rightFF = m_elevatorFF.calculate(currentRState.velocity);
-
-      m_leftExtensionMotor.set(
-          TalonFXControlMode.Position, currentLState.position, DemandType.ArbitraryFeedForward, leftFF);
-      m_rightExtensionMotor.set(
-          TalonFXControlMode.Position, currentRState.position, DemandType.ArbitraryFeedForward, rightFF);
-    }, this);
-  }
-
-  private Command SetSetpoint(double setpoint) {
-    return new RunCommand(() -> {
-      m_leftExtensionMotor.set(TalonFXControlMode.Position, setpoint);
-    }, this);
-  }
-
-  private Command SetProfiledSetpoint(double setpoint) {
-    return new RunCommand(() -> {
-      m_leftExtensionMotor.set(TalonFXControlMode.MotionMagic, setpoint);
-      m_rightExtensionMotor.set(TalonFXControlMode.MotionMagic, setpoint);
+      m_leftExtensionMotor.set(TalonFXControlMode.MotionMagic, setpointMeters / ElevatorConstants.METERS_PER_TICK,
+          DemandType.ArbitraryFeedForward, m_feedForwardVolts / Constants.NOMINAL_VOLTAGE); // Converting ff to percent
+      double elevatordesiredVelMPS = m_leftExtensionMotor.getActiveTrajectoryVelocity() * 10
+          * ElevatorConstants.METERS_PER_TICK;
+      m_feedForwardVolts = m_elevatorFF.calculate(elevatordesiredVelMPS);
+      SmartDashboard.putNumber("Elevator/Motion Magic Velocity", elevatordesiredVelMPS);
+      SmartDashboard.putNumber("Elevator/Feed Forward V", m_feedForwardVolts);
     }, this);
   }
 
   private void configHardware() {
-    m_leftExtensionMotor.configFactoryDefault();
-    m_leftExtensionMotor.setSelectedSensorPosition(0);
-    m_leftExtensionMotor.config_kP(0, ElevatorConstants.ELEVATOR_KP);
-    m_leftExtensionMotor.config_kD(0, ElevatorConstants.ELEVATOR_KD);
-    m_leftExtensionMotor.configClosedLoopPeakOutput(0, ElevatorConstants.PEAK_OUTPUT);
+    CANConfigurator<ErrorCode> talonManager = new CANConfigurator<>("Elevator", ErrorCode.class);
+    talonManager.actionConsumer.accept(() -> m_leftExtensionMotor.configFactoryDefault());
+    talonManager.actionConsumer.accept(() -> m_leftExtensionMotor.setSelectedSensorPosition(0));
+    talonManager.actionConsumer.accept(() -> m_leftExtensionMotor.config_kP(0, ElevatorConstants.kP));
+    talonManager.actionConsumer.accept(() -> m_leftExtensionMotor.config_kD(0, ElevatorConstants.kD));
+    talonManager.actionConsumer
+        .accept(() -> m_leftExtensionMotor.configClosedLoopPeakOutput(0, ElevatorConstants.OUTPUT_LIMIT));
+    talonManager.actionConsumer.accept(() -> m_leftExtensionMotor
+        .configMotionCruiseVelocity(ElevatorConstants.MOTION_CRUISE_VELOCITY / ElevatorConstants.METERS_PER_TICK / 10));
+    talonManager.actionConsumer.accept(() -> m_leftExtensionMotor
+        .configMotionAcceleration(ElevatorConstants.MOTION_ACCELERATION / ElevatorConstants.METERS_PER_TICK / 10));
+    talonManager.actionConsumer.accept(() -> m_leftExtensionMotor.configMotionSCurveStrength(7));
+    talonManager.actionConsumer
+        .accept(() -> m_leftExtensionMotor.configAllowableClosedloopError(0, ElevatorConstants.CLOSED_LOOP_TOLERANCE));
+    m_leftExtensionMotor.set(TalonFXControlMode.MotionMagic, 0);
     m_leftExtensionMotor.setInverted(false);
-
-    m_rightExtensionMotor.configFactoryDefault();
+    // This stops stale frames in sim
+    if (Constants.SIM) {
+      m_leftExtensionMotor.setStatusFramePeriod(StatusFrame.Status_13_Base_PIDF0, 10);
+      m_leftExtensionMotor.setStatusFramePeriod(StatusFrame.Status_10_Targets, 50);
+    }
+    talonManager.actionConsumer.accept(() -> m_rightExtensionMotor.configFactoryDefault());
     m_rightExtensionMotor.setInverted(TalonFXInvertType.OpposeMaster);
     m_rightExtensionMotor.follow(m_leftExtensionMotor);
+    talonManager.forceConfig();
   }
 
-  public void setState(ElevatorStates state) {
-    m_state = state;
+  public Command setState(ElevatorStates state) {
+    return Commands.runOnce(() -> m_state = state);
+  }
+
+  public ElevatorStates getState() {
+    return m_state;
   }
 
   public static Elevator getInstance() {

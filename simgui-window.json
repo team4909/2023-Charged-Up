@@ -1,0 +1,153 @@
+{
+  "Docking": {
+    "Data": [
+      "DockNode    ID=0x00000002 Pos=160,21 Size=1342,266 Split=X Selected=0x2D9B9756",
+      "DockNode  ID=0x00000003 Parent=0x00000002 SizeRef=456,555 Selected=0x2D9B9756",
+      "DockNode  ID=0x00000001 Parent=0x00000002 SizeRef=453,555 Selected=0xB804B83F",
+      "DockNode    ID=0x00000004 Pos=502,786 Size=937,205 Split=X",
+      "DockNode  ID=0x00000005 Parent=0x00000004 SizeRef=191,73 Selected=0x6AE6D891",
+      "DockNode  ID=0x00000006 Parent=0x00000004 SizeRef=603,73 Selected=0x138219D4",
+      "DockNode    ID=0x00000007 Pos=1511,23 Size=392,64 Split=X",
+      "DockNode  ID=0x0000000C Parent=0x00000007 SizeRef=127,54 Selected=0x82CCC910",
+      "DockNode  ID=0x0000000D Parent=0x00000007 SizeRef=125,54 Selected=0x49901AB5",
+      "DockNode    ID=0x00000008 Pos=373,290 Size=1100,472 Split=X",
+      "DockNode  ID=0x00000009 Parent=0x00000008 SizeRef=423,832 Selected=0x63F8E93F",
+      "DockNode  ID=0x0000000B Parent=0x00000008 SizeRef=780,832 Selected=0xB5CBE9F0",
+      "DockNode    ID=0x0000000A Pos=3,353 Size=324,257 Selected=0xC8493FD8"
+    ]
+  },
+  "MainWindow": {
+    "GLOBAL": {
+      "fps": "120",
+      "height": "1001",
+      "maximized": "1",
+      "style": "1",
+      "userScale": "2",
+      "width": "1920",
+      "xpos": "-1920",
+      "ypos": "23"
+    }
+  },
+  "Table": {
+    "0x542B5671,2": {
+      "Column 0  Width": "301",
+      "Column 1  Width": "470",
+      "RefScale": "13"
+    }
+  },
+  "Window": {
+    "###/SmartDashboard/Field": {
+      "Collapsed": "0",
+      "DockId": "0x0000000B,0",
+      "Pos": "761,290",
+      "Size": "712,472"
+    },
+    "###/SmartDashboard/Mech2d": {
+      "Collapsed": "0",
+      "Pos": "88,574",
+      "Size": "408,326"
+    },
+    "###/SmartDashboard/Robot Mechanism Simulation": {
+      "Collapsed": "0",
+      "DockId": "0x00000009,0",
+      "Pos": "373,290",
+      "Size": "386,472"
+    },
+    "###/SmartDashboard/SendableChooser[0]": {
+      "Collapsed": "0",
+      "DockId": "0x0000000C,0",
+      "Pos": "1511,23",
+      "Size": "197,64"
+    },
+    "###/SmartDashboard/SendableChooser[1]": {
+      "Collapsed": "0",
+      "DockId": "0x0000000D,0",
+      "Pos": "1710,23",
+      "Size": "193,64"
+    },
+    "###Addressable LEDs": {
+      "Collapsed": "0",
+      "Pos": "61,607",
+      "Size": "163,54"
+    },
+    "###FMS": {
+      "Collapsed": "0",
+      "DockId": "0x0000000A,0",
+      "Pos": "3,353",
+      "Size": "336,164"
+    },
+    "###Joysticks": {
+      "Collapsed": "0",
+      "DockId": "0x00000006,0",
+      "Pos": "729,786",
+      "Size": "710,205"
+    },
+    "###NetworkTables": {
+      "Collapsed": "0",
+      "DockId": "0x00000003,0",
+      "Pos": "160,21",
+      "Size": "672,266"
+    },
+    "###Other Devices": {
+      "Collapsed": "0",
+      "Pos": "1509,94",
+      "Size": "389,861"
+    },
+    "###PWM Outputs": {
+      "Collapsed": "0",
+      "Pos": "60,507",
+      "Size": "110,54"
+    },
+    "###Plot <0>": {
+      "Collapsed": "0",
+      "DockId": "0x00000001,0",
+      "Pos": "834,21",
+      "Size": "668,266"
+    },
+    "###Plot <1>": {
+      "Collapsed": "0",
+      "DockId": "0x00000001,1",
+      "Pos": "834,21",
+      "Size": "668,266"
+    },
+    "###Plot <2>": {
+      "Collapsed": "0",
+      "DockId": "0x00000001,2",
+      "Pos": "834,21",
+      "Size": "668,266"
+    },
+    "###Plot <3>": {
+      "Collapsed": "0",
+      "DockId": "0x00000001,3",
+      "Pos": "834,21",
+      "Size": "668,266"
+    },
+    "###RoboRIO": {
+      "Collapsed": "0",
+      "Pos": "357,364",
+      "Size": "193,468"
+    },
+    "###System Joysticks": {
+      "Collapsed": "0",
+      "DockId": "0x00000005,0",
+      "Pos": "502,786",
+      "Size": "225,205"
+    },
+    "###Timing": {
+      "Collapsed": "0",
+      "DockId": "0x0000000A,1",
+      "Pos": "3,353",
+      "Size": "162,142"
+    },
+    "Debug##Default": {
+      "Collapsed": "0",
+      "Pos": "60,60",
+      "Size": "400,400"
+    },
+    "Robot State": {
+      "Collapsed": "0",
+      "Pos": "11,28",
+      "Size": "109,114"
+    }
+  }
+}

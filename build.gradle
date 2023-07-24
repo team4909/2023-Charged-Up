@@ -1,12 +1,13 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2023.1.1"
+    id "edu.wpi.first.GradleRIO" version "2023.4.3"
 }
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
+def ENABLE_VISUAL_VM_DEBUGGING = true
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project DeployUtils.
@@ -25,6 +26,15 @@ deploy {
                 // getTargetTypeClass is a shortcut to get the class type using a string
 
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
+                    // Enable VisualVM Connection
+                    if (ENABLE_VISUAL_VM_DEBUGGING) {
+                        jvmArgs.add("-Dcom.sun.management.jmxremote=true")
+                        jvmArgs.add("-Dcom.sun.management.jmxremote.port=1198")
+                        jvmArgs.add("-Dcom.sun.management.jmxremote.local.only=false")
+                        jvmArgs.add("-Dcom.sun.management.jmxremote.ssl=false")
+                        jvmArgs.add("-Dcom.sun.management.jmxremote.authenticate=false")
+                        jvmArgs.add("-Djava.rmi.server.hostname=10.49.9.2")
+                    }
                 }
 
                 // Static files artifact
